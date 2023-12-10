@@ -13,7 +13,7 @@ using System.Collections.Immutable;
 using PvZA11y.Widgets;
 
 /*
-[PVZ-A11y 1.0]
+[PVZ-A11y Beta 1.0]
 
 Blind and motor accessibility mod for Plants Vs Zombies.
 Allows input with rebindable keys and controller buttons, rather than requiring a mouse for input.

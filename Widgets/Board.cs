@@ -877,9 +877,9 @@ namespace PvZA11y.Widgets
                 //For debugging purposes, info4 will instantly finish the level
 
                 //memIO.SetPlayerCoinCount(1000);
+                //Program.Debug_FinishLevel();
+                //return;
 
-                Program.Debug_FinishLevel();
-                return;
                 //GetZombossHealth
                 bool zomBossMinigame = memIO.GetGameMode() == (int)GameMode.DrZombossRevenge;
 
