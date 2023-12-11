@@ -11,9 +11,10 @@ using NAudio.Wave.SampleProviders;
 using System.Windows.Forms;
 using System.Collections.Immutable;
 using PvZA11y.Widgets;
+using System.Drawing;
 
 /*
-[PVZ-A11y Beta 1.1]
+[PVZ-A11y Beta 1.2]
 
 Blind and motor accessibility mod for Plants Vs Zombies.
 Allows input with rebindable keys and controller buttons, rather than requiring a mouse for input.
@@ -125,6 +126,9 @@ namespace PvZA11y
             private static extern short GetKeyState(int key);
         }
 
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool ClientToScreen(IntPtr hWnd, ref Point lpPoint);
 
 
         [DllImport("user32.dll")]
@@ -449,14 +453,14 @@ namespace PvZA11y
                 int cursorY = rect.Top + clickY;
                 Cursor.Position = new System.Drawing.Point(cursorX, cursorY);
 
-                //Move mouse before processing click
+            //Move mouse before processing click
                 PostMessage(gameWHnd, 0x0200, 1, MakeLParam(clickX, clickY));
 
                 Task.Delay(delayTime).Wait();
             }
 
             PostMessage(gameWHnd, clickDown, 1, MakeLParam(clickX, clickY));
-            
+
             Task.Delay(delayTime).Wait();
 
             PostMessage(gameWHnd, clickUp, 0, MakeLParam(clickX, clickY));
@@ -1102,8 +1106,12 @@ namespace PvZA11y
                 return currentWidget;
             }
 
-
-            
+            if(dialogID == DialogIDs.ZombatarLicense)
+            {
+                if (currentWidget is not ZombatarLicenseAgreement)
+                    return new ZombatarLicenseAgreement(memIO, ptrChain);
+                return currentWidget;
+            }
 
 
             //Gotta handle crazy dave first, because he can appear during the other widgets :/
@@ -1118,7 +1126,7 @@ namespace PvZA11y
                 if(currentWidget is not ContinueGame)
                     return new Widgets.ContinueGame(memIO, ptrChain);
             }
-            else if(vtableID == memIO.ptr.widgetType.UserName)
+            else if(vtableID == memIO.ptr.widgetType.UserName || dialogID == DialogIDs.CreateUser)
             {
                 if (currentWidget is not UserName)
                     return new UserName(memIO, ptrChain, dialogID == DialogIDs.CreateUser);
@@ -1560,7 +1568,15 @@ namespace PvZA11y
 
             drawStartX = (windowWidth - drawWidth) / 2; //After first black bar, if there are any.
 
-            gameWHnd = Process.GetProcessById(gameProc.Id).MainWindowHandle; //Ensure we have the main handle (changes when entering/exiting fullscreen)
+            try
+            {
+                gameWHnd = Process.GetProcessById(gameProc.Id).MainWindowHandle; //Ensure we have the main handle (changes when entering/exiting fullscreen)
+            }
+            catch
+            {
+                gameProc = HookProcess();
+                gameWHnd = gameProc.MainWindowHandle;
+            }
 
 
 
@@ -1595,7 +1611,18 @@ namespace PvZA11y
                 drawWidth = memIO.GetDrawWidth();
                 drawHeight = memIO.GetDrawHeight();
                 drawStartX = (windowWidth - drawWidth) / 2; //After first black bar, if there are any.
-                gameWHnd = Process.GetProcessById(gameProc.Id).MainWindowHandle; //Ensure we have the main handle (changes when entering/exiting fullscreen)
+
+
+
+                try
+                {
+                    gameWHnd = Process.GetProcessById(gameProc.Id).MainWindowHandle; //Ensure we have the main handle (changes when entering/exiting fullscreen)
+                }
+                catch
+                {
+                    gameProc = HookProcess();
+                    gameWHnd = gameProc.MainWindowHandle;
+                }
 
 
                 GameScene gameScene = (GameScene)memIO.GetGameScene();

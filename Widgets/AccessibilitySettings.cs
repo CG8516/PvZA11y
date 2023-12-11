@@ -411,6 +411,55 @@ namespace PvZA11y.Widgets
             }
         }
 
+        void SetControllerInputForAction(RequiredInput reqInput)
+        {
+            while (true)
+            {
+                string instruction = reqInput.intent.ToString();
+                instruction += "\r\n" + reqInput.description;
+                Console.WriteLine(instruction);
+                Program.Say(instruction);
+                GamepadButtons pressedButton = Program.input.GetButton();
+
+                //If user pressed escape while grabbing controller button, cancel this
+                if (pressedButton == GamepadButtons.None)
+                    return;
+
+                string result = "Press the same controller button again to confirm your selection, or press something else to change it";
+                Console.WriteLine(result);
+                Program.Say(result);
+                if (pressedButton == Program.input.GetButton())
+                {
+                    Program.PlayTone(1, 1, 300, 300, 50, SignalGeneratorType.Sin, 0);
+                    Program.PlayTone(1, 1, 350, 350, 50, SignalGeneratorType.Sin, 50);
+                    if(Config.current.controllerBinds.ContainsValue(reqInput.intent))
+                    {
+                        Console.WriteLine("Input already added");
+                        GamepadButtons origButton = Config.current.controllerBinds.FirstOrDefault(x => x.Value == reqInput.intent).Key;
+                        Console.WriteLine("Original button: " + origButton.ToString());
+                        Config.current.controllerBinds.Remove(origButton);
+                    }
+                    if(Config.current.controllerBinds.ContainsKey(pressedButton))
+                    {
+                        string warningStr = "Specified input is already bound to: " + Config.current.controllerBinds[pressedButton].ToString();
+                        warningStr += "\r\n" + Config.current.controllerBinds[pressedButton].ToString() + " action Is now unbound!";
+                        Config.current.controllerBinds.Remove(pressedButton);
+                        Console.WriteLine(warningStr);
+                        Program.Say(warningStr);
+                    }
+                    Config.current.controllerBinds.Add(pressedButton, reqInput.intent);
+                    Program.input.UpdateControllerBinds(Config.current.controllerBinds);
+                    return;
+                }
+                else
+                {
+                    Program.PlayTone(1, 1, 300, 300, 50, SignalGeneratorType.Sin, 0);
+                    Program.PlayTone(1, 1, 250, 250, 50, SignalGeneratorType.Sin, 50);
+                    continue;
+                }
+            }
+        }
+
         uint GetKyboardInputForAction(RequiredInput reqInput)
         {
             while (true)
@@ -571,12 +620,33 @@ namespace PvZA11y.Widgets
             Program.input.UpdateControllerBinds(controllerBinds);
         }
 
+        //Really gross that we need this
+        //TODO: Remove this
+        void DummyLeftRightAction(InputIntent intent){}
 
-
-        public AccessibilitySettings(MemoryIO memIO) : base(memIO, "")
+        void InputRebindMenu(bool isController = false)
         {
-            GetAvailableScreenreaders();
+            options.Clear();
+            optionIndex = 0;
+            hasReadContent = false;
 
+            foreach(var reqInput in requiredInputs)
+            {
+                if (isController)
+                    options.Add(new Option() { name = reqInput.intent.ToString(), description = reqInput.description, confirmAction = () => SetControllerInputForAction(reqInput), leftRightAction = DummyLeftRightAction });
+                else
+                    options.Add(new Option() { name = reqInput.intent.ToString(), description = reqInput.description, confirmAction = () => GetKyboardInputForAction(reqInput), leftRightAction = DummyLeftRightAction });
+            }
+
+            //options.Add(new Option() { name = "Up Direction", description = "Button used to move up in menus and on grids"})
+        }
+
+        void MainAccessibilityMenu()
+        {
+            options.Clear();
+            optionIndex = 0;
+            hasReadContent = false;
+            
             //TODO: This could probably be done a lot nicer
             //Input
             options.Add(new Option() { name = "Menu cursor wrapping", description = "Jump to the opposite end of menus when passing the first or last item", confirmAction = () => ToggleBool(ref Config.current.WrapCursorInMenus), valueGrabber = () => GetBoolOptionValue(Config.current.WrapCursorInMenus) });
@@ -585,23 +655,30 @@ namespace PvZA11y.Widgets
             options.Add(new Option() { name = "Key repetition", description = "Repeat directional inputs when held", confirmAction = () => ToggleBool(ref Config.current.KeyRepetition), valueGrabber = () => GetBoolOptionValue(Config.current.KeyRepetition) });
             options.Add(new Option() { name = "Rebind all keyboard inputs", description = "Allows you to rebind all keyboard controls.", confirmAction = RebindKeyboard });
             options.Add(new Option() { name = "Rebind all controller buttons", description = "Allows you to rebind all controller buttons.", confirmAction = RebindController });
+            //options.Add(new Option() { name = "Rebind all controller buttons", description = "Allows you to rebind all controller buttons.", confirmAction = () => InputRebindMenu(true) });
 
             //Gameplay
             options.Add(new Option() { name = "Shovel Confirmation", description = "Require the shovel button to be pressed twice, to avoid accidental shoveling", confirmAction = () => ToggleBool(ref Config.current.RequireShovelConfirmation), valueGrabber = () => GetBoolOptionValue(Config.current.RequireShovelConfirmation) });
             options.Add(new Option() { name = "Automatic sun collection", description = "Highly recommended until sun collection has been made accessible. Automatically clicks sun, coins, and end-level rewards.", confirmAction = () => ToggleBool(ref Config.current.AutoCollectItems), valueGrabber = () => GetBoolOptionValue(Config.current.AutoCollectItems) });
             options.Add(new Option() { name = "Say board position", description = "Automatically say the current board position when the cursor is moved", confirmAction = () => ToggleBool(ref Config.current.SayTilePosOnMove), valueGrabber = () => GetBoolOptionValue(Config.current.SayTilePosOnMove) });
             options.Add(new Option() { name = "Gameplay Tutorial", description = "Highly recommended on first playthroughs. Provides helpful gameplay advice at specific points in adventure mode.", confirmAction = () => ToggleBool(ref Config.current.GameplayTutorial), valueGrabber = () => GetBoolOptionValue(Config.current.GameplayTutorial) });
-            
+
             //Core
             options.Add(new Option() { name = "Restart on crash", description = "Automatically attempt to restart the mod if it crashes", confirmAction = () => ToggleBool(ref Config.current.RestartOnCrash), valueGrabber = () => GetBoolOptionValue(Config.current.RestartOnCrash) });
             options.Add(new Option() { name = "Move mouse cursor", description = "Move the mouse cursor to visually indicate where clicks will be performed", confirmAction = () => ToggleBool(ref Config.current.MoveMouseCursor), valueGrabber = () => GetBoolOptionValue(Config.current.MoveMouseCursor) });
             //options.Add(new Option() { name = "Focus on interact", description = "Automatically bring the game window to the front when pressing a mapped key or button", confirmAction = () => ToggleBool(ref Config.current.FocusOnInteract), valueGrabber = () => GetBoolOptionValue(Config.current.FocusOnInteract) });
             options.Add(new Option() { name = "Audio Cue Volume", description = "Adjusts the volume of all non-speech audio cues", leftRightAction = (intent) => SetFloat(intent, ref Config.current.AudioCueVolume), valueGrabber = () => GetFloatOptionAsPercentage(Config.current.AudioCueVolume) });
             options.Add(new Option() { name = "Screen Reader Engine. Press confirm to apply", description = "Which screen reader engine to use", leftRightAction = ScrollScreenReaders, valueGrabber = GetCurrentScreenreaderSelection, confirmAction = ConfirmScreenReader });
-            
+
             //options.Add(new Option() { name = "Delete and Rebind all inputs", description = "Deletes all keyboard and controllers keybinds, then allows you to rebind them to new buttons", confirmAction = RebindInputs });
-            
+
             //options.Add(new Option() { name = "Close Menu", description = "Closes the accessibility menu", confirmAction = () => menuClosed = true });
+        }
+
+        public AccessibilitySettings(MemoryIO memIO) : base(memIO, "")
+        {
+            GetAvailableScreenreaders();
+            MainAccessibilityMenu();
         }
 
         void ReadOptionText(bool readStateFirst = false)

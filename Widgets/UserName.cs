@@ -35,9 +35,22 @@ namespace PvZA11y.Widgets
             //Wait for enter or escape
             uint keyInput = 0;
             string prevName = memIO.mem.ReadString(pointerChain + memIO.ptr.usernamePickerNamesOffset + ",a8", "", 12);
+
+            string menuStr = (newUser ? "Create" : "Rename") + " user. Type a username, then press enter to confirm, or press escape to cancel.";
+            Console.WriteLine(menuStr);
+            Program.Say(menuStr);
+
+            
             while (keyInput != VIRTUALKEY.VK_RETURN && keyInput != VIRTUALKEY.VK_ESCAPE)
             {
                 keyInput = Program.input.GetKey(false);
+
+                if(keyInput == VIRTUALKEY.VK_UP || keyInput == VIRTUALKEY.VK_DOWN || keyInput == VIRTUALKEY.VK_F1)
+                {
+                    Console.WriteLine(menuStr);
+                    Program.Say(menuStr);
+                }
+
                 string nameText = memIO.mem.ReadString(pointerChain + memIO.ptr.usernamePickerNamesOffset + ",a8", "", 12);
                 if (nameText != prevName)
                 {
@@ -95,7 +108,6 @@ namespace PvZA11y.Widgets
             string titleString = memIO.mem.ReadString(pointerChain + memIO.ptr.dialogTitleStrOffset);    //New User / Rename User
             string bodyString = memIO.mem.ReadString(pointerChain + ",f4,0", "", 128);  //Please Enter your name:
             string currentName = memIO.mem.ReadString(pointerChain + memIO.ptr.usernamePickerNamesOffset + ",a8", "", 16); //Current name text
-
             return titleString + " ... " + bodyString + " ... " + currentName;
         }
 

@@ -14,7 +14,7 @@ namespace PvZA11y.Widgets
 
         public override void Interact(InputIntent intent)
         {
-            throw new NotImplementedException();
+            Console.WriteLine("No active widget.");
         }
     }
 }

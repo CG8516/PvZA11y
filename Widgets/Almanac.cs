@@ -108,8 +108,8 @@ namespace PvZA11y.Widgets
                 if (pageID > 0)
                 {
                     
-                    Program.MoveMouse(0.14f, 0.99f); //Click index button
-                    Program.Click(0.14f, 0.99f, false, false, 200); //Click index button
+                    //Program.MoveMouse(0.14f, 0.97f); //Click index button
+                    Program.Click(0.14f, 0.97f, false, false, 200); //Click index button
 
                     int delayCount = 30;   //~30ms timeout to avoid hanging while waiting for almanac to update
                     while (pageID > 0 && delayCount-- > 0)
@@ -120,8 +120,8 @@ namespace PvZA11y.Widgets
                 }
                 else
                 {
-                    Program.MoveMouse(0.9f, 0.99f); //Click close button
-                    Program.Click(0.9f, 0.99f, false, false, 200); //Click close button
+                    //Program.MoveMouse(0.9f, 0.97f); //Click close button
+                    Program.Click(0.9f, 0.97f, false, false, 200); //Click close button
                 }
 
                 hasUpdatedContents = true;

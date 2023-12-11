@@ -121,6 +121,7 @@ namespace PvZA11y
         //je ??                 (if space is pressed, jump to space-processing code)
         //cmp ?? 0d             (check if enter is pressed)
         public string keyboardInputDisable1 = "83 ?? ?? ?? ?? ?? 03 74 ?? 83 ?? 20 74 ?? 83 ?? 0D";
+        public string keyboardInputDisable1Patched = "83 ?? ?? ?? ?? ?? 03 eb ?? 83 ?? 20 74 ?? 83 ?? 0D";
 
 
         //Instruction in options menu, which reads space/enter/escape
@@ -140,6 +141,7 @@ namespace PvZA11y
         //Replace last two "74 ??" with "90 90" (je offset > nop nop)
         //Replace "75" near end with "EB" (jne > jmp)
         public string keyboardInputDisable2 = "74 07 8b ?? e8 ?? ?? ?? ?? 83 ?? 20 74 ?? 83 ?? 0d 74 ?? 83 ?? 1b 75 ??";
+        public string keyboardInputDisable2Patched = "74 07 8b ?? e8 ?? ?? ?? ?? 83 ?? 20 90 90 83 ?? 0d 90 90 83 ?? 1b eb ??";
 
 
 
@@ -147,6 +149,7 @@ namespace PvZA11y
         //This one is probably the most likely to go wrong
         //Replaces a cmp instruction after the cheatTypingCheck with a return (pop edi, pop eax, ret 0004).
         public string keyboardInputDisable3 = "83 ?? ?? ?? 00 00 02 75 ?? 8b ?? ?? ?? 00 00 83 ?? 2b";
+        public string keyboardInputDisable3Patched = "5f 5e c2 04 00 90 90 75 ?? 8b ?? ?? ?? 00 00 83 ?? 2b";
 
         //These are probably the only things that should be exposed externally
         public string boardChain;                       //[lawnApp,board]

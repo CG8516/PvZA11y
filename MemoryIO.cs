@@ -27,10 +27,10 @@ namespace PvZA11y
             long codeAddr = mem.AoBScan(ptr.keyboardInputDisable1).Result.FirstOrDefault();
             if (codeAddr == 0)
             {
-                Console.WriteLine("Failed to find 'keyboardInputDisable1' code!");
-                //Console.WriteLine("Press enter to quit!");
-                //Console.ReadLine();
-                //Environment.Exit(1);
+                if (mem.AoBScan(ptr.keyboardInputDisable1Patched).Result.FirstOrDefault() != 0)
+                    Console.WriteLine("'keyboardInputDisable1' already patched!");
+                else
+                    Console.WriteLine("Failed to find 'keyboardInputDisable1' code!");
             }
             codeAddr += 7;
             mem.WriteMemory(codeAddr.ToString("X2"), "byte", "EB"); //Replace je with jmp, so widget keyboard handler always ignores keyboard
@@ -39,10 +39,10 @@ namespace PvZA11y
             long codeAddr2 = mem.AoBScan(ptr.keyboardInputDisable2).Result.FirstOrDefault();
             if (codeAddr2 == 0)
             {
-                Console.WriteLine("Failed to find 'keyboardInputDisable2' code!");
-                //Console.WriteLine("Press enter to quit!");
-                //Console.ReadLine();
-                //Environment.Exit(1);
+                if (mem.AoBScan(ptr.keyboardInputDisable2Patched).Result.FirstOrDefault() != 0)
+                    Console.WriteLine("'keyboardInputDisable2' already patched!");
+                else
+                    Console.WriteLine("Failed to find 'keyboardInputDisable2' code!");
             }
             //"74 07 8b ?? e8 ???????? 83 ?? 20 74 ?? 83 ?? 0d 74 ?? 83 ?? 1b 75 ??";
             //replace je with two nops
@@ -61,10 +61,10 @@ namespace PvZA11y
             long codeAddr3 = mem.AoBScan(ptr.keyboardInputDisable3).Result.FirstOrDefault();
             if (codeAddr3 == 0)
             {
-                Console.WriteLine("Failed to find 'keyboardInputDisable3' code!");
-                //Console.WriteLine("Press enter to quit!");
-                //Console.ReadLine();
-                //Environment.Exit(1);
+                if (mem.AoBScan(ptr.keyboardInputDisable3Patched).Result.FirstOrDefault() != 0)
+                    Console.WriteLine("'keyboardInputDisable3' already patched!");
+                else
+                    Console.WriteLine("Failed to find 'keyboardInputDisable3' code!");
             }
             //Replace (cmp dword ptr [ecx+0000091C],02) (check if gameScene is Into/cutscene/seedpicker), with "pop edi; pop esi; ret 0004;" (return)
             mem.WriteMemory(codeAddr3.ToString("X2"), "bytes", "5f 5e c2 04 00 90 90");
