@@ -13,7 +13,7 @@ using System.Collections.Immutable;
 using PvZA11y.Widgets;
 
 /*
-[PVZ-A11y Beta 1.0]
+[PVZ-A11y Beta 1.1]
 
 Blind and motor accessibility mod for Plants Vs Zombies.
 Allows input with rebindable keys and controller buttons, rather than requiring a mouse for input.
@@ -81,6 +81,11 @@ namespace PvZA11y
 
         [DllImport("User32.dll")]
         public static extern Int32 SetForegroundWindow(int hWnd);
+
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
+        private static extern IntPtr GetForegroundWindow();
+
 
         /// <summary>
         /// Provides keyboard access.
@@ -408,8 +413,8 @@ namespace PvZA11y
             int clickUpX = (int)((upX * drawWidth) + drawStartX);
             int clickUpY = (int)(upY * drawHeight);
 
-            if(Config.current.FocusOnInteract)
-                SetForegroundWindow(gameWHnd.ToInt32()); //Bring window to front
+            //if(Config.current.FocusOnInteract)
+                //SetForegroundWindow(gameWHnd.ToInt32()); //Bring window to front
 
             PostMessage(gameWHnd, WM_LBUTTONDOWN, 1, MakeLParam(clickX, clickY));
             Task.Delay(50).Wait();
@@ -894,6 +899,14 @@ namespace PvZA11y
 
         static void DoWidgetInteractions(Widget currentWidget, Input input)
         {
+            //Ensure game window is focused
+            nint focusedWindow = GetForegroundWindow();
+            if(gameWHnd.ToInt32() != focusedWindow)
+            {
+                input.ClearIntents();
+                return;
+            }
+
             InputIntent intent = input.GetCurrentIntent();
             if (intent != InputIntent.None)
                 currentWidget.Interact(intent);
