@@ -44,7 +44,7 @@
 
     </application>
   </compatibility>
-
+	
   <!-- Indicates that the application is DPI-aware and will not be automatically scaled by Windows at higher
        DPIs. Windows Presentation Foundation (WPF) applications are automatically DPI-aware and do not need 
        to opt in. Windows Forms applications targeting .NET Framework 4.6 that opt into this setting, should 

@@ -246,7 +246,7 @@ namespace PvZA11y.Widgets
                 //Move mouse to plant position, for sighted players
                 RefreshPlantPickerState();
                 float clickX = (plantPickerState[pickerIndex].posX / 800.0f) + 0.03f;
-                float clickY = (plantPickerState[pickerIndex].posY / 600.0f) + 0.08f;
+                float clickY = (plantPickerState[pickerIndex].posY / 600.0f) + 0.06f;
                 Program.MoveMouse(clickX, clickY);
 
             }
@@ -324,7 +324,7 @@ namespace PvZA11y.Widgets
                 int pickedCount = GetSelectedPlants().Length;
                 if (pickedCount == seedBankSize)
                 {
-                    Program.Click(0.29f, 0.98f);
+                    Program.Click(0.29f, 0.97f);
                     return;
                 }
 

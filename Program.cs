@@ -13,6 +13,9 @@ using System.Collections.Immutable;
 using PvZA11y.Widgets;
 using System.Drawing;
 using SimWinInput;
+using System.Windows;
+using System.Data;
+using Microsoft.Win32;
 
 /*
 [PVZ-A11y Beta 1.4]
@@ -141,129 +144,11 @@ namespace PvZA11y
 
         public static int MakeLParam(int x, int y) => (y << 16) | (x & 0xFFFF);
 
-        const uint WM_KEYDOWN = 0x0100;
-        const uint WM_KEYUP = 0x0101;
-        const uint WM_CHAR = 0x0102;
-        const int VK_TAB = 0x09;
-        const int VK_ENTER = 0x0D;
-        const int VK_UP = 0x26;
-        const int VK_DOWN = 0x28;
-        const int VK_RIGHT = 0x27;
-
         const uint WM_LBUTTONDOWN = 0x0201;
         const uint WM_LBUTTONUP = 0x0202;
 
         const uint WM_RBUTTONDOWN = 0x0204;
         const uint WM_RBUTTONUP = 0x0205;
-
-        static string[] plantNameLookup = new string[]
-        {
-            "[PEASHOOTER]",
-            "[SUNFLOWER]",
-            "[CHERRY_BOMB]",
-            "[WALL_NUT]",
-            "[POTATO_MINE]",
-            "[SNOW_PEA]",
-            "[CHOMPER]",
-            "[REPEATER]",
-            "[PUFF_SHROOM]",
-            "[SUN_SHROOM]",
-            "[FUME_SHROOM]",
-            "[GRAVE_BUSTER]",
-            "[HYPNO_SHROOM]",
-            "[SCAREDY_SHROOM]",
-            "[ICE_SHROOM]",
-            "[DOOM_SHROOM]",
-            "[LILY_PAD]",
-            "[SQUASH]",
-            "[THREEPEATER]",
-            "[TANGLE_KELP]",
-            "[JALAPENO]",
-            "[SPIKEWEED]",
-            "[TORCHWOOD]",
-            "[TALL_NUT]",
-            "[SEA_SHROOM]",
-            "[PLANTERN]",
-            "[CACTUS]",
-            "[BLOVER]",
-            "[SPLIT_PEA]",
-            "[STARFRUIT]",
-            "[PUMPKIN]",
-            "[MAGNET_SHROOM]",
-            "[CABBAGE_PULT]",
-            "[FLOWER_POT]",
-            "[KERNEL_PULT]",
-            "[COFFEE_BEAN]",
-            "[GARLIC]",
-            "[UMBRELLA_LEAF]",
-            "[MARIGOLD]",
-            "[MELON_PULT]",
-            "[GATLING_PEA]",
-            "[TWIN_SUNFLOWER]",
-            "[GLOOM_SHROOM]",
-            "[CATTAIL]",
-            "[WINTER_MELON]",
-            "[GOLD_MAGNET]",
-            "[SPIKEROCK]",
-            "[COB_CANNON]",
-            "[IMITATER]",
-            "[EXPLODE_O_NUT]",
-            "[GIANT_WALLNUT]"
-        };
-
-        static string[] plantDescriptionLookup = new string[]
-        {
-            "[PEASHOOTER_TOOLTIP]",
-            "[SUNFLOWER_TOOLTIP]",
-            "[CHERRY_BOMB_TOOLTIP]",
-            "[WALL_NUT_TOOLTIP]",
-            "[POTATO_MINE_TOOLTIP]",
-            "[SNOW_PEA_TOOLTIP]",
-            "[CHOMPER_TOOLTIP]",
-            "[REPEATER_TOOLTIP]",
-            "[PUFF_SHROOM_TOOLTIP]",
-            "[SUN_SHROOM_TOOLTIP]",
-            "[FUME_SHROOM_TOOLTIP]",
-            "[GRAVE_BUSTER_TOOLTIP]",
-            "[HYPNO_SHROOM_TOOLTIP]",
-            "[SCAREDY_SHROOM_TOOLTIP]",
-            "[ICE_SHROOM_TOOLTIP]",
-            "[DOOM_SHROOM_TOOLTIP]",
-            "[LILY_PAD_TOOLTIP]",
-            "[SQUASH_TOOLTIP]",
-            "[THREEPEATER_TOOLTIP]",
-            "[TANGLE_KELP_TOOLTIP]",
-            "[JALAPENO_TOOLTIP]",
-            "[SPIKEWEED_TOOLTIP]",
-            "[TORCHWOOD_TOOLTIP]",
-            "[TALL_NUT_TOOLTIP]",
-            "[SEA_SHROOM_TOOLTIP]",
-            "[PLANTERN_TOOLTIP]",
-            "[CACTUS_TOOLTIP]",
-            "[BLOVER_TOOLTIP]",
-            "[SPLIT_PEA_TOOLTIP]",
-            "[STARFRUIT_TOOLTIP]",
-            "[PUMPKIN_TOOLTIP]",
-            "[MAGNET_SHROOM_TOOLTIP]",
-            "[CABBAGE_PULT_TOOLTIP]",
-            "[FLOWER_POT_TOOLTIP]",
-            "[KERNEL_PULT_TOOLTIP]",
-            "[COFFEE_BEAN_TOOLTIP]",
-            "[GARLIC_TOOLTIP]",
-            "[UMBRELLA_LEAF_TOOLTIP]",
-            "[MARIGOLD_TOOLTIP]",
-            "[MELON_PULT_TOOLTIP]",
-            "[GATLING_PEA_TOOLTIP]",
-            "[TWIN_SUNFLOWER_TOOLTIP]",
-            "[GLOOM_SHROOM_TOOLTIP]",
-            "[CATTAIL_TOOLTIP]",
-            "[WINTER_MELON_TOOLTIP]",
-            "[GOLD_MAGNET_TOOLTIP]",
-            "[SPIKEROCK_TOOLTIP]",
-            "[COB_CANNON_TOOLTIP]",
-            "[IMITATER_TOOLTIP]",
-            "[EXPLODE_O_NUT_TOOLTIP]"
-        };
 
         
 
@@ -439,6 +324,58 @@ namespace PvZA11y
             }
         }
 
+        [DllImport("user32.dll")]
+        static extern int GetDeviceCaps(IntPtr hdc, int nIndex);
+
+        [DllImport("gdi32.dll")]
+        static extern IntPtr GetDC(IntPtr hWnd);
+
+        [DllImport("user32.dll")]
+        static extern int ReleaseDC(IntPtr hWnd, IntPtr hDC);
+
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct DEVMODE
+        {
+            private const int CCHDEVICENAME = 0x20;
+            private const int CCHFORMNAME = 0x20;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 0x20)]
+            public string dmDeviceName;
+            public short dmSpecVersion;
+            public short dmDriverVersion;
+            public short dmSize;
+            public short dmDriverExtra;
+            public int dmFields;
+            public int dmPositionX;
+            public int dmPositionY;
+            public ScreenOrientation dmDisplayOrientation;
+            public int dmDisplayFixedOutput;
+            public short dmColor;
+            public short dmDuplex;
+            public short dmYResolution;
+            public short dmTTOption;
+            public short dmCollate;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 0x20)]
+            public string dmFormName;
+            public short dmLogPixels;
+            public int dmBitsPerPel;
+            public int dmPelsWidth;
+            public int dmPelsHeight;
+            public int dmDisplayFlags;
+            public int dmDisplayFrequency;
+            public int dmICMMethod;
+            public int dmICMIntent;
+            public int dmMediaType;
+            public int dmDitherType;
+            public int dmReserved1;
+            public int dmReserved2;
+            public int dmPanningWidth;
+            public int dmPanningHeight;
+        }
+
+        [DllImport("user32.dll")]
+        public static extern bool EnumDisplaySettings(string lpszDeviceName, int iModeNum, ref DEVMODE lpDevMode);
+
         public static void Click(float downX, float downY, float upX, float upY)
         {
             Task.Run(() => ClickTask(downX, downY, upX, upY));
@@ -446,11 +383,14 @@ namespace PvZA11y
 
         public static void MoveMouse(float x, float y)
         {
+            y += 0.05f;
             if (!Config.current.MoveMouseCursor)
                 return;
 
-            int posX = (int)((x * drawWidth) + drawStartX);
-            int posY = (int)(y * drawHeight);
+            float windowScale = GetScalingFactor();
+
+            int posX = (int)(((x * drawWidth)/ windowScale) + drawStartX);
+            int posY = (int)((y * drawHeight)/ windowScale);
 
             //RECT rect = new RECT();
             GetWindowRect(gameWHnd, out RECT rect);
@@ -499,10 +439,29 @@ namespace PvZA11y
             PostMessage(gameWHnd, WM_LBUTTONUP, 0, MakeLParam(clickUpX, clickUpY));
         }
 
+        static float GetScalingFactor()
+        {
+            Screen[] screenList = Screen.AllScreens;
+            for (int i = 0; i < screenList.Length; i++)
+            {
+                DEVMODE dm = new DEVMODE();
+                dm.dmSize = (short)Marshal.SizeOf(typeof(DEVMODE));
+                EnumDisplaySettings(screenList[i].DeviceName, -1, ref dm);
+
+                var scalingFactor = Math.Round(Decimal.Divide(dm.dmPelsWidth, screenList[i].Bounds.Width), 2);
+                return (float)scalingFactor;
+            }
+
+            return 1;
+        }
+
         static void ClickTask(float x, float y, bool rightClick = false, int delayTime = 50, bool moveMouse = false)
         {
-            int clickX = (int)((x * drawWidth) + drawStartX);
-            int clickY = (int)(y*drawHeight);
+            y += 0.02f;
+            float windowScale = GetScalingFactor();
+
+            int clickX = (int)(((x * drawWidth)/ windowScale) + drawStartX);
+            int clickY = (int)((y*drawHeight)/ windowScale);
 
             //Console.WriteLine("ClickX: {0} ClickY: {1}", clickX, clickY);
 
@@ -525,24 +484,36 @@ namespace PvZA11y
                 //Console.WriteLine("Window Pos: {0},{1}", rect.Left, rect.Top);
                 int cursorX = rect.Left + clickX;
                 int cursorY = rect.Top + clickY;
+                Cursor.Position = new(cursorX, cursorY);
             //Cursor.Position = new System.Drawing.Point(cursorX, cursorY);
 
-            //Move mouse before processing click
-            //PostMessage(gameWHnd, 0x0200, 1, MakeLParam(clickX, clickY));
+                //Move mouse before processing click
+                //PostMessage(gameWHnd, 0x0200, 1, MakeLParam(clickX, clickY));
 
-            //  Task.Delay(delayTime).Wait();
+                //  Task.Delay(delayTime).Wait();
             //}
 
             //SimMouse.Click(MouseButtons.Left, clickX, clickY);
             //SimMouse.Act(SimMouse.Action.MoveOnly, cursorX, cursorY);
             //Console.WriteLine("New click");
 
-            POINT targetPoint = new POINT() { x = clickX, y = clickY };
-            ClientToScreen(gameWHnd, ref targetPoint);
+            //float windowScale = GetScalingFactor();
+            //clickX = (int)(clickX / windowScale);
+            //clickY = (int)(clickY / windowScale);
+
+            //POINT targetPoint = new POINT() { x = clickX, y = clickY };
+            POINT targetPoint = new POINT() { x = cursorX, y = cursorY };
+
+            //ClientToScreen(gameWHnd, ref targetPoint);
 
             if (GetForegroundWindow() == gameWHnd)
             {
-                Cursor.Position = new(cursorX, cursorY);
+
+                
+
+
+                
+                //Cursor.Position = new(targetPoint.x, targetPoint.y);
                 SendLeftMouseClick(targetPoint);
             }
 

@@ -18,15 +18,7 @@ namespace PvZA11y.Widgets
         
         static ListItem[] InitListItems(MemoryIO memIO, string ptrChain, Widget? prevWidget = null)
         {
-            //Stupid hack to wait for menu to finish loading before reading
-            string continueString = "";
-            Console.WriteLine("Entering pause menu wait loop");
-            while (continueString == null || continueString.Length < 2)
-            {
-                Task.Delay(10).Wait();
-                continueString = memIO.mem.ReadString(ptrChain + memIO.ptr.optionsMenuContinueOffset + memIO.ptr.widgetDialogStringOffset);  //"OK" at main menu, "Return To Game" in game
-            }
-            Console.WriteLine("Got pause menu contents");
+            string continueString = memIO.mem.ReadString(ptrChain + memIO.ptr.optionsMenuContinueOffset + memIO.ptr.widgetDialogStringOffset);  //"OK" at main menu, "Return To Game" in game
 
             Vector2 baseSize = memIO.GetWidgetSize(ptrChain);
 
@@ -117,8 +109,12 @@ namespace PvZA11y.Widgets
             //Update position, in case dialogue was moved
             relativePos = memIO.GetWidgetPos(pointerChain);
             relativePos /= new Vector2(800.0f, 600.0f);
-            
-            if(accessibilitySettings != null)
+
+            //Update continue/ok button string, in case it wasn't read properly on init (timing error)
+            string continueString = memIO.mem.ReadString(pointerChain + memIO.ptr.optionsMenuContinueOffset + memIO.ptr.widgetDialogStringOffset);  //"OK" at main menu, "Return To Game" in game
+            listItems[listItems.Length - 1].text = continueString;
+
+            if (accessibilitySettings != null)
             {
                 accessibilitySettings.Interact(intent);
                 if (accessibilitySettings.menuClosed)
