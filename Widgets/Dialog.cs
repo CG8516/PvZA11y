@@ -47,7 +47,8 @@ namespace PvZA11y.Widgets
             Vector2 clickPos = GetItemPos();
             //Console.WriteLine("relativePos: {0},{1}", clickPos.X, clickPos.Y);
             //Console.WriteLine("listItem Name: " + listItems[listIndex].text);
-            Program.Click(clickPos.X, clickPos.Y, false, false, 50, true);
+            //Program.Click(clickPos.X, clickPos.Y, false, false, 50, false);
+            Program.Click(clickPos);
         }
 
         public virtual void DenyInteraction()

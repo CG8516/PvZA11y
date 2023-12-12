@@ -12,6 +12,7 @@ using System.Windows.Forms;
 using System.Collections.Immutable;
 using PvZA11y.Widgets;
 using System.Drawing;
+using SimWinInput;
 
 /*
 [PVZ-A11y Beta 1.2]
@@ -353,9 +354,7 @@ namespace PvZA11y
 
         static int drawStartX;
 
-        [DllImport("user32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        static extern bool GetWindowRect(IntPtr hWnd, ref RECT lpRect);
+
         [StructLayout(LayoutKind.Sequential)]
         private struct RECT
         {
@@ -363,6 +362,81 @@ namespace PvZA11y
             public int Top;
             public int Right;
             public int Bottom;
+        }
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool ScreenToClient(IntPtr hWnd, ref POINT lpPoint);
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool ClientToScreen(IntPtr hWnd, ref POINT lpPoint);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        static extern uint SendInput(uint nInputs, INPUT[] pInputs, int cbSize);
+
+
+        [StructLayout(LayoutKind.Sequential)]
+        struct POINT
+        {
+            public int x, y;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        struct INPUT
+        {
+            public int type;
+            public InputUnion U;
+        }
+
+        [StructLayout(LayoutKind.Explicit)]
+        struct InputUnion
+        {
+            [FieldOffset(0)] public MOUSEINPUT mi;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        struct MOUSEINPUT
+        {
+            public int dx;
+            public int dy;
+            public uint mouseData;
+            public uint dwFlags;
+            public uint time;
+            public IntPtr dwExtraInfo;
+        }
+
+        const int INPUT_MOUSE = 0;
+        const int MOUSEEVENTF_LEFTDOWN = 0x02;
+        const int MOUSEEVENTF_LEFTUP = 0x04;
+
+        static void SendLeftMouseClick(POINT targetPoint)
+        {
+            INPUT[] inputs = new INPUT[2];
+
+            // Move the mouse to the target point
+            inputs[0].type = INPUT_MOUSE;
+            inputs[0].U.mi.dx = targetPoint.x;
+            inputs[0].U.mi.dy = targetPoint.y;
+            inputs[0].U.mi.mouseData = 0;
+            inputs[0].U.mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
+
+            // Release the left mouse button
+            inputs[1].type = INPUT_MOUSE;
+            inputs[1].U.mi.dx = targetPoint.x;
+            inputs[1].U.mi.dy = targetPoint.y;
+            inputs[1].U.mi.mouseData = 0;
+            inputs[1].U.mi.dwFlags = MOUSEEVENTF_LEFTUP;
+
+            // Send the input
+            if (SendInput(2, inputs, Marshal.SizeOf(typeof(INPUT))) == 0)
+            {
+                Console.WriteLine("Failed to send input. Error code: " + Marshal.GetLastWin32Error());
+            }
         }
 
         public static void Click(float downX, float downY, float upX, float upY)
@@ -378,8 +452,8 @@ namespace PvZA11y
             int posX = (int)((x * drawWidth) + drawStartX);
             int posY = (int)(y * drawHeight);
 
-            RECT rect = new RECT();
-            GetWindowRect(gameWHnd, ref rect);
+            //RECT rect = new RECT();
+            GetWindowRect(gameWHnd, out RECT rect);
             //Console.WriteLine("Window Pos: {0},{1}", rect.Left, rect.Top);
             int cursorX = rect.Left + posX;
             int cursorY = rect.Top + posY;
@@ -444,26 +518,41 @@ namespace PvZA11y
             //mem.WriteMemory(lawnAppPtr + ",320,108", "int", clickX.ToString());
             //mem.WriteMemory(lawnAppPtr + ",320,10c", "int", clickY.ToString());
 
-            if (moveMouse && Config.current.MoveMouseCursor)
-            {
-                RECT rect = new RECT();
-                GetWindowRect(gameWHnd, ref rect);
+            //if (moveMouse && Config.current.MoveMouseCursor)
+            //{
+                //RECT rect = new RECT();
+                GetWindowRect(gameWHnd, out RECT rect);
                 //Console.WriteLine("Window Pos: {0},{1}", rect.Left, rect.Top);
                 int cursorX = rect.Left + clickX;
                 int cursorY = rect.Top + clickY;
-                Cursor.Position = new System.Drawing.Point(cursorX, cursorY);
+            //Cursor.Position = new System.Drawing.Point(cursorX, cursorY);
 
             //Move mouse before processing click
-                PostMessage(gameWHnd, 0x0200, 1, MakeLParam(clickX, clickY));
+            //PostMessage(gameWHnd, 0x0200, 1, MakeLParam(clickX, clickY));
 
-                Task.Delay(delayTime).Wait();
+            //  Task.Delay(delayTime).Wait();
+            //}
+
+            //SimMouse.Click(MouseButtons.Left, clickX, clickY);
+            //SimMouse.Act(SimMouse.Action.MoveOnly, cursorX, cursorY);
+            Console.WriteLine("New click");
+
+            POINT targetPoint = new POINT() { x = clickX, y = clickY };
+            ClientToScreen(gameWHnd, ref targetPoint);
+
+            if (GetForegroundWindow() == gameWHnd)
+            {
+                Cursor.Position = new(cursorX, cursorY);
+                SendLeftMouseClick(targetPoint);
             }
 
-            PostMessage(gameWHnd, clickDown, 1, MakeLParam(clickX, clickY));
+            //SimMouse.Click(MouseButtons.Left, cursorX, cursorY);
 
-            Task.Delay(delayTime).Wait();
+            //PostMessage(gameWHnd, clickDown, 1, MakeLParam(clickX, clickY));
 
-            PostMessage(gameWHnd, clickUp, 0, MakeLParam(clickX, clickY));
+            //Task.Delay(delayTime).Wait();
+
+            //PostMessage(gameWHnd, clickUp, 0, MakeLParam(clickX, clickY));
         }
 
 

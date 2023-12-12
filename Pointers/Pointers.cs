@@ -88,6 +88,8 @@ namespace PvZA11y
         public string optionsMenuSfxSliderOffset = ",178"; //optionsMenu[,SfxSlider]
         public string optionsMenuMusicSliderOffset = ",174"; //optionsMenu[,MusicSlider]
 
+        public string awardContinueButton = ",a8";
+
 
         public string zenPlantCountOffset = ",378";
         public uint zenPlantStartOffset = 0x37c;
@@ -211,6 +213,7 @@ namespace PvZA11y
             this.playerMinigamesUnlockedOffset = playerMinigamesUnlockedOffset;
             this.playerPuzzleUnlockedOffset = playerPuzzleUnlockedOffset;
             this.playerSurvivalUnlockedOffset = playerSurvivalUnlockedOffset;
+            this.awardScreenOffset = awardScreenOffset;
 
             boardChain = lawnAppPtr + boardPtrOffset;
             boardPausedChain = boardChain + boardPausedOffset;

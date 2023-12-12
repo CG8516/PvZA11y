@@ -35,21 +35,32 @@ namespace PvZA11y.Widgets
             //float musicSliderX = memIO.mem.ReadInt(ptrChain + ",174,40") / baseSize.X + 0.002f;
             Vector2 posOffset = new Vector2(0.002f, 0.002f);
 
-            Vector2 musicSliderPos = memIO.GetWidgetPos(ptrChain + memIO.ptr.optionsMenuMusicSliderOffset) / baseSize + posOffset;
-            Vector2 sfxSliderPos = memIO.GetWidgetPos(ptrChain + memIO.ptr.optionsMenuSfxSliderOffset) / baseSize + posOffset;
-            Vector2 fullscreenButtonPos = memIO.GetWidgetPos(ptrChain + memIO.ptr.optionsMenuFullscreenOffset) / baseSize + posOffset;
-            Vector2 accelButtonPos = memIO.GetWidgetPos(ptrChain + memIO.ptr.optionsMenu3DAccelOffset) / baseSize + posOffset;
+            Vector2 musicSliderPos = memIO.GetWidgetPos(ptrChain + memIO.ptr.optionsMenuMusicSliderOffset) / baseSize;
+            musicSliderPos += memIO.GetWidgetSize(ptrChain + memIO.ptr.optionsMenuMusicSliderOffset) / baseSize / 2;
 
-            Vector2 almanacPos = memIO.GetWidgetPos(ptrChain + memIO.ptr.optionsMenuAlmanacOffset) / baseSize + posOffset;
+            Vector2 sfxSliderPos = memIO.GetWidgetPos(ptrChain + memIO.ptr.optionsMenuSfxSliderOffset) / baseSize;
+            sfxSliderPos += memIO.GetWidgetSize(ptrChain + memIO.ptr.optionsMenuSfxSliderOffset) / baseSize / 2;
+
+            Vector2 fullscreenButtonPos = memIO.GetWidgetPos(ptrChain + memIO.ptr.optionsMenuFullscreenOffset) / baseSize;
+            fullscreenButtonPos += memIO.GetWidgetSize(ptrChain + memIO.ptr.optionsMenuFullscreenOffset) / baseSize / 1.5f;
+
+            Vector2 accelButtonPos = memIO.GetWidgetPos(ptrChain + memIO.ptr.optionsMenu3DAccelOffset) / baseSize;
+            accelButtonPos += memIO.GetWidgetSize(ptrChain + memIO.ptr.optionsMenu3DAccelOffset) / baseSize / 1.5f;
+
+            Vector2 almanacPos = memIO.GetWidgetPos(ptrChain + memIO.ptr.optionsMenuAlmanacOffset) / baseSize;
+            almanacPos += memIO.GetWidgetSize(ptrChain + memIO.ptr.optionsMenuAlmanacOffset) / baseSize / 2;
             bool almanacVisible = memIO.mem.ReadByte(ptrChain + memIO.ptr.optionsMenuAlmanacOffset + ",64") > 0;
 
-            Vector2 mainMenuPos = memIO.GetWidgetPos(ptrChain + memIO.ptr.optionsMenuReturnToMainOffset) / baseSize + posOffset;
+            Vector2 mainMenuPos = memIO.GetWidgetPos(ptrChain + memIO.ptr.optionsMenuReturnToMainOffset) / baseSize;
+            mainMenuPos += memIO.GetWidgetSize(ptrChain + memIO.ptr.optionsMenuReturnToMainOffset) / baseSize / 2;
             bool mainMenuVisible = memIO.mem.ReadByte(ptrChain + memIO.ptr.optionsMenuReturnToMainOffset + ",64") > 0;
 
-            Vector2 restartPos = memIO.GetWidgetPos(ptrChain + memIO.ptr.optionsMenuRestartOffset) / baseSize + posOffset;
+            Vector2 restartPos = memIO.GetWidgetPos(ptrChain + memIO.ptr.optionsMenuRestartOffset) / baseSize;
+            restartPos += memIO.GetWidgetSize(ptrChain + memIO.ptr.optionsMenuRestartOffset) / baseSize / 2;
             bool restartVisible = memIO.mem.ReadByte(ptrChain + memIO.ptr.optionsMenuRestartOffset + ",64") > 0;
 
-            Vector2 continuePos = memIO.GetWidgetPos(ptrChain + memIO.ptr.optionsMenuContinueOffset) / baseSize + posOffset;
+            Vector2 continuePos = (memIO.GetWidgetPos(ptrChain + memIO.ptr.optionsMenuContinueOffset) / baseSize);
+            continuePos += memIO.GetWidgetSize(ptrChain + memIO.ptr.optionsMenuContinueOffset) / baseSize / 2;
 
             int itemCount = 5 + (almanacVisible ? 1 : 0) + (mainMenuVisible ? 1 : 0) + (restartVisible ? 1 : 0) +1; //+1 for accessibility options
 
@@ -122,8 +133,10 @@ namespace PvZA11y.Widgets
             //Close if back/pause is pressed
             if(intent == InputIntent.Start || intent == InputIntent.Deny)
             {
-                Program.Click(relativePos + listItems[listItems.Length-1].relativePos);
-                return;
+                listIndex = listItems.Length - 1;
+                ConfirmInteraction();
+                //Program.Click(relativePos + listItems[listItems.Length-1].relativePos);
+                //return;
             }
             
             base.Interact(intent);  //Up/down movement

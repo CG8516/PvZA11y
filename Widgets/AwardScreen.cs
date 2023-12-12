@@ -11,12 +11,34 @@ namespace PvZA11y.Widgets
     {
         int awardType = -1;
 
-        static ListItem[] listItems = new ListItem[]
-        {
-            new ListItem(){text = "Continue", relativePos = new Vector2(0.5f,0.87f)}
-        };
 
-        public AwardScreen(MemoryIO memIO, string pointerChain) : base(memIO, pointerChain, listItems)
+        static ListItem[] GetListItems(string pointerChain, MemoryIO memIO)
+        {
+            string continueChain = memIO.ptr.lawnAppPtr + memIO.ptr.awardScreenOffset + memIO.ptr.awardContinueButton;
+            int continueX = memIO.mem.ReadInt(continueChain + ",08");
+            int continueY = memIO.mem.ReadInt(continueChain + ",0c");
+            
+            int continueWidth = memIO.mem.ReadInt(continueChain + ",10");
+            int continueHeight = memIO.mem.ReadInt(continueChain + ",14");
+
+            continueX += continueWidth / 2;
+            continueY += continueHeight;// / 2;
+
+            Console.WriteLine("Continue pos: {0},{1}", continueX, continueY);
+            Console.WriteLine("Continue pos relative: {0},{1}", continueX / 800.0f, continueY / 600.0f);
+            Console.WriteLine("Continue Chain: '{0}'", continueChain);
+            
+            var listItems = new ListItem[]
+            {
+                //new ListItem(){text = "Continue", relativePos = new Vector2(0.5f,0.87f)}
+                new ListItem(){text = "Continue", relativePos = new Vector2(continueX/800.0f, continueY/600.0f)}
+            };
+
+
+            return listItems;
+        }
+
+        public AwardScreen(MemoryIO memIO, string pointerChain) : base(memIO, pointerChain, GetListItems(pointerChain, memIO))
         {
         }
 
@@ -28,6 +50,8 @@ namespace PvZA11y.Widgets
 
         public override void Interact(InputIntent intent)
         {
+            //Ensure continue button position is updated
+            listItems = GetListItems(pointerChain, memIO);
             base.Interact(intent);
             if (intent is InputIntent.Info1)
                 hasReadContent = false;

@@ -107,9 +107,17 @@ namespace PvZA11y.Widgets
             {
                 if (pageID > 0)
                 {
-                    
+                    int indexPosX = memIO.mem.ReadInt(pointerChain + ",18c,8"); //32
+                    int indexPosY = memIO.mem.ReadInt(pointerChain + ",18c,c"); //567
+                    float clickX = indexPosX / 800.0f;
+                    float clickY = indexPosY / 600.0f;
+                    clickX += 0.05f;
+                    clickY += 0.05f;
+
+                    Program.Click(clickX, clickY, false, false);
+
                     //Program.MoveMouse(0.14f, 0.97f); //Click index button
-                    Program.Click(0.14f, 0.97f, false, false, 200); //Click index button
+                    //Program.Click(0.14f, 0.97f, false, false, 200); //Click index button
 
                     int delayCount = 30;   //~30ms timeout to avoid hanging while waiting for almanac to update
                     while (pageID > 0 && delayCount-- > 0)
@@ -120,8 +128,17 @@ namespace PvZA11y.Widgets
                 }
                 else
                 {
+                    int closePosX = memIO.mem.ReadInt(pointerChain + ",188,8"); //676
+                    int closePosY = memIO.mem.ReadInt(pointerChain + ",188,c"); //567
+                    float clickX = closePosX / 800.0f;
+                    float clickY = closePosY / 600.0f;
+                    clickX += 0.05f;
+                    clickY += 0.05f;
+
+                    Program.Click(clickX, clickY, false, false);
+
                     //Program.MoveMouse(0.9f, 0.97f); //Click close button
-                    Program.Click(0.9f, 0.97f, false, false, 200); //Click close button
+                    //Program.Click(0.9f, 0.97f, false, false, 200); //Click close button
                 }
 
                 hasUpdatedContents = true;
