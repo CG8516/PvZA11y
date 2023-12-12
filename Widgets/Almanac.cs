@@ -108,13 +108,17 @@ namespace PvZA11y.Widgets
             {
                 if (pageID > 0)
                 {
-                    string indexChain = pointerChain + ",18c";
+                    string indexChain = pointerChain + memIO.ptr.almanacIndexButtonOffset;
                     int indexPosX = memIO.mem.ReadInt(indexChain + memIO.ptr.inlineButtonPosXOffset); //32
                     int indexPosY = memIO.mem.ReadInt(indexChain + memIO.ptr.inlineButtonPosYOffset); //567
                     int indexWidth = memIO.mem.ReadInt(indexChain + memIO.ptr.inlineButtonWidthOffset);
                     int indexHeight = memIO.mem.ReadInt(indexChain + memIO.ptr.inlineButtonHeightOffset);
                     float clickX = (indexPosX + indexWidth / 2) / 800.0f;
                     float clickY = (indexPosY + indexHeight / 2) / 600.0f;
+
+                    string fullChain = indexChain + memIO.ptr.inlineButtonPosXOffset;
+                    Console.WriteLine("FullChain: {0}", fullChain);
+                    Console.WriteLine("x/y: {0},{1}", clickX, clickY);
 
                     Program.Click(clickX, clickY, false, false,100,true);
 
@@ -127,7 +131,7 @@ namespace PvZA11y.Widgets
                 }
                 else
                 {
-                    string closeChain = pointerChain + ",188";
+                    string closeChain = pointerChain + memIO.ptr.almanacCloseButtonOffset;
                     int closePosX = memIO.mem.ReadInt(closeChain + memIO.ptr.inlineButtonPosXOffset); //676
                     int closePosY = memIO.mem.ReadInt(closeChain + memIO.ptr.inlineButtonPosYOffset); //567
                     int closeWidth = memIO.mem.ReadInt(closeChain + memIO.ptr.inlineButtonWidthOffset);

@@ -78,6 +78,9 @@ namespace PvZA11y
 
             ret.awardContinueButton = ",a8";
 
+            ret.almanacCloseButtonOffset = ",194";
+            ret.almanacIndexButtonOffset = ",198";
+
             return ret;
         }
     }
