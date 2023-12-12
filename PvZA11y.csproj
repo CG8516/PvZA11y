@@ -59,6 +59,18 @@
 		<None Update="Dot Net 8.0 Download Link.url">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
+		<None Update="RegistryKeys\Disable3DAcceleration.reg">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="RegistryKeys\DisableFullscreen.reg">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="RegistryKeys\Enable3DAcceleration.reg">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="RegistryKeys\EnableFullscreen.reg">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
 	</ItemGroup>
 
 </Project>

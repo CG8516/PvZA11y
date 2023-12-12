@@ -3,6 +3,7 @@ using Microsoft.VisualBasic.Devices;
 using NAudio.Wave.SampleProviders;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
@@ -107,9 +108,15 @@ namespace PvZA11y.Widgets
             {
                 if (pageID > 0)
                 {
-                    
-                    //Program.MoveMouse(0.14f, 0.97f); //Click index button
-                    Program.Click(0.14f, 0.97f, false, false, 200); //Click index button
+                    string indexChain = pointerChain + ",18c";
+                    int indexPosX = memIO.mem.ReadInt(indexChain + memIO.ptr.inlineButtonPosXOffset); //32
+                    int indexPosY = memIO.mem.ReadInt(indexChain + memIO.ptr.inlineButtonPosYOffset); //567
+                    int indexWidth = memIO.mem.ReadInt(indexChain + memIO.ptr.inlineButtonWidthOffset);
+                    int indexHeight = memIO.mem.ReadInt(indexChain + memIO.ptr.inlineButtonHeightOffset);
+                    float clickX = (indexPosX + indexWidth / 2) / 800.0f;
+                    float clickY = (indexPosY + indexHeight / 2) / 600.0f;
+
+                    Program.Click(clickX, clickY, false, false,100,true);
 
                     int delayCount = 30;   //~30ms timeout to avoid hanging while waiting for almanac to update
                     while (pageID > 0 && delayCount-- > 0)
@@ -120,8 +127,15 @@ namespace PvZA11y.Widgets
                 }
                 else
                 {
-                    //Program.MoveMouse(0.9f, 0.97f); //Click close button
-                    Program.Click(0.9f, 0.97f, false, false, 200); //Click close button
+                    string closeChain = pointerChain + ",188";
+                    int closePosX = memIO.mem.ReadInt(closeChain + memIO.ptr.inlineButtonPosXOffset); //676
+                    int closePosY = memIO.mem.ReadInt(closeChain + memIO.ptr.inlineButtonPosYOffset); //567
+                    int closeWidth = memIO.mem.ReadInt(closeChain + memIO.ptr.inlineButtonWidthOffset);
+                    int closeHeight = memIO.mem.ReadInt(closeChain + memIO.ptr.inlineButtonHeightOffset);
+                    float clickX = (closePosX + closeWidth / 2) / 800.0f;
+                    float clickY = (closePosY + closeHeight / 2) / 600.0f;
+
+                    Program.Click(clickX, clickY, false, false, 100, true);
                 }
 
                 hasUpdatedContents = true;

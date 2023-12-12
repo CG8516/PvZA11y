@@ -71,6 +71,13 @@ namespace PvZA11y
             ret.usernamePickerCountOffset = ",1a0";
             ret.usernamePickerNamesOffset = ",194";
 
+            ret.inlineButtonPosXOffset = ",10";
+            ret.inlineButtonPosYOffset = ",14";
+            ret.inlineButtonWidthOffset = ",18";
+            ret.inlineButtonHeightOffset = ",1c";
+
+            ret.awardContinueButton = ",a8";
+
             return ret;
         }
     }
