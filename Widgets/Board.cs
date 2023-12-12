@@ -528,7 +528,188 @@ namespace PvZA11y.Widgets
             }
         }
 
+
+        string? GetCurrentTileObject(bool informEmptyTiles = true, bool beepOnFound = true, bool beepOnEmpty = true)
+        {
+            var gridItems = Program.GetGridItems();
+
+            int vaseType = -1;
+            bool hasCrater = false;
+            bool hasGravestone = false;
+            for (int i = 0; i < gridItems.Count; i++)
+            {
+                if (gridItems[i].x == gridInput.cursorX && gridItems[i].y == gridInput.cursorY)
+                {
+                    if (gridItems[i].type == (int)GridItemType.Gravestone)
+                        hasGravestone = true;
+                    else if (gridItems[i].type == (int)GridItemType.Vase)
+                        vaseType = gridItems[i].state;
+                    else if (gridItems[i].type == (int)GridItemType.Crater)
+                        hasCrater = true;
+
+                }
+            }
+
+            float rightVol = (float)gridInput.cursorX / (float)gridInput.width;
+            float freq = 1000.0f - ((gridInput.cursorY * 500.0f) / (float)gridInput.height);
+
+            var plant = Program.GetPlantAtCell(gridInput.cursorX, gridInput.cursorY);
+
+            string plantInfoString = "";
+
+            if (plant.plantType == -1)
+            {
+                //Get row type
+                int rowType = memIO.mem.ReadInt(memIO.ptr.boardChain + "," + (0x5f0 + (gridInput.cursorY * 4)).ToString("X2"));
+                LevelType levelType = memIO.GetLevelType();
+
+                string typeString = "";
+
+                typeString = rowType == 0 ? "dirt" : rowType == 1 ? "grass" : rowType == 2 ? "water" : "";
+                if (levelType == LevelType.Roof || levelType == LevelType.Boss)
+                    typeString = "roof";
+
+                if (hasCrater)
+                    plantInfoString = "Crater";
+                else if (hasGravestone)
+                    plantInfoString = "Gravestone";
+                else if (vaseType != -1)
+                    plantInfoString = vaseType == 3 ? "Mystery vase" : vaseType == 4 ? "Plant vase" : "Zombie vase";
+                else
+                {
+                    if (informEmptyTiles)
+                        plantInfoString = "Empty " + typeString + " tile";
+                    else
+                        plantInfoString = null;
+                }
+
+                if ((hasCrater || hasGravestone || vaseType != -1) && beepOnFound)
+                    Program.PlayTone(1.0f- rightVol, rightVol, freq, freq, 100, SignalGeneratorType.SawTooth);
+                else if(beepOnEmpty)
+                {
+                    Program.PlayTone(1.0f- rightVol, rightVol, freq, freq, 50, SignalGeneratorType.Square);
+                    //Program.PlayTone(1.0f- rightVol, rightVol, freq-100, freq, 50, SignalGeneratorType.Square, 55);
+                }
+            }
+            else
+            {
+                Console.WriteLine("PlantID: " + plant.plantType);
+                if (plant.squished)
+                    plantInfoString = "Squished ";
+                if (plant.sleeping)
+                    plantInfoString += "Sleeping ";
+                if (plant.plantType == (int)SeedType.SEED_POTATOMINE)
+                {
+                    if (plant.state == 0)
+                        plantInfoString = "Buried ";
+                    else
+                        plantInfoString = "Armed ";
+                }
+                plantInfoString += Consts.plantNames[plant.plantType];
+                if (plant.plantType != (int)SeedType.SEED_PUMPKINSHELL && plant.hasPumpkin)
+                    plantInfoString += " with pumpkin shield";
+
+                if(beepOnFound)
+                    Program.PlayTone(1.0f- rightVol, rightVol, freq, freq, 100, SignalGeneratorType.SawTooth);
+            }
+
+            return plantInfoString;
+        }
         
+        string? GetZombieInfo(bool currentTileOnly = false, bool beepOnFound = true, bool beepOnNone = true, bool includeTileName = true)
+        {
+            List<Zombie> zombies = GetZombies();
+            int y = gridInput.cursorY;
+            float dirtyOffset = gridInput.cursorX * 5f;
+            float targetX = (gridInput.cursorX * 100.0f) - 60.0f - dirtyOffset;
+
+            List<Zombie> zombiesThisRow = new List<Zombie>();
+
+            for (int i = 0; i < zombies.Count; i++)
+            {
+                if (zombies[i].row == y)
+                {
+                    Console.Write("{0} ", zombies[i].posX);
+                    if(currentTileOnly && (zombies[i].posX >= targetX && zombies[i].posX <= targetX + 100.0f))
+                        zombiesThisRow.Add(zombies[i]);
+                    else if(!currentTileOnly)
+                        zombiesThisRow.Add(zombies[i]);
+                }
+            }
+            Console.WriteLine("");
+
+            string verboseZombieInfo = "";
+
+            Fireball? fireball = GetZombossFireballInfo();
+            bool needToAddFireball = false;
+            if (fireball.HasValue && fireball.Value.row == gridInput.cursorY)
+            {
+                verboseZombieInfo = (1 + zombiesThisRow.Count).ToString() + ".";
+                needToAddFireball = true;
+            }
+            else
+                verboseZombieInfo = zombiesThisRow.Count.ToString() + ".";
+
+            zombiesThisRow.Sort((x, y) => (int)x.posX - (int)y.posX); //Sort by distance (so we can print/inform player in the correct order when speaking)
+
+            for (int i = 0; i < zombiesThisRow.Count; i++)
+            {
+                if (needToAddFireball && zombiesThisRow[i].posX > fireball.Value.x)
+                {
+                    string name = fireball.Value.isIce ? "Ice Ball." : "Fire Ball.";
+
+                    int ballColumn = (int)((fireball.Value.x + 100.0f) / 100.0f);
+                    ballColumn = ballColumn < 0 ? 0 : ballColumn;
+                    ballColumn = ballColumn > 10 ? 10 : ballColumn;
+
+                    verboseZombieInfo += "\r\n" + (includeTileName ? ((char)('A' + ballColumn) + ": ") : " ") + name;
+
+                    needToAddFireball = false;
+                }
+
+
+                //For each zombie, play a sound, with a start delay relative to their distance from left to right
+                float rVolume = zombiesThisRow[i].posX / 900.0f;
+                float lVolume = 1.0f - rVolume;
+                int startDelay = (int)(zombiesThisRow[i].posX / 2.0f);
+                if (startDelay > 1000 || startDelay < 0)
+                    continue;
+
+                if(beepOnFound)
+                    Program.PlayTone(lVolume, rVolume, 300, 300, 100, SignalGeneratorType.Sin, startDelay);
+
+                if (zombiesThisRow[i].zombieType >= (int)ZombieType.CachedZombieTypes)
+                    continue;
+                string zombieName = Consts.zombieNames[zombiesThisRow[i].zombieType];
+                int zombieNameLen = zombieName.Length;
+
+                int zombieColumn = (int)((zombiesThisRow[i].posX + 100.0f) / 100.0f);
+                if (zombieColumn < 0)
+                    zombieColumn = 0;
+                if (zombieColumn > 10)
+                    zombieColumn = 10;
+
+                if (zombiesThisRow[i].zombieType == (int)ZombieType.DrZomBoss)
+                {
+                    if (zombiesThisRow[i].phase >= 87 && zombiesThisRow[i].phase <= 89)
+                        zombieName = "Zomboss Head";
+                }
+
+                verboseZombieInfo += " " + (includeTileName ? ((char)('A' + zombieColumn) + " ") : " ") + zombieName + ", ";
+            }
+
+            if (zombiesThisRow.Count == 0)
+            {
+                if (beepOnNone)
+                {
+                    Program.PlayTone(1, 1, 200, 200, 50, SignalGeneratorType.SawTooth);
+                    Program.PlayTone(1, 1, 250, 250, 50, SignalGeneratorType.SawTooth, 55);
+                }
+                return null;
+            }
+            else
+                return verboseZombieInfo;
+        }
 
         public override void Interact(InputIntent intent)
         {
@@ -570,96 +751,12 @@ namespace PvZA11y.Widgets
             //Zombie info hotkey
             if (intent == InputIntent.Info1)
             {
+                string? zombiesThisRow = GetZombieInfo();
+                if(zombiesThisRow == null)
+                    zombiesThisRow = "No Zombies";
 
-                List<Zombie> zombies = GetZombies();
-                int y = gridInput.cursorY;
-                List<Zombie> zombiesThisRow = new List<Zombie>();
-
-                for (int i = 0; i < zombies.Count; i++)
-                {
-                    if (zombies[i].row == y)
-                    {
-                        Console.Write("{0} ", zombies[i].posX);
-                        zombiesThisRow.Add(zombies[i]);
-                    }
-                }
-                Console.WriteLine("");
-
-                string verboseZombieInfo = "";
-
-                Fireball? fireball = GetZombossFireballInfo();
-                bool needToAddFireball = false;
-                if (fireball.HasValue && fireball.Value.row == gridInput.cursorY)
-                {
-                    verboseZombieInfo = (1 + zombiesThisRow.Count).ToString() + ".";
-                    needToAddFireball = true;
-                }
-                else
-                    verboseZombieInfo = zombiesThisRow.Count.ToString() + ".";
-
-                zombiesThisRow.Sort((x, y) => (int)x.posX - (int)y.posX); //Sort by distance (so we can print/inform player in the correct order when speaking)
-
-                for (int i = 0; i < zombiesThisRow.Count; i++)
-                {
-                    if (needToAddFireball && zombiesThisRow[i].posX > fireball.Value.x)
-                    {
-                        string name = fireball.Value.isIce ? "Ice Ball." : "Fire Ball.";
-
-                        int ballColumn = (int)((fireball.Value.x + 100.0f) / 100.0f);
-                        ballColumn = ballColumn < 0 ? 0 : ballColumn;
-                        ballColumn = ballColumn > 10 ? 10 : ballColumn;
-
-                        verboseZombieInfo += "\r\n" + (char)('A' + ballColumn) + ": " + name;
-
-                        needToAddFireball = false;
-                    }
-
-
-                    //For each zombie, play a sound, with a start delay relative to their distance from left to right
-                    float rVolume = zombiesThisRow[i].posX / 900.0f;
-                    float lVolume = 1.0f - rVolume;
-                    int startDelay = (int)(zombiesThisRow[i].posX / 2.0f);
-                    if (startDelay > 1000 || startDelay < 0)
-                        continue;
-
-                    Program.PlayTone(lVolume, rVolume, 300, 300, 100, SignalGeneratorType.Sin, startDelay);
-
-                    if (zombiesThisRow[i].zombieType >= (int)ZombieType.CachedZombieTypes)
-                        continue;
-                    string zombieName = Consts.zombieNames[zombiesThisRow[i].zombieType];
-                    int zombieNameLen = zombieName.Length;
-
-                    int zombieColumn = (int)((zombiesThisRow[i].posX + 100.0f) / 100.0f);
-                    if (zombieColumn < 0)
-                        zombieColumn = 0;
-                    if (zombieColumn > 10)
-                        zombieColumn = 10;
-
-                    if (zombiesThisRow[i].zombieType == (int)ZombieType.DrZomBoss)
-                    {
-                        if (zombiesThisRow[i].phase >= 87 && zombiesThisRow[i].phase <= 89)
-                            zombieName = "Zomboss Head";
-                    }
-
-                    verboseZombieInfo += "\r\n" + (char)('A' + zombieColumn) + ": " + zombieName + ".";
-                }
-
-                if (zombiesThisRow.Count == 0)
-                {
-                    Program.PlayTone(1, 1, 200, 200, 50, SignalGeneratorType.SawTooth);
-                    Program.PlayTone(1, 1, 250, 250, 50, SignalGeneratorType.SawTooth, 55);
-
-                    Console.WriteLine("No Zombies");
-                    Program.Say("No Zombies", true);
-                }
-                else
-                {
-                    Console.WriteLine(verboseZombieInfo);
-                    Program.Say(verboseZombieInfo, true);
-                }
-
-
-
+                Console.WriteLine(zombiesThisRow);
+                Program.Say(zombiesThisRow);
             }
 
             var plants = GetPlantsInBoardBank();
@@ -690,20 +787,67 @@ namespace PvZA11y.Widgets
                 gridInput.cursorY = gridInput.cursorY < minY ? minY : gridInput.cursorY;
                 gridInput.cursorY = gridInput.cursorY > maxY ? maxY : gridInput.cursorY;
 
+                string totalTileInfoStr = "";
+
                 if(prevX == gridInput.cursorX && prevY == gridInput.cursorY)
                     Program.PlayTone(1, 1, 70, 70, 50, SignalGeneratorType.Square);
                 else
                 {
                     float rightVol = (float)gridInput.cursorX / (float)gridInput.width;
                     float freq = 1000.0f - ((gridInput.cursorY * 500.0f) / (float)gridInput.height);
-                    Program.PlayTone(1.0f - rightVol, rightVol, freq, freq, 100, SignalGeneratorType.Sin);
+
+                    bool plantFound = false;
+                    if (Config.current.SayPlantOnTileMove || Config.current.BeepWhenPlantFound)
+                    {
+                        //Say plant at current tile
+                        string? tileObjectInfo = GetCurrentTileObject(false, Config.current.BeepWhenPlantFound, false);
+                        plantFound = tileObjectInfo != null;
+                        if (tileObjectInfo is not null && Config.current.SayPlantOnTileMove)
+                            totalTileInfoStr += tileObjectInfo;
+                    }
+
+                    bool zombieFound = false;
+                    if(Config.current.SayZombieOnTileMove || Config.current.BeepWhenZombieFound)
+                    {
+                        string? zombiesThisTile = GetZombieInfo(true,false,false,false);
+                        if (zombiesThisTile != null)
+                        {
+                            zombieFound = true;
+
+                            if (Config.current.SayZombieOnTileMove)
+                                totalTileInfoStr += " " + zombiesThisTile;
+
+                            if (Config.current.BeepWhenZombieFound)
+                            {
+                                //Try getting the count from the string
+                                int count = zombiesThisTile[0] - '0';
+                                float zombieFreq = freq - 30;
+                                Program.PlayTone(1.0f - rightVol, rightVol, zombieFreq, zombieFreq-50, 80, SignalGeneratorType.Square);
+                                if (count > 0 && count < 10)
+                                {
+                                    for(int i =1; i < count; i++)
+                                        Program.PlayTone(1.0f - rightVol, rightVol, zombieFreq - (50*i), zombieFreq - (50*(i+1)), 80, SignalGeneratorType.Square, 100*i);
+                                }
+                            }
+                        }
+                    }
+
+
+                    
+                    if (!plantFound && !zombieFound)
+                        Program.PlayTone(1.0f - rightVol, rightVol, freq, freq, 100, SignalGeneratorType.Sin);
                 }
 
                 if (Config.current.SayTilePosOnMove)
                 {
                     string tilePos = String.Format("{0}-{1}", (char)(gridInput.cursorX + 'A'), gridInput.cursorY + 1);
-                    Console.WriteLine(tilePos);
-                    Program.Say(tilePos, true);
+                    totalTileInfoStr += " " + tilePos;
+                }
+
+                if (totalTileInfoStr.Length > 0)
+                {
+                    Console.WriteLine(totalTileInfoStr);
+                    Program.Say(totalTileInfoStr);
                 }
 
                 //Move mouse cursor to aid sighted players in knowing where their cursor is located visually
@@ -719,6 +863,7 @@ namespace PvZA11y.Widgets
                     Program.PlayTone(1.0f - rightVol, rightVol, freq, freq, 100, SignalGeneratorType.Sin);
                 }
                 */
+
             }
             else if(intent is InputIntent.Up or InputIntent.Down or InputIntent.Left or InputIntent.Right)
                 Program.PlayTone(1, 1, 70, 70, 50, SignalGeneratorType.Square);
@@ -905,83 +1050,10 @@ namespace PvZA11y.Widgets
             //Eg; Grass, Water, RoofTile, Lilypad, Flowerpot, Peashooter, Sunflower with pumpkin,
             if (intent == InputIntent.Info2)
             {
-                var gridItems = Program.GetGridItems();
-
-                int vaseType = -1;
-                bool hasCrater = false;
-                bool hasGravestone = false;
-                for (int i = 0; i < gridItems.Count; i++)
-                {
-                    if (gridItems[i].x == gridInput.cursorX && gridItems[i].y == gridInput.cursorY)
-                    {
-                        if (gridItems[i].type == (int)GridItemType.Gravestone)
-                            hasGravestone = true;
-                        else if (gridItems[i].type == (int)GridItemType.Vase)
-                            vaseType = gridItems[i].state;
-                        else if (gridItems[i].type == (int)GridItemType.Crater)
-                            hasCrater = true;
-
-                    }
-                }
 
 
-                var plant = Program.GetPlantAtCell(gridInput.cursorX, gridInput.cursorY);
-
-                string plantInfoString = "";
-
-                if (plant.plantType == -1)
-                {
-                    //Get row type
-                    int rowType = memIO.mem.ReadInt(memIO.ptr.boardChain + "," + (0x5f0 + (gridInput.cursorY * 4)).ToString("X2"));
-                    LevelType levelType = memIO.GetLevelType();
-
-                    string typeString = "";
-
-                    typeString = rowType == 0 ? "dirt" : rowType == 1 ? "grass" : rowType == 2 ? "water" : "";
-                    if (levelType == LevelType.Roof || levelType == LevelType.Boss)
-                        typeString = "roof";
-
-                    if (hasCrater)
-                        plantInfoString = "Crater";
-                    else if (hasGravestone)
-                        plantInfoString = "Gravestone";
-                    else if (vaseType != -1)
-                        plantInfoString = vaseType == 3 ? "Mystery vase" : vaseType == 4 ? "Plant vase" : "Zombie vase";
-                    else
-                        plantInfoString = "Empty " + typeString + " tile";
-
-                    if (hasCrater || hasGravestone || vaseType != -1)
-                        Program.PlayTone(1, 1, 300, 300, 100, SignalGeneratorType.SawTooth);
-                    else
-                    {
-                        Program.PlayTone(1, 1, 100, 100, 50, SignalGeneratorType.SawTooth);
-                        Program.PlayTone(1, 1, 100, 100, 50, SignalGeneratorType.SawTooth, 55);
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("PlantID: " + plant.plantType);
-                    if (plant.squished)
-                        plantInfoString = "Squished ";
-                    if (plant.sleeping)
-                        plantInfoString += "Sleeping ";
-                    if (plant.plantType == (int)SeedType.SEED_POTATOMINE)
-                    {
-                        if (plant.state == 0)
-                            plantInfoString = "Buried ";
-                        else
-                            plantInfoString = "Armed ";
-                    }
-                    plantInfoString += Consts.plantNames[plant.plantType];
-                    if (plant.plantType != (int)SeedType.SEED_PUMPKINSHELL && plant.hasPumpkin)
-                        plantInfoString += " with pumpkin shield";
-
-                    Program.PlayTone(1, 1, 300, 300, 100, SignalGeneratorType.SawTooth);
-                }
-
-
-                //TODO: ADD OPTIONAL POSITION READOUT WITH PLANT TILE INFO GRABBER
-                string totalString = plantInfoString;
+                //string totalString = plantInfoString;
+                string totalString = GetCurrentTileObject();
                 Console.WriteLine(totalString);
                 Program.Say(totalString, true);
             }
