@@ -303,8 +303,8 @@ namespace PvZA11y.Widgets
 
 
                 ChosenSeedState seedState = plantPickerState[pickerIndex].seedState;
-                float clickX = (plantPickerState[pickerIndex].posX / 800.0f) + 0.02f;
-                float clickY = (plantPickerState[pickerIndex].posY / 600.0f) + 0.02f;
+                float clickX = (plantPickerState[pickerIndex].posX / 800.0f) + 0.03f;
+                float clickY = (plantPickerState[pickerIndex].posY / 600.0f) + 0.08f;
                 if (seedState == ChosenSeedState.InBank || seedState == ChosenSeedState.InChooser)
                 {
                     //If player tries to add seed to an alread-full seedbank, play a tone
@@ -324,7 +324,7 @@ namespace PvZA11y.Widgets
                 int pickedCount = GetSelectedPlants().Length;
                 if (pickedCount == seedBankSize)
                 {
-                    Program.Click(0.29f, 0.925f);
+                    Program.Click(0.29f, 0.98f);
                     return;
                 }
 

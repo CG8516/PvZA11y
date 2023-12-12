@@ -15,7 +15,7 @@ using System.Drawing;
 using SimWinInput;
 
 /*
-[PVZ-A11y Beta 1.2]
+[PVZ-A11y Beta 1.4]
 
 Blind and motor accessibility mod for Plants Vs Zombies.
 Allows input with rebindable keys and controller buttons, rather than requiring a mouse for input.
@@ -535,7 +535,7 @@ namespace PvZA11y
 
             //SimMouse.Click(MouseButtons.Left, clickX, clickY);
             //SimMouse.Act(SimMouse.Action.MoveOnly, cursorX, cursorY);
-            Console.WriteLine("New click");
+            //Console.WriteLine("New click");
 
             POINT targetPoint = new POINT() { x = clickX, y = clickY };
             ClientToScreen(gameWHnd, ref targetPoint);
@@ -960,8 +960,8 @@ namespace PvZA11y
 
                 //Get pos, add a couple of pixels to account for rounding errors
                 Vector2 pos = new Vector2();
-                pos.X = (mem.ReadFloat(memIO.ptr.boardChain + ",fc," + (index + 0x24).ToString("X2"))+2.0f) / 800.0f;
-                pos.Y = (mem.ReadFloat(memIO.ptr.boardChain + ",fc," + (index + 0x28).ToString("X2"))+2.0f) / 600.0f;
+                pos.X = (mem.ReadFloat(memIO.ptr.boardChain + ",fc," + (index + 0x24).ToString("X2"))+30.0f) / 800.0f;
+                pos.Y = (mem.ReadFloat(memIO.ptr.boardChain + ",fc," + (index + 0x28).ToString("X2"))+30.0f) / 600.0f;
 
                 //If at/above the seed picker/bank, don't click.
                 if (pos.Y < 0.15f)
