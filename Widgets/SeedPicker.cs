@@ -67,6 +67,7 @@ namespace PvZA11y.Widgets
             NoFog,      //Plantern on non-foggy levels
             NoGround,   //spikeweed on roof levels
             HasGround,  //FlowerPot on non-roof levels
+            NotAllowed, //Sun/free plants on last stand
         }
 
         PlantIssue FindPlantIssues(SeedType plant)
@@ -74,6 +75,12 @@ namespace PvZA11y.Widgets
             LevelType levelType = memIO.GetLevelType();
             bool isNocturnal = Program.IsNocturnal(plant);
             bool isAquatic = Program.IsAquatic(plant);
+
+            if(memIO.GetGameMode() == (int)GameMode.LastStand)
+            {
+                if (plant is SeedType.SEED_SUNFLOWER or SeedType.SEED_TWINSUNFLOWER or PvZA11y.SeedType.SEED_SUNSHROOM or SeedType.SEED_PUFFSHROOM or SeedType.SEED_SEASHROOM)
+                    return PlantIssue.NotAllowed;
+            }
 
             if(isAquatic)
             {
@@ -223,6 +230,9 @@ namespace PvZA11y.Widgets
                     case PlantIssue.Nocturnal:
                         plantInfo = "Nocturnal. ";
                         break;
+                    case PlantIssue.NotAllowed:
+                        plantInfo = "Not allowed. ";
+                        break;
                 }
 
                 plantInfo += (isPicked ? "Picked. " : "") + Consts.plantNames[pickerIndex] + ": " + sunCost + ": " + Consts.plantDescriptions[pickerIndex];
@@ -301,6 +311,15 @@ namespace PvZA11y.Widgets
                 int startPickCount = GetSelectedPlants().Length;
                 int endPickCount = startPickCount;
 
+                PlantIssue issue = FindPlantIssues((SeedType)pickerIndex);
+                if(issue is PlantIssue.NotAllowed)
+                {
+                    Program.PlayTone(1, 1, 300, 300, 100, SignalGeneratorType.Triangle);
+                    string alertStr = "That plant is not allowed on this level.";
+                    Console.WriteLine(alertStr);
+                    Program.Say(alertStr);
+                    return;
+                }
 
                 ChosenSeedState seedState = plantPickerState[pickerIndex].seedState;
                 float clickX = (plantPickerState[pickerIndex].posX / 800.0f) + 0.02f;

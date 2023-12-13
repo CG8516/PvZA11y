@@ -931,6 +931,18 @@ namespace PvZA11y.Widgets
         {
             if(intent == InputIntent.Option)
             {
+                if(memIO.GetGameMode() == (int)GameMode.LastStand)
+                {
+                    //start/continue onslaught button
+                    //boardPtr,164,105
+                    bool buttonVisible = memIO.mem.ReadByte(memIO.ptr.boardChain + ",164,105") != 1;
+                    if(buttonVisible)
+                    {
+                        Program.Click(0.5f, 0.98f);
+                        return;
+                    }
+                }
+                
                 bool mPaused = !memIO.GetBoardPaused();
                 memIO.SetBoardPaused(mPaused);
 
