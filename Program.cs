@@ -13,7 +13,7 @@ using System.Collections.Immutable;
 using PvZA11y.Widgets;
 
 /*
-[PVZ-A11y Beta 1.7]
+[PVZ-A11y Beta 1.8]
 
 Blind and motor accessibility mod for Plants Vs Zombies.
 Allows input with rebindable keys and controller buttons, rather than requiring a mouse for input.
@@ -31,14 +31,12 @@ Works by using pointerchains to find values in memory.
 Sends mouse movement and click events to the game process, to simulate input.
 
 Todo:
-    Make lawnMowers/poolCleaners/roofSweepers/iZombieBrains accessible (maybe play a left-panned squareWave when using zombie sonar, if one is present in that lane.)
     Imitater support in plant picker
     Ensure feature-parity across game versions
     Level progress for all minigame/puzzle modes
     Make all minigames blind-accessible. Some will be easy (Seeing Stars), but some will take a lot of work to before they can be not just played, but enjoyed, by blind gamers.
     Fix bug that causes tutorial messages to be played more than once (also happens when resuming an in-progress game on a level with a tutorial)
     Make dropped seed packets more acccessible, for modes like vasebreaker (don't instantly grab them, maybe move them to top of screen, and cycle similarly to normal plant deck)
-    Make zomboni ice trails accessible
     Allow plants to be placed in whack-a-zombie (cherry bomb, gravebuster, ice shroom)
     Calculate scaled plant-upgrade prices in 'Last Stand' minigame (plant upgrade prices increase as you use them)
         Inform player that sun plants aren't allowed on 'Last Stand' minigame

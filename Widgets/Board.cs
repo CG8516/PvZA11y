@@ -547,7 +547,7 @@ namespace PvZA11y.Widgets
             }
             if(level == 15)
             {
-                Program.GameplayTutorial(new string[] { "This is Whack-A-Zombie.", "Zombies will quickly rise from graves around the lawn.", "You need to quickly find each zombie, then hit them with the confirm button.", "Some zombies take more than one hit." });
+                Program.GameplayTutorial(new string[] { "This is Whack-A-Zombie.", "Zombies will quickly rise from graves around the lawn.", "You need to quickly find each zombie, then press the deny button to whack them with your mallet.", "Some zombies take more than one hit, and some will drop sun for you to use." });
             }
             if(level == 21)
             {
@@ -1107,7 +1107,7 @@ namespace PvZA11y.Widgets
                     Program.Say(plantStr, true);
                 }
             }
-            else if((intent is InputIntent.CycleLeft or InputIntent.CycleRight) && !inWhackAZombie)
+            else if((intent is InputIntent.CycleLeft or InputIntent.CycleRight))
             {
                 //Move mouse cursor to aid sighted players in knowing which seed packet is selected
                 //Program.PlacePlant(seedbankSize, plants[seedbankSlot].offsetX, false, true, true);
@@ -1139,7 +1139,7 @@ namespace PvZA11y.Widgets
             if(intent == InputIntent.Confirm && plants[seedbankSlot].packetType >= 0)
             {
                 //Click where plant needs to go. Not where plant is located (we already grab plant when auto-collecting everything on screen)
-                if (inVaseBreaker || inRainingSeeds || inWhackAZombie)
+                if (inVaseBreaker || inRainingSeeds)
                     PlacePlant(seedbankSlot, seedbankSize, plants[seedbankSlot].offsetX, false, false, false);
                 //Program.PlacePlant(0, 0, false);
                 else if (plants[seedbankSlot].absX < 0.72f)
@@ -1187,7 +1187,9 @@ namespace PvZA11y.Widgets
 
             if (intent == InputIntent.Deny)
             {
-                if (Config.current.RequireShovelConfirmation)
+                if(inWhackAZombie)
+                    PlacePlant(seedbankSlot, seedbankSize, plants[seedbankSlot].offsetX, false, false, false);
+                else if (Config.current.RequireShovelConfirmation)
                 {
                     if (shovelPressedLast)
                     {
