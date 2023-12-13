@@ -48,6 +48,7 @@ namespace PvZA11y
             public bool SayZombieOnTileMove = false;
             public bool SayLawnmowerType = false;
             public bool FastZombieAlert = true;
+            public bool BeepOnPacketReady = true;
             
 
             //Core functionality

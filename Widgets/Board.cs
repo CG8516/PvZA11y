@@ -18,7 +18,7 @@ namespace PvZA11y.Widgets
     class Board : Widget
     {
         GridInput gridInput;
-        int seedbankSlot;
+        public int seedbankSlot;
         int heldPlantID;    //For VaseBreaker/ItsRainingSeeds
         bool shovelPressedLast; //Whether the shovel was the last input (required for shovel confirmation mode)
         int animatingSunAmount;
@@ -592,6 +592,29 @@ namespace PvZA11y.Widgets
                 }
             }
             return count;
+        }
+
+        //Returns true if current plant packet is fully refreshed, and there's enough sun to place it
+        public bool PlantPacketReady()
+        {
+            bool inIZombie = memIO.GetGameMode() >= (int)GameMode.IZombie1 && memIO.GetGameMode() <= (int)GameMode.IZombieEndless;
+
+            var plants = GetPlantsInBoardBank();
+
+            if (plants[seedbankSlot].packetType < 0)
+                return false;
+
+            int sunAmount = memIO.mem.ReadInt(memIO.ptr.boardChain + ",5578");    //Such a huge struct //TODO: Is that the same struct, or does it just happen to usually be in memory after the board? ie; will a fragmented heap cause this to go somewhere else?
+            sunAmount += animatingSunAmount;
+            int sunCost = inIZombie ? Consts.iZombieSunCosts[plants[seedbankSlot].packetType - 60] : Consts.plantCosts[plants[seedbankSlot].packetType];
+
+            bool notEnoughSun = sunAmount < sunCost;
+            bool refreshing = plants[seedbankSlot].isRefreshing;
+
+            if (notEnoughSun || refreshing)
+                return false;
+
+            return true;
         }
 
         bool CheckIceAtTile()

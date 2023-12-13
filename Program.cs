@@ -1601,6 +1601,8 @@ namespace PvZA11y
             int oldMsgDuration = 0;
 
             int prevFastZombieCount = 0;
+            bool packetWasReady = false;
+            int prevSeedbankSlot = -1;
 
             while (true)
             {
@@ -1696,12 +1698,20 @@ namespace PvZA11y
                     animatingSun = CollectBoardStuff(currentWidget);
 
                 int thisFastZombieCount = 0;
+                bool plantPacketReady = false;
 
                 if (currentWidget is Board)
                 {
                     ((Board)currentWidget).SetAnimatingSunAmount(animatingSun);
                     thisFastZombieCount = ((Board)currentWidget).GetFastZombieCount();
+                    plantPacketReady = ((Board)currentWidget).PlantPacketReady();
+                    if (((Board)currentWidget).seedbankSlot != prevSeedbankSlot)
+                        packetWasReady = false;
+
+                    prevSeedbankSlot = ((Board)currentWidget).seedbankSlot;
                 }
+                else
+                    prevSeedbankSlot = -1;
 
                 if(thisFastZombieCount > prevFastZombieCount && Config.current.FastZombieAlert)
                 {
@@ -1714,6 +1724,13 @@ namespace PvZA11y
 
                 prevFastZombieCount = thisFastZombieCount;
 
+                if (plantPacketReady && !packetWasReady && Config.current.BeepOnPacketReady)
+                {
+                    PlayTone(0.5f, 0.5f, 700, 700, 100, SignalGeneratorType.Square, 0);
+                    PlayTone(0.5f, 0.5f, 800, 800, 100, SignalGeneratorType.Square, 100);
+                }
+
+                packetWasReady = plantPacketReady;
 
                 DoWidgetInteractions(currentWidget, input);
 
