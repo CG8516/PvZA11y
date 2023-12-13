@@ -532,9 +532,17 @@ namespace PvZA11y.Widgets
                 Program.GameplayTutorial(new string[] { "Pressing the deny button will dig up the plant at your current board position.", "Move around the board, and use the Info2 button to find the three peashooters.", "Shovel all three peashooters to continue." });
                 Program.GameplayTutorial(new string[] { "You will soon be playing a conveyor level, where your deck is replaced with a conveyor belt.", "As you play, plants will arrive and build up on the conveyor belt.", "When you place a plant, it is removed from the conveyor belt." });
             }
+            if(level == 6)
+            {
+                Program.GameplayTutorial(new string[] { "Each row has a lawn mower on the left side.", "If a zombie reaches a lawnmower, it will be activated and shred all zombies in that row.", "Once a lawnmower has been used, it won't come back until the level restarts, or a new one begins." });
+            }
             if(level == 10)
             {
                 Program.GameplayTutorial(new string[] { "This is another conveyor belt level, similar to the bowling minigame.", "Plants will stop arriving when the belt gets full.", "Placing a plant will make room on the belt, and it will start moving again." });
+            }
+            if(level == 11)
+            {
+                Program.GameplayTutorial(new string[] { "The sun has set; leaving you with new challenges to face in this moonlit night.", "You'll find gravstones scattered around your front yard, which can not be planted on.", "And on the final wave of each level, additional zombies will emerge from the graves." });
             }
             if(level == 15)
             {
@@ -543,6 +551,10 @@ namespace PvZA11y.Widgets
             if(level == 21)
             {
                 Program.GameplayTutorial(new string[] { "Your backyard has six rows of tiles, with an in-ground pool taking up the two middle rows.", "Only aquatic plants can be placed in the pool, however, you can place non-aquatic plants on top of lillypads." });
+            }
+            if(level == 31)
+            {
+                Program.GameplayTutorial(new string[] { "As the moon takes the suns place in the sky, it brings a thick rolling fog with it." });
             }
             if(level == 35)
             {
