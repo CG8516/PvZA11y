@@ -31,6 +31,12 @@ namespace PvZA11y.Widgets
             public int maxHealth;
         }
 
+        public struct LawnMower
+        {
+            public MowerType mowerType;
+            public int row;
+        }
+
         struct Fireball
         {
             public float x;
@@ -98,6 +104,34 @@ namespace PvZA11y.Widgets
             }
 
             return 0;
+        }
+
+        public List<LawnMower> GetLawnMowers(bool thisRowOnly = false)
+        {
+            List<LawnMower> lawnMowers = new List<LawnMower>();
+
+            int maxIndex = memIO.mem.ReadInt(memIO.ptr.boardChain + ",11c");
+            int currentCount = memIO.mem.ReadInt(memIO.ptr.boardChain + ",128");
+            //118
+            for(int i =0; i < maxIndex; i++)
+            {
+                int index = i * 0x48;
+
+                int state = memIO.mem.ReadInt(memIO.ptr.boardChain + ",118," + (index + 0x2c).ToString("X2"));
+                byte isDead = (byte)memIO.mem.ReadByte(memIO.ptr.boardChain + ",118," + (index + 0x30).ToString("X2"));
+                byte isVisible = (byte)memIO.mem.ReadByte(memIO.ptr.boardChain + ",118," + (index + 0x31).ToString("X2"));
+                if (state != 1 || isDead == 1 || isVisible == 0)
+                    continue;
+
+                int row = memIO.mem.ReadInt(memIO.ptr.boardChain + ",118," + (index + 0x14).ToString("X2"));
+                int type = memIO.mem.ReadInt(memIO.ptr.boardChain + ",118," + (index + 0x34).ToString("X2"));
+
+                if (thisRowOnly && row != gridInput.cursorY)
+                    continue;
+                lawnMowers.Add(new LawnMower() { row = row, mowerType = (MowerType)type });
+            }
+
+            return lawnMowers;
         }
 
         public List<Zombie> GetZombies(bool seedPicker = false)
@@ -1025,6 +1059,20 @@ namespace PvZA11y.Widgets
                 //Program.Debug_FinishLevel();
                 //return;
 
+                string info4String = "";
+
+                var lawnMowers = GetLawnMowers(true);
+
+                float freq = 1000.0f - ((gridInput.cursorY * 500.0f) / (float)gridInput.height);
+
+                if (lawnMowers.Count > 0)
+                {
+                    if(Config.current.SayLawnmowerType)
+                        info4String += lawnMowers[0].mowerType.ToString();
+                    Program.PlayTone(1, 0, freq, freq, 100, SignalGeneratorType.Square, 0);
+                    //Program.PlayTone(1, 0, freq, freq, 100, SignalGeneratorType.Sin, 0);
+                }
+
                 //GetZombossHealth
                 bool zomBossMinigame = memIO.GetGameMode() == (int)GameMode.DrZombossRevenge;
 
@@ -1035,15 +1083,16 @@ namespace PvZA11y.Widgets
                     percentage = 1.0f - percentage;
                     percentage *= 100.0f;
                     string percentStr = percentage.ToString("0") + "% complete.";
-                    Console.WriteLine(percentStr);
-                    Program.Say(percentStr, true);
+                    info4String += " " + percentStr;
                 }
                 else
                 {
                     string waveInfo = GetWaveInfo();
-                    Console.WriteLine(waveInfo);
-                    Program.Say(waveInfo, true);
+                    info4String += " " + waveInfo;
                 }
+
+                Console.WriteLine(info4String);
+                Program.Say(info4String, true);
             }
 
             //Get plant info for this cell

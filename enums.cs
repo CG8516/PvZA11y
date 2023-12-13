@@ -699,6 +699,14 @@ namespace PvZA11y
         Credits,
         MinigameSelector
     }
+
+    enum MowerType
+    {
+        LawnMower,
+        PoolCleaner,
+        RoofSweeper,
+        TrickedOut
+    }
     
     public static class DialogIDs
     {

@@ -46,6 +46,7 @@ namespace PvZA11y
             public bool BeepWhenPlantFound = true;
             public bool BeepWhenZombieFound = true;
             public bool SayZombieOnTileMove = false;
+            public bool SayLawnmowerType = false;
             
 
             //Core functionality
