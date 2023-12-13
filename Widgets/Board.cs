@@ -656,11 +656,70 @@ namespace PvZA11y.Widgets
                     else
                         plantInfoString = "Armed ";
                 }
+                if(plant.plantType == (int)SeedType.SEED_CHOMPER)
+                {
+                    if (plant.state == 13)
+                        plantInfoString = "Chewing ";
+                }
+                if (plant.plantType == (int)SeedType.SEED_SCAREDYSHROOM)
+                {
+                    if (plant.state == 20 || plant.state == 21)
+                        plantInfoString = "Buried ";
+                }
+                if (plant.plantType == (int)SeedType.SEED_SUNSHROOM)
+                {
+                    if (plant.state == 23)
+                        plantInfoString = "Small ";
+                }
+                if(plant.plantType == (int)SeedType.SEED_MAGNETSHROOM)
+                {
+                    if (plant.state == 27)
+                        plantInfoString = "Filled ";
+                }
                 plantInfoString += Consts.plantNames[plant.plantType];
                 if (plant.plantType != (int)SeedType.SEED_PUMPKINSHELL && plant.hasPumpkin)
                     plantInfoString += " with pumpkin shield";
 
-                if(beepOnFound)
+                if (plant.plantType == (int)SeedType.SEED_MAGNETSHROOM && plant.magItem != 0)
+                {
+                    switch(plant.magItem)
+                    {
+                        case 1:
+                        case 2:
+                        case 3:
+                            plantInfoString += " holding bucket";
+                            break;
+                        case 4:
+                        case 5:
+                        case 6:
+                            plantInfoString += " holding football helmet";
+                            break;
+                        case 7:
+                        case 8:
+                        case 9:
+                            plantInfoString += " holding screen door";
+                            break;
+                        case 10:
+                        case 11:
+                        case 12:
+                            plantInfoString += " holding pogo stick";
+                            break;
+                        case 13:
+                            plantInfoString += " holding Jack-in-the-box";
+                            break;
+                        case 14:
+                        case 15:
+                        case 16:
+                        case 17:
+                            plantInfoString += " holding ladder";
+                            break;
+                        case 21:
+                            plantInfoString += " holding pickaxe";
+                            break;
+                    }
+                }
+
+                if (beepOnFound)
                     Program.PlayTone(1.0f- rightVol, rightVol, freq, freq, 100, SignalGeneratorType.SawTooth);
             }
 

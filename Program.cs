@@ -594,6 +594,7 @@ namespace PvZA11y
             public int row;
             public int column;
             public int state;
+            public int magItem;
 
             //Only gathered when GetPlantAtCell is called
             public bool hasPumpkin;
@@ -705,6 +706,7 @@ namespace PvZA11y
             bool squished = false;
             bool sleeping = false;
             int state = 0;
+            int magItem = 0;
             for(int i =0; i < plants.Count; i++)
             {
                 if (plants[i].column != x)
@@ -723,6 +725,9 @@ namespace PvZA11y
                     plantID = plants[i].plantType;
                     state = plants[i].state;
                 }
+                
+                if (plants[i].magItem != 0)
+                    magItem = plants[i].magItem;
 
                 squished |= plants[i].squished;
                 sleeping |= plants[i].sleeping;
@@ -738,6 +743,7 @@ namespace PvZA11y
             plant.squished = squished;
             plant.sleeping = sleeping;
             plant.state = state;
+            plant.magItem = magItem;
 
             if (plant.hasLillypad && plant.plantType == -1)
                 plant.plantType = (int)SeedType.SEED_LILYPAD;
@@ -774,6 +780,15 @@ namespace PvZA11y
                     p.plantType = mem.ReadInt(memIO.ptr.boardChain + ",c4," + (index + 0x24).ToString("X2"));
                     p.column = mem.ReadInt(memIO.ptr.boardChain + ",c4," + (index + 0x28).ToString("X2"));
                     p.state = mem.ReadInt(memIO.ptr.boardChain + ",c4," + (index + 0x3c).ToString("X2"));
+
+                    //magnetItems: c8
+                    for(int mag = 0; mag < 5; mag++)
+                    {
+                        int magIndex = index + 0xc8 + (mag * 0x14) + 0x10;
+                        int magItem = mem.ReadInt(memIO.ptr.boardChain + ",c4," + (magIndex).ToString("X2"));
+                        if (magItem > 0 && (magItem <= 17 || magItem == 21))
+                            p.magItem = magItem;
+                    }
 
                     plants.Add(p);
                 }
