@@ -562,6 +562,21 @@ namespace PvZA11y.Widgets
             }
         }
 
+        int getIzombieBrainCount(bool thisRowOnly = false)
+        {
+            int count = 0;
+
+            var gridItems = Program.GetGridItems();
+            foreach (var item in gridItems)
+            {
+                if ((GridItemType)item.type == GridItemType.IzombieBrain)
+                {
+                    if (!thisRowOnly || item.y == gridInput.cursorY)
+                        count++;
+                }
+            }
+            return count;
+        }
 
         string? GetCurrentTileObject(bool informEmptyTiles = true, bool beepOnFound = true, bool beepOnEmpty = true)
         {
@@ -1073,6 +1088,9 @@ namespace PvZA11y.Widgets
                     //Program.PlayTone(1, 0, freq, freq, 100, SignalGeneratorType.Sin, 0);
                 }
 
+                if(getIzombieBrainCount(true) > 0)
+                    Program.PlayTone(1, 0, freq, freq, 100, SignalGeneratorType.Square, 0);
+
                 //GetZombossHealth
                 bool zomBossMinigame = memIO.GetGameMode() == (int)GameMode.DrZombossRevenge;
 
@@ -1084,6 +1102,10 @@ namespace PvZA11y.Widgets
                     percentage *= 100.0f;
                     string percentStr = percentage.ToString("0") + "% complete.";
                     info4String += " " + percentStr;
+                }
+                else if(inIZombie)
+                {
+                    info4String += 5-getIzombieBrainCount() + " out of 5 brains eaten";
                 }
                 else
                 {
