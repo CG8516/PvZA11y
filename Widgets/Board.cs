@@ -535,6 +535,7 @@ namespace PvZA11y.Widgets
             if(level == 6)
             {
                 Program.GameplayTutorial(new string[] { "Each row has a lawn mower on the left side.", "If a zombie reaches a lawnmower, it will be activated and shred all zombies in that row.", "Once a lawnmower has been used, it won't come back until the level restarts, or a new one begins." });
+                Program.GameplayTutorial(new string[] { "Also, watch out for pole-vaulting zombies! They're fast, quiet, and jump over the first plant they run into!" });
             }
             if(level == 10)
             {
@@ -708,6 +709,10 @@ namespace PvZA11y.Widgets
                 {
                     if (plant.state == 27)
                         plantInfoString = "Filled ";
+                }
+                if(plant.hasLadder)
+                {
+                    plantInfoString += "Laddered ";
                 }
                 plantInfoString += Consts.plantNames[plant.plantType];
                 if (plant.plantType != (int)SeedType.SEED_PUMPKINSHELL && plant.hasPumpkin)

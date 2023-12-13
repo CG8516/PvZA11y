@@ -600,6 +600,7 @@ namespace PvZA11y
             public bool hasPumpkin;
             public bool hasPot;
             public bool hasLillypad;
+            public bool hasLadder;
             public bool squished;
             public bool sleeping;
         }
@@ -733,6 +734,14 @@ namespace PvZA11y
                 sleeping |= plants[i].sleeping;
             }
 
+            bool hasLadder = false;
+            var gridItems = GetGridItems();
+            foreach(var gridItem in gridItems)
+            {
+                if (gridItem.type == (int)GridItemType.Ladder && gridItem.x == x && gridItem.y == y)
+                    hasLadder = true;
+            }
+
             PlantOnBoard plant;
             plant.row = x;
             plant.column = y;
@@ -744,6 +753,7 @@ namespace PvZA11y
             plant.sleeping = sleeping;
             plant.state = state;
             plant.magItem = magItem;
+            plant.hasLadder = hasLadder;
 
             if (plant.hasLillypad && plant.plantType == -1)
                 plant.plantType = (int)SeedType.SEED_LILYPAD;
