@@ -10,6 +10,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml.Linq;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Tab;
 
 namespace PvZA11y.Widgets
@@ -762,6 +763,8 @@ namespace PvZA11y.Widgets
 
             zombiesThisRow.Sort((x, y) => (int)x.posX - (int)y.posX); //Sort by distance (so we can print/inform player in the correct order when speaking)
 
+            int prevColumn = -1;
+
             for (int i = 0; i < zombiesThisRow.Count; i++)
             {
                 if (needToAddFireball && zombiesThisRow[i].posX > fireball.Value.x)
@@ -772,7 +775,14 @@ namespace PvZA11y.Widgets
                     ballColumn = ballColumn < 0 ? 0 : ballColumn;
                     ballColumn = ballColumn > 10 ? 10 : ballColumn;
 
-                    verboseZombieInfo += "\r\n" + (includeTileName ? ((char)('A' + ballColumn) + ": ") : " ") + name;
+                    verboseZombieInfo += " ";
+                    if (ballColumn > prevColumn)
+                    {
+                        prevColumn = ballColumn;
+                        if (includeTileName)
+                            verboseZombieInfo += (char)('A' + ballColumn) + ": ";
+                    }
+                    verboseZombieInfo += name;
 
                     needToAddFireball = false;
                 }
@@ -805,7 +815,13 @@ namespace PvZA11y.Widgets
                         zombieName = "Zomboss Head";
                 }
 
-                verboseZombieInfo += " " + (includeTileName ? ((char)('A' + zombieColumn) + " ") : " ") + zombieName + ", ";
+                if (zombieColumn > prevColumn)
+                {
+                    prevColumn = zombieColumn;
+                    if (includeTileName)
+                        verboseZombieInfo += " " + (char)('A' + zombieColumn) + ": ";
+                }
+                verboseZombieInfo += zombieName + ", ";
             }
 
             if (zombiesThisRow.Count == 0)
