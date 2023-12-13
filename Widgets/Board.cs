@@ -915,6 +915,7 @@ namespace PvZA11y.Widgets
             var zombies = GetZombies();
             int poleVaultingCount = 0;
             int footballCount = 0;
+            int bobsledCount = 0;
             foreach(var zombie in zombies)
             {
                 if ((ZombieType)zombie.zombieType is ZombieType.PoleVaulting)
@@ -922,9 +923,12 @@ namespace PvZA11y.Widgets
 
                 if ((ZombieType)zombie.zombieType is ZombieType.Football)
                     footballCount++;
+
+                if ((ZombieType)zombie.zombieType is ZombieType.Bobsled)
+                    bobsledCount++;
             }
 
-            return poleVaultingCount + footballCount;
+            return poleVaultingCount + footballCount + bobsledCount;
         }
 
         public override void Interact(InputIntent intent)
