@@ -32,6 +32,7 @@ namespace PvZA11y.Widgets
             public int row;    //From GameObject
             public int health;
             public int maxHealth;
+            public bool hypnotized;
         }
 
         public struct LawnMower
@@ -165,6 +166,8 @@ namespace PvZA11y.Widgets
 
                 zombie.phase = memIO.mem.ReadInt(memIO.ptr.boardChain + ",a8," + (index + 0x28).ToString("X2"));
                 zombie.posX = memIO.mem.ReadFloat(memIO.ptr.boardChain + ",a8," + (index + 0x2c).ToString("X2"));
+
+                zombie.hypnotized = memIO.mem.ReadByte(memIO.ptr.boardChain + ",a8," + (index + 0xb8).ToString("X2")) == 1;
 
                 //Zomboss should be detected on the right
                 if (zombie.zombieType == (int)ZombieType.DrZomBoss)
@@ -881,6 +884,10 @@ namespace PvZA11y.Widgets
                     if (includeTileName)
                         verboseZombieInfo += " " + (char)('A' + zombieColumn) + ": ";
                 }
+
+                if (zombiesThisRow[i].hypnotized)
+                    verboseZombieInfo += "Hypnotized ";
+
                 verboseZombieInfo += zombieName + ", ";
             }
 
