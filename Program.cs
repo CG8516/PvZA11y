@@ -1576,6 +1576,9 @@ namespace PvZA11y
 
             bool playedPlantFullIndicator = false;
             int oldMsgDuration = 0;
+
+            int prevFastZombieCount = 0;
+
             while (true)
             {
                 //Ensure window/draw specs, and hwnd are accurate
@@ -1669,8 +1672,24 @@ namespace PvZA11y
                 if(Config.current.AutoCollectItems)
                     animatingSun = CollectBoardStuff(currentWidget);
 
+                int thisFastZombieCount = 0;
+
                 if (currentWidget is Board)
+                {
                     ((Board)currentWidget).SetAnimatingSunAmount(animatingSun);
+                    thisFastZombieCount = ((Board)currentWidget).GetFastZombieCount();
+                }
+
+                if(thisFastZombieCount > prevFastZombieCount && Config.current.FastZombieAlert)
+                {
+                    //play warning
+                    PlayTone(1, 1, 500, 1000, 200, SignalGeneratorType.Sweep, 0);
+                    PlayTone(1, 1, 1000, 500, 200, SignalGeneratorType.Sweep, 0);
+                    PlayTone(1, 1, 500, 1000, 200, SignalGeneratorType.Sweep, 200);
+                    PlayTone(1, 1, 1000, 500, 200, SignalGeneratorType.Sweep, 200);
+                }
+
+                prevFastZombieCount = thisFastZombieCount;
 
 
                 DoWidgetInteractions(currentWidget, input);

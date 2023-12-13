@@ -768,6 +768,23 @@ namespace PvZA11y.Widgets
             this.animatingSunAmount = sun;
         }
 
+        public int GetFastZombieCount()
+        {
+            var zombies = GetZombies();
+            int poleVaultingCount = 0;
+            int footballCount = 0;
+            foreach(var zombie in zombies)
+            {
+                if ((ZombieType)zombie.zombieType is ZombieType.PoleVaulting)
+                    poleVaultingCount++;
+
+                if ((ZombieType)zombie.zombieType is ZombieType.Football)
+                    footballCount++;
+            }
+
+            return poleVaultingCount + footballCount;
+        }
+
         public override void Interact(InputIntent intent)
         {
             if(intent == InputIntent.Option)
