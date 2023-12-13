@@ -13,7 +13,7 @@ using System.Collections.Immutable;
 using PvZA11y.Widgets;
 
 /*
-[PVZ-A11y Beta 1.5]
+[PVZ-A11y Beta 1.7]
 
 Blind and motor accessibility mod for Plants Vs Zombies.
 Allows input with rebindable keys and controller buttons, rather than requiring a mouse for input.
@@ -1208,6 +1208,9 @@ namespace PvZA11y
         {            
             leftVolume *= Config.current.AudioCueVolume;
             rightVolume *= Config.current.AudioCueVolume;
+
+            if (leftVolume == 0 && rightVolume == 0)
+                return;
             
             var sine20Seconds = new SignalGenerator(44100, 1)
             {

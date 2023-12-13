@@ -337,6 +337,28 @@ namespace PvZA11y.Widgets
             //Click menu button when back is pressed
             if (intent == InputIntent.Deny)
                 Program.Click(0.95f, 0.05f);
+
+            //Inform user which zombies will be present in this level
+            if(intent is InputIntent.Info1)
+            {
+                Widgets.Board tempBoard = new Board(memIO);
+                var zombiesThisLevel = tempBoard.GetZombies(true);
+                List<int> zombieTypes = new List<int>();
+                foreach(var zombie in zombiesThisLevel)
+                {
+                    if (!zombieTypes.Contains(zombie.zombieType))
+                        zombieTypes.Add(zombie.zombieType);
+                }
+                zombieTypes.Sort();
+                string totalZombieTypeString = "";
+                foreach(int zombieType in zombieTypes)
+                    totalZombieTypeString += Consts.zombieNames[zombieType] + ", ";
+
+                Console.WriteLine(totalZombieTypeString);
+                Program.Say(totalZombieTypeString);
+
+            }
+
         }
 
         protected override string? GetContent()
