@@ -593,6 +593,23 @@ namespace PvZA11y.Widgets
             return count;
         }
 
+        bool CheckIceAtTile()
+        {
+            int distanceIndex = 0x624 + (4 * gridInput.cursorY);
+            int timerIndex = 0x63c + (4 * gridInput.cursorY);
+            int iceTimerThisRow = memIO.mem.ReadInt(memIO.ptr.boardChain + "," + timerIndex.ToString("X2"));
+            int iceDistanceThisRow = memIO.mem.ReadInt(memIO.ptr.boardChain + "," + distanceIndex.ToString("X2"));
+            int[] iceLimits = new int[] { 107, 187, 267, 347, 427, 507, 587, 667, 750 };
+
+            if (iceTimerThisRow < 1)
+                return false;
+
+            if (iceDistanceThisRow <= iceLimits[gridInput.cursorX])
+                return true;
+
+            return false;
+        }
+
         string? GetCurrentTileObject(bool informEmptyTiles = true, bool beepOnFound = true, bool beepOnEmpty = true)
         {
             var gridItems = Program.GetGridItems();
@@ -600,6 +617,7 @@ namespace PvZA11y.Widgets
             int vaseType = -1;
             bool hasCrater = false;
             bool hasGravestone = false;
+            bool hasIce = CheckIceAtTile();
             for (int i = 0; i < gridItems.Count; i++)
             {
                 if (gridItems[i].x == gridInput.cursorX && gridItems[i].y == gridInput.cursorY)
@@ -639,6 +657,8 @@ namespace PvZA11y.Widgets
                     plantInfoString = "Gravestone";
                 else if (vaseType != -1)
                     plantInfoString = vaseType == 3 ? "Mystery vase" : vaseType == 4 ? "Plant vase" : "Zombie vase";
+                else if (hasIce)
+                    plantInfoString = "Ice";
                 else
                 {
                     if (informEmptyTiles)
@@ -647,7 +667,7 @@ namespace PvZA11y.Widgets
                         plantInfoString = null;
                 }
 
-                if ((hasCrater || hasGravestone || vaseType != -1) && beepOnFound)
+                if ((hasCrater || hasGravestone || vaseType != -1 || hasIce) && beepOnFound)
                     Program.PlayTone(1.0f- rightVol, rightVol, freq, freq, 100, SignalGeneratorType.SawTooth);
                 else if(beepOnEmpty)
                 {
