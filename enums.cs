@@ -619,6 +619,38 @@ namespace PvZA11y
         CachedZombieTypes
     };
 
+    enum CoinType
+    {
+        None,
+        Silver,
+        Gold,
+        Diamond,
+        Sun,
+        Smallsun,
+        Largesun,
+        FinalSeedPacket,
+        Trophy,
+        Shovel,
+        Almanac,
+        Carkeys,
+        Vase,
+        WateringCan,
+        Taco,
+        Note,
+        UsableSeedPacket,
+        PresentPlant,
+        AwardMoneyBag,
+        AwardPresent,
+        AwardBagDiamond,
+        AwardSilverSunflower,
+        AwardGoldSunflower,
+        Chocolate,
+        AwardChocolate,
+        PresentMinigames,
+        PresentPuzzleMode,
+        PresentSurvivalMode
+    };
+
     enum GridItemType
     {
         None = 0,

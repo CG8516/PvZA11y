@@ -783,25 +783,24 @@ namespace PvZA11y
             return plants;
         }
 
-        static void CollectBoardStuff(Widget currentWidget)
+        //returns amount of sun currently on its way to the sun bank
+        static int CollectBoardStuff(Widget currentWidget)
         {
             if (currentWidget is not (Board or ZenGarden))
-                return;
+                return 0;
             
-            //Don't try to collect anything while paused
-            if (memIO.GetBoardPaused() && currentWidget is Board)
-                return;
-
             //Make sure we're actually on the board
             bool hasBoardPtr = mem.ReadUInt(memIO.ptr.boardChain) != 0;
             if (!hasBoardPtr)
-                return;
+                return 0;
 
             //And we aren't holding anything with our cursor (plant/shovel)
             //Don't care if it's whack-a-zombie, it's fine.
             int cursorType = GetCursorType();
             if (cursorType > 0 && cursorType != 7)
-                return;
+                return 0;
+
+            int sunAmount = 0;
 
             //Grab all coins, sunflowers, awards
             int maxCount = mem.ReadInt(memIO.ptr.boardChain + ",100");
@@ -810,13 +809,29 @@ namespace PvZA11y
             {
                 int index = i * 216;
 
+                int coinType = mem.ReadInt(memIO.ptr.boardChain + ",fc," + (index + 0x58).ToString("X2"));
+
                 //Skip inactive clickables
                 if (mem.ReadByte(memIO.ptr.boardChain + ",fc," + (index + 0x38).ToString("X2")) == 1)
                     continue;
 
                 //Skip collectables we've already clicked on
                 if (mem.ReadByte(memIO.ptr.boardChain + ",fc," + (index + 0x50).ToString("X2")) == 1)
+                {
+
+                    switch ((CoinType)coinType)
+                    {
+                        case CoinType.Sun:
+                            sunAmount += 25;
+                            break;
+                        case CoinType.Smallsun:
+                            sunAmount += 15;
+                            break;
+                    }
+
                     continue;
+                }
+                    
 
                 //Get pos, add a couple of pixels to account for rounding errors
                 Vector2 pos = new Vector2();
@@ -825,6 +840,10 @@ namespace PvZA11y
 
                 //If at/above the seed picker/bank, don't click.
                 if (pos.Y < 0.15f)
+                    continue;
+
+                //Don't try to collect anything while paused
+                if (memIO.GetBoardPaused() && currentWidget is Board)
                     continue;
 
                 //Wait until click goes through
@@ -837,17 +856,19 @@ namespace PvZA11y
                 {
                     int plantHeldID = GetCursorPlantID();
                     if (plantHeldID == -1)
-                        return;
+                        return sunAmount;
 
                     string plantHoldStr = Consts.plantNames[plantHeldID] + " in hand.";
                     Console.WriteLine(plantHoldStr);
                     Say(plantHoldStr, true);
-                    return;
+                    return sunAmount;
                 }
 
                 if (cursorType > 0 && cursorType != 7)
-                    return;
+                    return sunAmount;
             }
+
+            return sunAmount;
         }
 
         static void DoWidgetInteractions(Widget currentWidget, Input input)
@@ -1642,9 +1663,14 @@ namespace PvZA11y
                 }
                 else
                     CurrentTreeDialogue = -1;
-                
+
+                int animatingSun = 0;
+
                 if(Config.current.AutoCollectItems)
-                    CollectBoardStuff(currentWidget);
+                    animatingSun = CollectBoardStuff(currentWidget);
+
+                if (currentWidget is Board)
+                    ((Board)currentWidget).SetAnimatingSunAmount(animatingSun);
 
 
                 DoWidgetInteractions(currentWidget, input);

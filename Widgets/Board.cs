@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,6 +20,7 @@ namespace PvZA11y.Widgets
         int seedbankSlot;
         int heldPlantID;    //For VaseBreaker/ItsRainingSeeds
         bool shovelPressedLast; //Whether the shovel was the last input (required for shovel confirmation mode)
+        int animatingSunAmount;
 
         public struct Zombie
         {
@@ -760,6 +762,12 @@ namespace PvZA11y.Widgets
                 return verboseZombieInfo;
         }
 
+        //Sets the amount of sun that has been collected, and is flying to the sun bank
+        public void SetAnimatingSunAmount(int sun)
+        {
+            this.animatingSunAmount = sun;
+        }
+
         public override void Interact(InputIntent intent)
         {
             if(intent == InputIntent.Option)
@@ -1010,6 +1018,7 @@ namespace PvZA11y.Widgets
                     //Check if there's enough sun, and plant isn't on cooldown
 
                     int sunAmount = memIO.mem.ReadInt(memIO.ptr.boardChain + ",5578");    //Such a huge struct //TODO: Is that the same struct, or does it just happen to usually be in memory after the board? ie; will a fragmented heap cause this to go somewhere else?
+                    sunAmount += animatingSunAmount;
                     int sunCost = inIZombie? Consts.iZombieSunCosts[plants[seedbankSlot].packetType - 60] : Consts.plantCosts[plants[seedbankSlot].packetType];
 
                     bool notEnoughSun = sunAmount < sunCost;
@@ -1132,6 +1141,7 @@ namespace PvZA11y.Widgets
             if(intent == InputIntent.Info3)
             {
                 int sunAmount = memIO.mem.ReadInt(memIO.ptr.boardChain + ",5578");
+                sunAmount += animatingSunAmount;
                 string sunString = sunAmount + " sun.";
                 Console.WriteLine(sunString);
                 Program.Say(sunString, true);
