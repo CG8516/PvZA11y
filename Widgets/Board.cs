@@ -614,6 +614,13 @@ namespace PvZA11y.Widgets
         public bool PlantPacketReady()
         {
             bool inIZombie = memIO.GetGameMode() >= (int)GameMode.IZombie1 && memIO.GetGameMode() <= (int)GameMode.IZombieEndless;
+            
+            bool inSlotMachine = memIO.GetGameMode() == (int)GameMode.SlotMachine;
+            if (inSlotMachine)
+            {
+                bool slotReady = memIO.mem.ReadInt(memIO.ptr.boardChain + ",178,54") == 0;
+                return slotReady;
+            }
 
             var plants = GetPlantsInBoardBank();
 
@@ -1179,10 +1186,11 @@ namespace PvZA11y.Widgets
             bool inRainingSeeds = memIO.GetGameMode() == (int)GameMode.ItsRainingSeeds;
             bool inWhackAZombie = memIO.GetGameMode() == (int)GameMode.WhackAZombie || memIO.GetPlayerLevel() == 15;
             bool inIZombie = memIO.GetGameMode() >= (int)GameMode.IZombie1 && memIO.GetGameMode() <= (int)GameMode.IZombieEndless;
+            bool inSlotMachine = memIO.GetGameMode() == (int)GameMode.SlotMachine;
 
             //If user tries to switch seeds while holding one in vasebreaker or rainingSeeds, inform them of already held plant.
             //Otherwise, inform them of plant in newly switched slot
-            if ((intent == InputIntent.CycleLeft || intent == InputIntent.CycleRight) && (inVaseBreaker || inRainingSeeds))
+            if ((intent == InputIntent.CycleLeft || intent == InputIntent.CycleRight) && (inVaseBreaker || inRainingSeeds || inSlotMachine))
             {
                 heldPlantID = memIO.mem.ReadInt(memIO.ptr.boardChain + ",150,28");
                 if (heldPlantID != -1)
@@ -1228,7 +1236,7 @@ namespace PvZA11y.Widgets
                 
                 
                 //Click where plant needs to go. Not where plant is located (we already grab plant when auto-collecting everything on screen)
-                if (inVaseBreaker || inRainingSeeds || isCobCannon)
+                if (inVaseBreaker || inRainingSeeds || isCobCannon || inSlotMachine)
                     PlacePlant(seedbankSlot, seedbankSize, plants[seedbankSlot].offsetX, false, false, false, false);
                 //Program.PlacePlant(0, 0, false);
                 else if (plants[seedbankSlot].absX < 0.72f)
@@ -1336,6 +1344,12 @@ namespace PvZA11y.Widgets
                 {
                     info4String += 5-getIzombieBrainCount() + " out of 5 brains eaten";
                 }
+                else if(inSlotMachine)
+                {
+                    int sunAmount = memIO.mem.ReadInt(memIO.ptr.boardChain + ",5578");
+                    sunAmount += animatingSunAmount;
+                    info4String += " " + Program.FormatNumber(sunAmount) + " out of 2,000 sun";
+                }
                 else
                 {
                     string waveInfo = GetWaveInfo();
@@ -1360,6 +1374,13 @@ namespace PvZA11y.Widgets
 
             if(intent == InputIntent.Info3)
             {
+                if(inSlotMachine)
+                {
+                    //bool slotReady = memIO.mem.ReadInt(memIO.ptr.boardChain + ",178,54") == 0;
+                    //if (slotReady)
+                    Program.Click(0.62f, 0.1f);
+                    return;
+                }
                 int sunAmount = memIO.mem.ReadInt(memIO.ptr.boardChain + ",5578");
                 sunAmount += animatingSunAmount;
                 string sunString = sunAmount + " sun.";
