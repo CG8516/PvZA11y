@@ -17,7 +17,7 @@ namespace PvZA11y.Widgets
 {
     class Board : Widget
     {
-        GridInput gridInput;
+        public GridInput gridInput;
         public int seedbankSlot;
         int heldPlantID;    //For VaseBreaker/ItsRainingSeeds
         bool shovelPressedLast; //Whether the shovel was the last input (required for shovel confirmation mode)
@@ -138,7 +138,7 @@ namespace PvZA11y.Widgets
             return lawnMowers;
         }
 
-        public List<Zombie> GetZombies(bool seedPicker = false)
+        public List<Zombie> GetZombies(bool seedPicker = false, bool entryScanner = false)
         {
             int maxIndex = memIO.mem.ReadInt(memIO.ptr.boardChain + ",ac");
             int currentCount = memIO.mem.ReadInt(memIO.ptr.boardChain + ",b8");
@@ -174,16 +174,28 @@ namespace PvZA11y.Widgets
                     zombie.posX = 799;
 
                 //Skip off-screen zombies
-                if (zombie.posX > 800 && !seedPicker)
+                if (zombie.posX > 800 && !seedPicker && !entryScanner)
                     continue;
 
                 zombie.posY = memIO.mem.ReadFloat(memIO.ptr.boardChain + ",a8," + (index + 0x30).ToString("X2"));
 
-                zombies.Add(zombie);
-                addedZombies++;
+                int zombieAge = memIO.mem.ReadInt(memIO.ptr.boardChain + ",a8," + (index + 0x60).ToString("X2"));
+                if(entryScanner && zombieAge < 5)
+                {
+                    memIO.mem.WriteMemory(memIO.ptr.boardChain + ",a8," + (index + 0x60).ToString("X2"), "int", "5");
+                    zombies.Add(zombie);
+                    addedZombies++;
+                }
+                else if(!entryScanner)
+                {
+                    zombies.Add(zombie);
+                    addedZombies++;
+                }
+
+                
 
                 //Zomboss is in all rows
-                if (zombie.zombieType == (int)ZombieType.DrZomBoss)
+                if (zombie.zombieType == (int)ZombieType.DrZomBoss && !entryScanner)
                 {
                     zombie.row = 1;
                     zombies.Add(zombie);

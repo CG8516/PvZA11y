@@ -50,6 +50,7 @@ namespace PvZA11y
             public bool FastZombieAlert = true;
             public bool BeepOnPacketReady = true;
             public bool ZombieSonarOnRowChange = false;
+            public bool ZombieEnterAlert = true;
             
 
             //Core functionality

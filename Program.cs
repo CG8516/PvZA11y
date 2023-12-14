@@ -1773,6 +1773,22 @@ namespace PvZA11y
                         packetWasReady = false;
 
                     prevSeedbankSlot = ((Board)currentWidget).seedbankSlot;
+
+                    if (Config.current.ZombieEnterAlert)
+                    {
+                        var enteredZombies = ((Board)currentWidget).GetZombies(false, true);
+                        List<ToneProperties> zombieTones = new List<ToneProperties>();
+                        float boardHeight = ((Board)currentWidget).gridInput.height;
+                        for(int z = 0; z < boardHeight; z++)
+                        {
+                            if (enteredZombies.Any(zom => zom.row == z))
+                            {
+                                float freq = 1000.0f - ((z * 500.0f) / boardHeight);
+                                zombieTones.Add(new ToneProperties() { leftVolume = 0, rightVolume = 1, startFrequency = freq, endFrequency = freq, duration = 100, signalType = SignalGeneratorType.Sin, startDelay = z * 200 });
+                            }
+                        }
+                        PlayTones(zombieTones);
+                    }
                 }
                 else
                     prevSeedbankSlot = -1;
@@ -1780,10 +1796,12 @@ namespace PvZA11y
                 if(thisFastZombieCount > prevFastZombieCount && Config.current.FastZombieAlert)
                 {
                     //play warning
-                    PlayTone(1, 1, 500, 1000, 200, SignalGeneratorType.Sweep, 0);
-                    PlayTone(1, 1, 1000, 500, 200, SignalGeneratorType.Sweep, 0);
-                    PlayTone(1, 1, 500, 1000, 200, SignalGeneratorType.Sweep, 200);
-                    PlayTone(1, 1, 1000, 500, 200, SignalGeneratorType.Sweep, 200);
+                    List<ToneProperties> tones = new List<ToneProperties>();
+                    tones.Add(new ToneProperties() { leftVolume = 1, rightVolume = 1, startFrequency = 500, endFrequency = 1000, duration = 200, signalType = SignalGeneratorType.Sweep, startDelay = 0 });
+                    tones.Add(new ToneProperties() { leftVolume = 1, rightVolume = 1, startFrequency = 1000, endFrequency = 500, duration = 200, signalType = SignalGeneratorType.Sweep, startDelay = 0 });
+                    tones.Add(new ToneProperties() { leftVolume = 1, rightVolume = 1, startFrequency = 500, endFrequency = 1000, duration = 200, signalType = SignalGeneratorType.Sweep, startDelay = 200 });
+                    tones.Add(new ToneProperties() { leftVolume = 1, rightVolume = 1, startFrequency = 1000, endFrequency = 500, duration = 200, signalType = SignalGeneratorType.Sweep, startDelay = 200 });
+                    PlayTones(tones);
                 }
 
                 prevFastZombieCount = thisFastZombieCount;
