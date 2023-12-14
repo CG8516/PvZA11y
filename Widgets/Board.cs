@@ -1072,6 +1072,14 @@ namespace PvZA11y.Widgets
                         }
                     }
 
+                    if(Config.current.ZombieSonarOnRowChange && prevY != gridInput.cursorY)
+                    {
+                        string? zombiesThisRow = GetZombieInfo();
+                        if (zombiesThisRow == null)
+                            zombiesThisRow = "No Zombies";
+                        totalTileInfoStr += " " + zombiesThisRow;
+                    }
+
 
                     
                     if (!plantFound && !zombieFound)
