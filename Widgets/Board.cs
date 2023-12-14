@@ -826,15 +826,17 @@ namespace PvZA11y.Widgets
             bool needToAddFireball = false;
             if (fireball.HasValue && fireball.Value.row == gridInput.cursorY)
             {
-                verboseZombieInfo = (1 + zombiesThisRow.Count).ToString() + ".";
+                verboseZombieInfo = (1 + zombiesThisRow.Count).ToString() + ". ";
                 needToAddFireball = true;
             }
             else
-                verboseZombieInfo = zombiesThisRow.Count.ToString() + ".";
+                verboseZombieInfo = zombiesThisRow.Count.ToString() + ". ";
 
             zombiesThisRow.Sort((x, y) => (int)x.posX - (int)y.posX); //Sort by distance (so we can print/inform player in the correct order when speaking)
 
             int prevColumn = -1;
+
+            List<Program.ToneProperties> tones = new List<Program.ToneProperties>();
 
             for (int i = 0; i < zombiesThisRow.Count; i++)
             {
@@ -866,8 +868,7 @@ namespace PvZA11y.Widgets
                 if (startDelay > 1000 || startDelay < 0)
                     continue;
 
-                if(beepOnFound)
-                    Program.PlayTone(lVolume, rVolume, 300, 300, 100, SignalGeneratorType.Sin, startDelay);
+                tones.Add(new Program.ToneProperties() { leftVolume = lVolume, rightVolume = rVolume, startFrequency = 300 + (i*10), endFrequency = 300 + (i*10), duration = 100, signalType = SignalGeneratorType.Sin, startDelay = startDelay });
 
                 if (zombiesThisRow[i].zombieType >= (int)ZombieType.CachedZombieTypes)
                     continue;
@@ -898,6 +899,9 @@ namespace PvZA11y.Widgets
 
                 verboseZombieInfo += zombieName + ", ";
             }
+
+            if (beepOnFound)
+                Program.PlayTones(tones);
 
             if (zombiesThisRow.Count == 0)
             {
@@ -1062,11 +1066,12 @@ namespace PvZA11y.Widgets
                                 //Try getting the count from the string
                                 int count = zombiesThisTile[0] - '0';
                                 float zombieFreq = freq - 30;
-                                Program.PlayTone(1.0f - rightVol, rightVol, zombieFreq, zombieFreq-50, 80, SignalGeneratorType.Square);
-                                if (count > 0 && count < 10)
+                                if (count >= 0 && count < 10)
                                 {
-                                    for(int i =1; i < count; i++)
-                                        Program.PlayTone(1.0f - rightVol, rightVol, zombieFreq - (50*i), zombieFreq - (50*(i+1)), 80, SignalGeneratorType.Square, 100*i);
+                                    List<Program.ToneProperties> tones = new List<Program.ToneProperties>();
+                                    for (int i = 0; i < count; i++)
+                                        tones.Add(new Program.ToneProperties() { leftVolume = 1.0f - rightVol, rightVolume = rightVol, startFrequency = zombieFreq - (50 * i), endFrequency = zombieFreq - (50 * (i + 1)), duration = 80, signalType = SignalGeneratorType.Square, startDelay = 100 * i });
+                                    Program.PlayTones(tones);
                                 }
                             }
                         }
@@ -1088,7 +1093,7 @@ namespace PvZA11y.Widgets
 
                 if (Config.current.SayTilePosOnMove)
                 {
-                    string tilePos = String.Format("{0}-{1}", (char)(gridInput.cursorX + 'A'), gridInput.cursorY + 1);
+                    string tilePos = string.Format("{0}-{1}", (char)(gridInput.cursorX + 'A'), gridInput.cursorY + 1);
                     totalTileInfoStr += " " + tilePos;
                 }
 

@@ -11,6 +11,7 @@ using NAudio.Wave.SampleProviders;
 using System.Windows.Forms;
 using System.Collections.Immutable;
 using PvZA11y.Widgets;
+using NAudio.Mixer;
 
 /*
 [PVZ-A11y Beta 1.8]
@@ -1260,6 +1261,52 @@ namespace PvZA11y
 
         static List<WaveOutEvent> waveOutEvents = new List<WaveOutEvent>();
 
+        public struct ToneProperties
+        {
+            public float leftVolume;
+            public float rightVolume;
+            public float startFrequency;
+            public float endFrequency;
+            public float duration;
+            public SignalGeneratorType signalType;
+            public int startDelay;
+        }
+
+        public static void PlayTones(List<ToneProperties> tones)
+        {
+            if (tones.Count < 1)
+                return;
+
+            List<ISampleProvider> allSamples = new List<ISampleProvider>();
+            foreach(var tone in tones)
+            {
+                var beepSignal = new SignalGenerator(44100, 1)
+                {
+                    Gain = 0.2,
+                    Frequency = tone.startFrequency,
+                    Type = tone.signalType,
+                    FrequencyEnd = tone.endFrequency,
+                }.Take(TimeSpan.FromMilliseconds(tone.duration));
+
+                int startDelay = tone.startDelay < 16 ? 16 : tone.startDelay;
+
+                var sinepause = new SignalGenerator(44100, 2)
+                {
+                    Gain = 0,
+                    Frequency = 1,
+                    Type = SignalGeneratorType.Sin,
+                }.Take(TimeSpan.FromMilliseconds(startDelay));
+
+                allSamples.Add(sinepause.FollowedBy(beepSignal.ToStereo(tone.leftVolume, tone.rightVolume)));
+            }
+
+            MixingSampleProvider mixer = new MixingSampleProvider(allSamples);
+            var waveOutEvent = new WaveOutEvent();
+            waveOutEvent.Init(mixer);
+            waveOutEvent.Play();
+            waveOutEvents.Add(waveOutEvent);
+        }
+
         public static void PlayTone(float leftVolume, float rightVolume, float startFrequency, float endFrequency, float duration, SignalGeneratorType signalType = SignalGeneratorType.Sweep, int startDelay = 0)
         {            
             leftVolume *= Config.current.AudioCueVolume;
@@ -1268,7 +1315,7 @@ namespace PvZA11y
             if (leftVolume == 0 && rightVolume == 0)
                 return;
             
-            var sine20Seconds = new SignalGenerator(44100, 1)
+            var beepSignal = new SignalGenerator(44100, 1)
             {
                 Gain = 0.2,
                 Frequency = startFrequency,
@@ -1299,7 +1346,7 @@ namespace PvZA11y
             }
             
             var waveOutEvent = new WaveOutEvent();
-            waveOutEvent.Init(sinepause.FollowedBy(sine20Seconds.ToStereo(leftVolume, rightVolume)));
+            waveOutEvent.Init(sinepause.FollowedBy(beepSignal.ToStereo(leftVolume, rightVolume)));
             waveOutEvent.Play();
             waveOutEvents.Add(waveOutEvent);
             return;
