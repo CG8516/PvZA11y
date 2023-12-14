@@ -452,7 +452,7 @@ namespace PvZA11y.Widgets
 
         //TODO: Split code into method which obtains cell position, one that obtains seedbank/conveyor pos, one that clicks, one that moves the mouse.
         //Can't we just grab the packet position from memory? I wrote this near the start of the project, so don't remember if I tried, or just started with a hacky solution.
-        void PlacePlant(int seedbankIndex, int maxPlants, float offsetX = 0, bool clickPlantFirst = true, bool visualOnly = false, bool visualSeedLoc = false, bool releasePlant = true)
+        void PlacePlant(int seedbankIndex, int maxPlants, float offsetX = 0, bool clickPlantFirst = true, bool visualOnly = false, bool visualSeedLoc = false, bool releasePlant = true, bool clickPlantOnly = false)
         {
 
             bool mPaused = memIO.GetBoardPaused();
@@ -504,8 +504,9 @@ namespace PvZA11y.Widgets
                     Program.MoveMouse(cellPos.X, cellPos.Y);
                 return;
             }
-
-            Program.Click(cellPos.X, cellPos.Y);
+            
+            if(!clickPlantOnly)
+                Program.Click(cellPos.X, cellPos.Y);
 
             Task.Delay(50).Wait();
 
@@ -613,13 +614,39 @@ namespace PvZA11y.Widgets
         //Returns true if current plant packet is fully refreshed, and there's enough sun to place it
         public bool PlantPacketReady()
         {
-            bool inIZombie = memIO.GetGameMode() >= (int)GameMode.IZombie1 && memIO.GetGameMode() <= (int)GameMode.IZombieEndless;
+            GameMode gameMode = (GameMode)memIO.GetGameMode();
+            bool inIZombie = gameMode >= GameMode.IZombie1 && gameMode <= GameMode.IZombieEndless;
             
-            bool inSlotMachine = memIO.GetGameMode() == (int)GameMode.SlotMachine;
+            bool inSlotMachine = gameMode is GameMode.SlotMachine;
+            bool inZombiquarium = gameMode is GameMode.Zombiquarium;
             if (inSlotMachine)
             {
                 bool slotReady = memIO.mem.ReadInt(memIO.ptr.boardChain + ",178,54") == 0;
                 return slotReady;
+            }
+
+            int sunAmount = memIO.mem.ReadInt(memIO.ptr.boardChain + ",5578");    //Such a huge struct //TODO: Is that the same struct, or does it just happen to usually be in memory after the board? ie; will a fragmented heap cause this to go somewhere else?
+            sunAmount += animatingSunAmount;
+
+            if(inZombiquarium)
+            {
+                if (seedbankSlot == 0 && sunAmount >= 100)
+                    return true;
+                if (seedbankSlot == 1 && sunAmount >= 1000)
+                    return true;
+
+                var gridItems = Program.GetGridItems();
+                int brainCount = 0;
+                foreach(var item in gridItems)
+                {
+                    if (item.type == (int)GridItemType.Brain)
+                        brainCount++;
+                }
+
+                if (seedbankSlot == 2 && sunAmount >= 5 && brainCount < 3)
+                    return true;
+
+                return false;
             }
 
             var plants = GetPlantsInBoardBank();
@@ -627,8 +654,7 @@ namespace PvZA11y.Widgets
             if (plants[seedbankSlot].packetType < 0)
                 return false;
 
-            int sunAmount = memIO.mem.ReadInt(memIO.ptr.boardChain + ",5578");    //Such a huge struct //TODO: Is that the same struct, or does it just happen to usually be in memory after the board? ie; will a fragmented heap cause this to go somewhere else?
-            sunAmount += animatingSunAmount;
+            
             int sunCost = inIZombie ? Consts.iZombieSunCosts[plants[seedbankSlot].packetType - 60] : Consts.plantCosts[plants[seedbankSlot].packetType];
 
             bool notEnoughSun = sunAmount < sunCost;
@@ -1029,15 +1055,15 @@ namespace PvZA11y.Widgets
             }
 
             var plants = GetPlantsInBoardBank();
+            GameMode gameMode = (GameMode)memIO.GetGameMode();
 
-            if(prevX != gridInput.cursorX || prevY != gridInput.cursorY)
+            if (prevX != gridInput.cursorX || prevY != gridInput.cursorY)
             {
                 int minX = 0;
                 int maxX = 8;
 
                 //If in wallnut bowling
-                int gameMode = memIO.GetGameMode();
-                bool inBowling = gameMode == (int)GameMode.WallnutBowling || gameMode == (int)GameMode.WallnutBowling2;
+                bool inBowling = gameMode == GameMode.WallnutBowling || gameMode == GameMode.WallnutBowling2;
                 inBowling |= memIO.GetPlayerLevel() == 5 && ConveyorBeltCounter() > 0; //converyorBeltCounter >0, means we're passed the peashooter-shovelling part.
                 if (inBowling)
                     maxX = 2;
@@ -1046,7 +1072,7 @@ namespace PvZA11y.Widgets
                 //if (inIZombie)
                   //  minX = 4;
 
-                bool inZomboss = gameMode == (int)GameMode.DrZombossRevenge || (gameMode == (int)GameMode.Adventure && memIO.GetPlayerLevel() == 50);
+                bool inZomboss = gameMode == GameMode.DrZombossRevenge || (gameMode == GameMode.Adventure && memIO.GetPlayerLevel() == 50);
                 if (inZomboss)
                     maxX = 7;
 
@@ -1146,6 +1172,13 @@ namespace PvZA11y.Widgets
             else if(intent is InputIntent.Up or InputIntent.Down or InputIntent.Left or InputIntent.Right)
                 Program.PlayTone(1, 1, 70, 70, 50, SignalGeneratorType.Square);
 
+            bool inZombiquarium = gameMode == GameMode.Zombiquarium;
+            //Dirty hack to allow scrolling to empty seedbank slot in zombiequarium (so placing brains can be a seedbank option)
+            if (inZombiquarium)
+            {
+                seedbankSize = 3;
+                plants[2] = plants[2] with { packetType = 0 };
+            }
 
             int lastPlantSlot = seedbankSlot;
             if (intent == InputIntent.CycleLeft)
@@ -1183,10 +1216,10 @@ namespace PvZA11y.Widgets
             seedbankSlot = seedbankSlot < 0 ? 0 : seedbankSlot; //cap index min to 0 again
 
             bool inVaseBreaker = VaseBreakerCheck();
-            bool inRainingSeeds = memIO.GetGameMode() == (int)GameMode.ItsRainingSeeds;
-            bool inWhackAZombie = memIO.GetGameMode() == (int)GameMode.WhackAZombie || memIO.GetPlayerLevel() == 15;
-            bool inIZombie = memIO.GetGameMode() >= (int)GameMode.IZombie1 && memIO.GetGameMode() <= (int)GameMode.IZombieEndless;
-            bool inSlotMachine = memIO.GetGameMode() == (int)GameMode.SlotMachine;
+            bool inRainingSeeds = gameMode == GameMode.ItsRainingSeeds;
+            bool inWhackAZombie = gameMode == GameMode.WhackAZombie || memIO.GetPlayerLevel() == 15;
+            bool inIZombie = gameMode >= GameMode.IZombie1 && gameMode <= GameMode.IZombieEndless;
+            bool inSlotMachine = gameMode == GameMode.SlotMachine;
 
             //If user tries to switch seeds while holding one in vasebreaker or rainingSeeds, inform them of already held plant.
             //Otherwise, inform them of plant in newly switched slot
@@ -1199,6 +1232,31 @@ namespace PvZA11y.Widgets
                     Console.WriteLine(plantStr);
                     Program.Say(plantStr, true);
                 }
+            }
+            else if(inZombiquarium && intent is InputIntent.CycleLeft or InputIntent.CycleRight)
+            {
+                PlacePlant(seedbankSlot, seedbankSize, plants[seedbankSlot].offsetX, false, true, true);    //Update mouse position
+                float frequency = 100.0f + (100.0f * seedbankSlot);
+                float rVolume = (float)seedbankSlot / (float)seedbankSize;
+                Program.PlayTone(1.0f - rVolume, rVolume, frequency, frequency, 100, SignalGeneratorType.Square);
+
+                string functionString = "";
+                switch(seedbankSlot)
+                {
+                    case 0:
+                        functionString = "Buy snorkel zombie.";
+                        break;
+                    case 1:
+                        functionString = "Buy trophy.";
+                        break;
+                    case 2:
+                        functionString = "Brain food.";
+                        break;
+                }
+
+                Console.WriteLine(functionString);
+                Program.Say(functionString);
+
             }
             else if((intent is InputIntent.CycleLeft or InputIntent.CycleRight))
             {
@@ -1238,12 +1296,32 @@ namespace PvZA11y.Widgets
                 //Click where plant needs to go. Not where plant is located (we already grab plant when auto-collecting everything on screen)
                 if (inVaseBreaker || inRainingSeeds || isCobCannon || inSlotMachine)
                     PlacePlant(seedbankSlot, seedbankSize, plants[seedbankSlot].offsetX, false, false, false, false);
-                //Program.PlacePlant(0, 0, false);
+                else if(inZombiquarium)
+                {
+                    int sunAmount = memIO.mem.ReadInt(memIO.ptr.boardChain + ",5578");
+                    sunAmount += animatingSunAmount;
+                    int sunCost = seedbankSlot == 0 ? 100 : seedbankSlot == 1 ? 1000 : 5;
+
+                    if(sunAmount < sunCost)
+                    {
+                        string warning = "Not enough sun! " + sunAmount + " out of " + sunCost;
+                        Console.WriteLine(warning);
+                        Program.PlayTone(1, 1, 300, 300, 50, SignalGeneratorType.Square);
+                        Program.PlayTone(1, 1, 275, 275, 50, SignalGeneratorType.Square, 50);
+                        Program.Say(warning, true);
+                    }
+                    else if (seedbankSlot == 2)
+                        PlacePlant(seedbankSlot, seedbankSize, plants[seedbankSlot].offsetX, false, false, false, false);
+                    else
+                        PlacePlant(seedbankSlot, seedbankSize, plants[seedbankSlot].offsetX, true, false, false, false, true);
+
+
+                }
                 else if (plants[seedbankSlot].absX < 0.72f)
                 {
                     //Check if there's enough sun, and plant isn't on cooldown
 
-                    int sunAmount = memIO.mem.ReadInt(memIO.ptr.boardChain + ",5578");    //Such a huge struct //TODO: Is that the same struct, or does it just happen to usually be in memory after the board? ie; will a fragmented heap cause this to go somewhere else?
+                    int sunAmount = memIO.mem.ReadInt(memIO.ptr.boardChain + ",5578");
                     sunAmount += animatingSunAmount;
                     int sunCost = inIZombie? Consts.iZombieSunCosts[plants[seedbankSlot].packetType - 60] : Consts.plantCosts[plants[seedbankSlot].packetType];
 
@@ -1251,9 +1329,7 @@ namespace PvZA11y.Widgets
                     bool refreshing = plants[seedbankSlot].isRefreshing;
                     bool isConveyorLevel = ConveyorBeltCounter() > 0;
 
-                    int gameMode = memIO.GetGameMode();
 
-                    //Todo: Other conveyor belt levels (is there a bool or something to indicate it's a conveyor level? Maybe search for converyor element?)
                     if (notEnoughSun && !isConveyorLevel && !inIZombie)
                     {
                         string warning = "Not enough sun! " + sunAmount + " out of " + sunCost;

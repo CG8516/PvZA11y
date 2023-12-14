@@ -151,6 +151,9 @@ namespace PvZA11y.Widgets
                 if (gameMode >= (int)GameMode.ZomBotany && gameMode <= (int)GameMode.LimboIntro)
                     awardBody = "You've unlocked a new mini-game!";
 
+                if (gameMode >= (int)GameMode.SurvivalDay && gameMode <= (int)GameMode.SurvivalEndless5)
+                    awardBody = "You've unlocked a new survival level!";
+
             }
 
             if (awardType == 2)
