@@ -1258,6 +1258,8 @@ namespace PvZA11y
             }
         }
 
+        static List<WaveOutEvent> waveOutEvents = new List<WaveOutEvent>();
+
         public static void PlayTone(float leftVolume, float rightVolume, float startFrequency, float endFrequency, float duration, SignalGeneratorType signalType = SignalGeneratorType.Sweep, int startDelay = 0)
         {            
             leftVolume *= Config.current.AudioCueVolume;
@@ -1285,17 +1287,22 @@ namespace PvZA11y
                 Type = SignalGeneratorType.Sin,
             }.Take(TimeSpan.FromMilliseconds(startDelay));
 
+            var tempWaveOutEvents = waveOutEvents.ToList();
+
+            foreach(var tempEvent in tempWaveOutEvents)
+            {
+                if (tempEvent.PlaybackState == PlaybackState.Stopped)
+                {
+                    tempEvent.Dispose();
+                    waveOutEvents.Remove(tempEvent);
+                }
+            }
+            
             var waveOutEvent = new WaveOutEvent();
             waveOutEvent.Init(sinepause.FollowedBy(sine20Seconds.ToStereo(leftVolume, rightVolume)));
-            waveOutEvent.PlaybackStopped += NewWaveOut_PlaybackStopped;
             waveOutEvent.Play();
+            waveOutEvents.Add(waveOutEvent);
             return;
-        }
-
-        private static void NewWaveOut_PlaybackStopped(object? sender, StoppedEventArgs e)
-        {
-            if(sender != null && sender is WaveOutEvent waveOut)
-                waveOut.Dispose();
         }
 
         public static bool CheckOwnedPlant(int plantID)
