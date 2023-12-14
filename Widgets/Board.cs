@@ -1186,6 +1186,9 @@ namespace PvZA11y.Widgets
             if (intent == InputIntent.CycleRight)
                 seedbankSlot++;
 
+            if (intent >= InputIntent.Slot1 && intent <= InputIntent.Slot10)
+                seedbankSlot = intent - InputIntent.Slot1;
+
             if (Config.current.WrapPlantSelection)
             {
                 seedbankSlot = seedbankSlot < 0 ? seedbankSize : seedbankSlot;
@@ -1223,7 +1226,7 @@ namespace PvZA11y.Widgets
 
             //If user tries to switch seeds while holding one in vasebreaker or rainingSeeds, inform them of already held plant.
             //Otherwise, inform them of plant in newly switched slot
-            if ((intent == InputIntent.CycleLeft || intent == InputIntent.CycleRight) && (inVaseBreaker || inRainingSeeds || inSlotMachine))
+            if (((intent == InputIntent.CycleLeft || intent == InputIntent.CycleRight) || (intent >= InputIntent.Slot1 && intent <= InputIntent.Slot10)) && (inVaseBreaker || inRainingSeeds || inSlotMachine))
             {
                 heldPlantID = memIO.mem.ReadInt(memIO.ptr.boardChain + ",150,28");
                 if (heldPlantID != -1)
@@ -1233,7 +1236,7 @@ namespace PvZA11y.Widgets
                     Program.Say(plantStr, true);
                 }
             }
-            else if(inZombiquarium && intent is InputIntent.CycleLeft or InputIntent.CycleRight)
+            else if(inZombiquarium && ((intent is InputIntent.CycleLeft or InputIntent.CycleRight) || (intent >= InputIntent.Slot1 && intent <= InputIntent.Slot10)))
             {
                 PlacePlant(seedbankSlot, seedbankSize, plants[seedbankSlot].offsetX, false, true, true);    //Update mouse position
                 float frequency = 100.0f + (100.0f * seedbankSlot);
@@ -1258,7 +1261,7 @@ namespace PvZA11y.Widgets
                 Program.Say(functionString);
 
             }
-            else if((intent is InputIntent.CycleLeft or InputIntent.CycleRight))
+            else if((intent is InputIntent.CycleLeft or InputIntent.CycleRight) || (intent >= InputIntent.Slot1 && intent <= InputIntent.Slot10))
             {
                 //Move mouse cursor to aid sighted players in knowing which seed packet is selected
                 //Program.PlacePlant(seedbankSize, plants[seedbankSlot].offsetX, false, true, true);

@@ -509,7 +509,17 @@ namespace PvZA11y.Widgets
             new RequiredInput(){intent = InputIntent.Info1, description = "1 of 4. Provides additional information."},
             new RequiredInput(){intent = InputIntent.Info2, description = "2 of 4. Provides additional information."},
             new RequiredInput(){intent = InputIntent.Info3, description = "3 of 4. Provides additional information."},
-            new RequiredInput(){intent = InputIntent.Info4, description = "4 of 4. Provides additional information."}
+            new RequiredInput(){intent = InputIntent.Info4, description = "4 of 4. Provides additional information."},
+            new RequiredInput(){intent = InputIntent.Slot1, description = "1 of 10. Hotkey to instantly select plant slot 1."},
+            new RequiredInput(){intent = InputIntent.Slot2, description = "2 of 10. Hotkey to instantly select plant slot 2."},
+            new RequiredInput(){intent = InputIntent.Slot3, description = "3 of 10. Hotkey to instantly select plant slot 3."},
+            new RequiredInput(){intent = InputIntent.Slot4, description = "4 of 10. Hotkey to instantly select plant slot 4."},
+            new RequiredInput(){intent = InputIntent.Slot5, description = "5 of 10. Hotkey to instantly select plant slot 5."},
+            new RequiredInput(){intent = InputIntent.Slot6, description = "6 of 10. Hotkey to instantly select plant slot 6."},
+            new RequiredInput(){intent = InputIntent.Slot7, description = "7 of 10. Hotkey to instantly select plant slot 7."},
+            new RequiredInput(){intent = InputIntent.Slot8, description = "8 of 10. Hotkey to instantly select plant slot 8."},
+            new RequiredInput(){intent = InputIntent.Slot9, description = "9 of 10. Hotkey to instantly select plant slot 9."},
+            new RequiredInput(){intent = InputIntent.Slot10, description = "10 of 10. Hotkey to instantly select plant slot 10."},
         };
 
         //TODO: Create sub-menu for rebinds, so users can rebind individual keys, instead of needing to rebind everything at once
@@ -610,6 +620,8 @@ namespace PvZA11y.Widgets
             Dictionary<GamepadButtons, InputIntent> controllerBinds = new Dictionary<GamepadButtons, InputIntent>();
             foreach (var reqInput in requiredInputs)
             {
+                if (reqInput.intent >= InputIntent.Slot1 && reqInput.intent <= InputIntent.Slot10)
+                    continue;
                 GamepadButtons pressedButton = GetControllerInputForAction(reqInput);
                 if (pressedButton != GamepadButtons.None)
                     controllerBinds.Add(pressedButton, reqInput.intent);

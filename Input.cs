@@ -31,12 +31,24 @@ namespace PvZA11y
         Info2,      //Y
         Info3,      //L3
         Info4,      //R3
+        Slot1,      //Right-Stick / number keys
+        Slot2,
+        Slot3,
+        Slot4,
+        Slot5,
+        Slot6,
+        Slot7,
+        Slot8,
+        Slot9,
+        Slot10,
     }
 
     public class Input
     {
         bool[] heldKeys = new bool[0xff + 1]; //Array of all currently-held keys
         State prevState;
+
+        int prevRightSlot = -1;
 
         Dictionary<uint, InputIntent> keyBinds = new Dictionary<uint, InputIntent>();
         Dictionary<GamepadButtons, InputIntent> controllerBinds = new Dictionary<GamepadButtons, InputIntent>();
@@ -149,6 +161,18 @@ namespace PvZA11y
                 keyBinds.Add(VIRTUALKEY.VK_F2, InputIntent.Info2);
                 keyBinds.Add(VIRTUALKEY.VK_F3, InputIntent.Info3);
                 keyBinds.Add(VIRTUALKEY.VK_F4, InputIntent.Info4);
+
+                //Really need to improve input rebinding menu
+                keyBinds.Add((uint)VIRTUALKEY.VK_1, InputIntent.Slot1);
+                keyBinds.Add((uint)VIRTUALKEY.VK_2, InputIntent.Slot2);
+                keyBinds.Add((uint)VIRTUALKEY.VK_3, InputIntent.Slot3);
+                keyBinds.Add((uint)VIRTUALKEY.VK_4, InputIntent.Slot4);
+                keyBinds.Add((uint)VIRTUALKEY.VK_5, InputIntent.Slot5);
+                keyBinds.Add((uint)VIRTUALKEY.VK_6, InputIntent.Slot6);
+                keyBinds.Add((uint)VIRTUALKEY.VK_7, InputIntent.Slot7);
+                keyBinds.Add((uint)VIRTUALKEY.VK_8, InputIntent.Slot8);
+                keyBinds.Add((uint)VIRTUALKEY.VK_9, InputIntent.Slot9);
+                keyBinds.Add((uint)VIRTUALKEY.VK_0, InputIntent.Slot10);
 
                 Config.current.keyBinds = keyBinds;
                 Config.SaveConfig();
@@ -421,9 +445,9 @@ namespace PvZA11y
                 {
                     bool shouldPress = state.Gamepad.Buttons.HasFlag(controllerBind.Key) && !prevState.Gamepad.Buttons.HasFlag(controllerBind.Key);
 
-                    if(Config.current.KeyRepetition && keyRepeatTimers.ContainsKey(controllerBind.Value))
+                    if (Config.current.KeyRepetition && keyRepeatTimers.ContainsKey(controllerBind.Value))
                     {
-                        if(shouldPress)
+                        if (shouldPress)
                             keyRepeatTimers[controllerBind.Value] = DateTime.UtcNow.Ticks + initialKeyRepeatDelay * 10000;
                         else if (state.Gamepad.Buttons.HasFlag(controllerBind.Key) && keyRepeatTimers[controllerBind.Value] < DateTime.UtcNow.Ticks)
                         {
@@ -434,7 +458,7 @@ namespace PvZA11y
 
                     if (shouldPress)
                         intents.Add(controllerBind.Value);
-                    
+
                 }
 
                 //TODO: Clean this up
@@ -482,6 +506,24 @@ namespace PvZA11y
                     intents.Add(InputIntent.Up);
                 }
 
+                //Map right-stick as wheel selector for plant slot (generous deadzones to keep wheel segments more distinct)
+                if (state.Gamepad.RightThumbX > 27000 || state.Gamepad.RightThumbX < -27000 || state.Gamepad.RightThumbY > 27000 || state.Gamepad.RightThumbY < -27000)
+                {
+                    float theta = MathF.Atan2(state.Gamepad.RightThumbY, state.Gamepad.RightThumbX);
+                    theta += MathF.PI * 2.0f;
+                    theta %= MathF.PI * 2.0f;
+                    theta = theta * 180.0f / MathF.PI;
+                    float segmentSize = 360.0f / 10.0f;
+
+                    // Map to the corresponding slot, handling wrap-around
+                    int segmentIndex = (int)(theta / segmentSize);
+                    segmentIndex = 9 - segmentIndex;
+                    if (segmentIndex != prevRightSlot)
+                        intents.Add((InputIntent)((int)InputIntent.Slot1 + segmentIndex));
+
+                    prevRightSlot = segmentIndex;
+                }
+                
             }
 
             prevState = state;
