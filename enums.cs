@@ -489,6 +489,15 @@ namespace PvZA11y
         //For iZombie gamemodes
         public static int[] iZombieNameIndex = new int[] { 0,2,3,4,21,17,20,7,16,6,12,18,8,23,24 };
         public static int[] iZombieSunCosts = new int[] { 50, 75, 75, 125, 150, 125, 125, 175, 150, 100, 175, 200, 350, 300, 50 };
+
+        public static bool[] SeeingStars = new bool[45]
+        {
+            false,  false,  false,  true,   false,  false,  false,  false,  false,
+            false,  false,  false,  true,   true,   false,  false,  false,  false,
+            false,  true,   true,   true,   true,   true,   true,   false,  false,
+            false,  false,  false,  true,   true,   true,   false,  false,  false,
+            false,  false,  false,  true,   false,  false,  true,   false,  false
+        };
     }
 
     enum GameMode
@@ -799,6 +808,6 @@ namespace PvZA11y
         public const int steamCloudSavingActive = 56;
     }
 
-
+    
 
 }

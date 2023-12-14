@@ -672,6 +672,10 @@ namespace PvZA11y.Widgets
                 }
             }
 
+            bool starfruitTemplate = memIO.GetGameMode() == (int)GameMode.SeeingStars && Consts.SeeingStars[gridInput.cursorY * 9 + gridInput.cursorX];
+            if (starfruitTemplate && Program.GetPlantAtCell(gridInput.cursorX, gridInput.cursorY).plantType == (int)SeedType.SEED_STARFRUIT)
+                starfruitTemplate = false;
+
             float rightVol = (float)gridInput.cursorX / (float)gridInput.width;
             float freq = 1000.0f - ((gridInput.cursorY * 500.0f) / (float)gridInput.height);
 
@@ -699,6 +703,8 @@ namespace PvZA11y.Widgets
                     plantInfoString = vaseType == 3 ? "Mystery vase" : vaseType == 4 ? "Plant vase" : "Zombie vase";
                 else if (hasIce)
                     plantInfoString = "Ice";
+                else if (starfruitTemplate)
+                    plantInfoString = "Starfruit guide";
                 else
                 {
                     if (informEmptyTiles)
@@ -707,7 +713,7 @@ namespace PvZA11y.Widgets
                         plantInfoString = null;
                 }
 
-                if ((hasCrater || hasGravestone || vaseType != -1 || hasIce) && beepOnFound)
+                if ((hasCrater || hasGravestone || vaseType != -1 || hasIce || starfruitTemplate) && beepOnFound)
                     Program.PlayTone(1.0f- rightVol, rightVol, freq, freq, 100, SignalGeneratorType.SawTooth);
                 else if(beepOnEmpty)
                 {
