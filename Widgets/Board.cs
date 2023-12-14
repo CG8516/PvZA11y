@@ -440,7 +440,7 @@ namespace PvZA11y.Widgets
 
         //TODO: Split code into method which obtains cell position, one that obtains seedbank/conveyor pos, one that clicks, one that moves the mouse.
         //Can't we just grab the packet position from memory? I wrote this near the start of the project, so don't remember if I tried, or just started with a hacky solution.
-        void PlacePlant(int seedbankIndex, int maxPlants, float offsetX = 0, bool clickPlantFirst = true, bool visualOnly = false, bool visualSeedLoc = false)
+        void PlacePlant(int seedbankIndex, int maxPlants, float offsetX = 0, bool clickPlantFirst = true, bool visualOnly = false, bool visualSeedLoc = false, bool releasePlant = true)
         {
 
             bool mPaused = memIO.GetBoardPaused();
@@ -497,7 +497,8 @@ namespace PvZA11y.Widgets
 
             Task.Delay(50).Wait();
 
-            Program.Click(cellPos.X, cellPos.Y, true);  //Right-click to release plant
+            if(releasePlant)
+                Program.Click(cellPos.X, cellPos.Y, true);  //Right-click to release plant
 
             //Restore pause state
             memIO.SetBoardPaused(mPaused);
@@ -740,6 +741,13 @@ namespace PvZA11y.Widgets
                 {
                     plantInfoString += "Laddered ";
                 }
+                if(plant.plantType == (int)SeedType.SEED_COBCANNON)
+                {
+                    if (plant.state != 37)
+                        plantInfoString = "Charging ";
+                    else
+                        plantInfoString = "Ready ";
+                }
                 plantInfoString += Consts.plantNames[plant.plantType];
                 if (plant.plantType != (int)SeedType.SEED_PUMPKINSHELL && plant.hasPumpkin)
                     plantInfoString += " with pumpkin shield";
@@ -938,10 +946,10 @@ namespace PvZA11y.Widgets
                 if(memIO.GetGameMode() == (int)GameMode.LastStand)
                 {
                     //start/continue onslaught button
-                    //boardPtr,164,105
-                    bool buttonVisible = memIO.mem.ReadByte(memIO.ptr.boardChain + ",164,105") != 1;
+                    bool buttonVisible = memIO.mem.ReadByte(memIO.ptr.boardChain + memIO.ptr.lastStandButtonVisible) != 1;
                     if(buttonVisible)
                     {
+                        memIO.SetBoardPaused(false);
                         Program.Click(0.5f, 0.98f);
                         return;
                     }
@@ -1184,9 +1192,13 @@ namespace PvZA11y.Widgets
             //Place plant
             if(intent == InputIntent.Confirm && plants[seedbankSlot].packetType >= 0)
             {
+                bool isCobCannon = Program.GetPlantAtCell(gridInput.cursorX, gridInput.cursorY).plantType == (int)SeedType.SEED_COBCANNON;
+                isCobCannon |= Program.GetCursorType() == 8;
+                
+                
                 //Click where plant needs to go. Not where plant is located (we already grab plant when auto-collecting everything on screen)
-                if (inVaseBreaker || inRainingSeeds)
-                    PlacePlant(seedbankSlot, seedbankSize, plants[seedbankSlot].offsetX, false, false, false);
+                if (inVaseBreaker || inRainingSeeds || isCobCannon)
+                    PlacePlant(seedbankSlot, seedbankSize, plants[seedbankSlot].offsetX, false, false, false, false);
                 //Program.PlacePlant(0, 0, false);
                 else if (plants[seedbankSlot].absX < 0.72f)
                 {

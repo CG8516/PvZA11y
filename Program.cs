@@ -706,8 +706,15 @@ namespace PvZA11y
             bool sleeping = false;
             int state = 0;
             int magItem = 0;
+            bool rightCobCannon = false;
             for(int i =0; i < plants.Count; i++)
             {
+                if (plants[i].column == x - 1 && plants[i].row == y && plants[i].plantType == (int)SeedType.SEED_COBCANNON)
+                {
+                    state = plants[i].state;
+                    rightCobCannon = true;
+                }
+                
                 if (plants[i].column != x)
                     continue;
                 if (plants[i].row != y)
@@ -739,6 +746,9 @@ namespace PvZA11y
                 if (gridItem.type == (int)GridItemType.Ladder && gridItem.x == x && gridItem.y == y)
                     hasLadder = true;
             }
+
+            if (rightCobCannon)
+                plantID = (int)SeedType.SEED_COBCANNON;
 
             PlantOnBoard plant;
             plant.row = x;

@@ -115,7 +115,9 @@ namespace PvZA11y
 
         public string almanacCloseButtonOffset = ",188";
         public string almanacIndexButtonOffset = ",18c";
-        
+
+        public string lastStandButtonVisible = ",164,fd";
+
 
         //Memory.dll throws an exception if an aobscan is missing a space between any bytes in the search string
         //Whyyyyyyy 
