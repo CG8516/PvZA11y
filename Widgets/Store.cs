@@ -484,7 +484,6 @@ namespace PvZA11y.Widgets
                     }
                     else if (isStinky)
                     {
-                        //uint timestamp = (uint)DateTimeOffset.UtcNow.ToUnixTimeSeconds();
                         uint timestamp = (uint)Program.CurrentEpoch();
                         memIO.SetPlayerPurchase((int)itemType, (int)timestamp); //TODO: Don't cast to int. Maybe convert to byte array and write as array. Or add uint support to Memory lib
                     }

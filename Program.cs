@@ -611,6 +611,10 @@ namespace PvZA11y
             public int state;
             public int x;
             public int y;
+
+            //Positions that aren't exact board tiles (stinky uses these)
+            public float floatX;
+            public float floatY;
         }
 
 
@@ -680,6 +684,8 @@ namespace PvZA11y
                 gridItem.state = mem.ReadInt(memIO.ptr.boardChain + ",134," + (index + 0x0c).ToString("X2"));
                 gridItem.x = mem.ReadInt(memIO.ptr.boardChain + ",134," + (index + 0x10).ToString("X2"));
                 gridItem.y = mem.ReadInt(memIO.ptr.boardChain + ",134," + (index + 0x14).ToString("X2"));
+                gridItem.floatX = mem.ReadFloat(memIO.ptr.boardChain + ",134," + (index + 0x24).ToString("X2"));
+                gridItem.floatY = mem.ReadFloat(memIO.ptr.boardChain + ",134," + (index + 0x28).ToString("X2"));
                 gridItems.Add(gridItem);
 
                 //Console.WriteLine("Added item at {0} {1}", gridItem.x, gridItem.y);
@@ -1733,8 +1739,11 @@ namespace PvZA11y
                     if (oldMsgDuration == 0 && messageDuration != 0)
                     {
                         string messageStr = mem.ReadString(memIO.ptr.boardChain + ",158,4","",128);
-                        Console.WriteLine(messageStr);
-                        Say(messageStr, true);
+                        if (!messageStr.Contains("fell asleep"))
+                        {
+                            Console.WriteLine(messageStr);
+                            Say(messageStr, true);
+                        }
                     }
                     oldMsgDuration = messageDuration;
                 }
@@ -1796,6 +1805,27 @@ namespace PvZA11y
                 }
                 else
                     prevSeedbankSlot = -1;
+
+                if(currentWidget is ZenGarden)
+                {
+                    int timestamp = (int)CurrentEpoch();
+                    int stinkyValue = memIO.GetPlayerPurchase(StoreItem.ZenStinkyTheSnail);
+                    if (stinkyValue != 0 && timestamp - stinkyValue >= 180)
+                    {
+                        //Check if he's asleep
+                        var gridItems = GetGridItems();
+                        foreach(var gridItem in gridItems)
+                        {
+                            if(gridItem.type == (int)GridItemType.Stinky)
+                            {
+                                int cursorType = GetCursorType();
+                                if (gridItem.state == 23 && cursorType == 0)
+                                    Click(gridItem.floatX/800.0f, gridItem.floatY/600.0f);
+                                break;
+                            }
+                        }
+                    }
+                }
 
                 if(thisFastZombieCount > prevFastZombieCount && Config.current.FastZombieAlert)
                 {
