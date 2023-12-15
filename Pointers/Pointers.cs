@@ -45,7 +45,8 @@ namespace PvZA11y
         public string playerLevelOffset;                //lawnApp,playerInfo[,level]
         public string playerCoinsOffset;                //lawnApp,playerInfo[,coins]
         public string playerAdventureCompletionsOffset; //lawnApp,playerInfo[,AdventureCompletions]
-        public string playerChallengeScoresOffset = ",0x54";  //lawnApp,playerInfo[,challengeScores]
+        //public string playerChallengeScoresOffset = ",0x54";  //lawnApp,playerInfo[,challengeScores]
+        public int playerChallengeScoreOffsetInt = 0x54;
         //public string playerPurchasesOffset;            //lawnApp,playerInfo[,purchases]
         public int playerPurchaseOffsetInt = 0x1e8;
         public string playerMinigamesUnlockedOffset;    //lawnApp,playerInfo[,minigamesUnlocked]

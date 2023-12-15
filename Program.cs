@@ -1231,6 +1231,10 @@ namespace PvZA11y
             if (daveMessageIndex == 3100)
                 return true;
 
+            //Tree of life intro
+            if (daveMessageIndex == 3200)
+                return true;
+
             //Zen garden intro
             if (daveMessageIndex >= 2100 && daveMessageIndex <= 2104)
                 return true;

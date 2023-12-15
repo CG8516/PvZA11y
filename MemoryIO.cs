@@ -184,14 +184,15 @@ namespace PvZA11y
 
         public int GetChallengeScore(int challengeID)
         {
+            SetPlayerPurchase((int)StoreItem.ZenTreeFood, -1000);
             int challengeOffset = challengeID * 4;
-            return mem.ReadInt(ptr.playerChallengeScoresOffset + "+" + challengeOffset.ToString("X2")); //TODO: URGENT: Does this work? eg "0x010101,22,33+10"
+            return mem.ReadInt(ptr.playerInfoChain + "," + (ptr.playerChallengeScoreOffsetInt + challengeOffset).ToString("X2"));
         }
 
         public void SetPlayerPurchase(int itemID, int value)
         {
             int purchaseOffset = itemID * 4;
-            mem.WriteMemory(ptr.playerInfoChain + "," + (ptr.playerPurchaseOffsetInt + purchaseOffset).ToString("X2"), "int",value.ToString()); //TODO: URGENT: Does this work? eg "0x010101,22,33+10"
+            mem.WriteMemory(ptr.playerInfoChain + "," + (ptr.playerPurchaseOffsetInt + purchaseOffset).ToString("X2"), "int",value.ToString());
         }
 
         public Vector2 GetWidgetPos(string ptrChain)
