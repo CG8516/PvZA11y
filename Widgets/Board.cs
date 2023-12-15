@@ -801,27 +801,30 @@ namespace PvZA11y.Widgets
                 }
                 if(plant.plantType == (int)SeedType.SEED_WALLNUT || plant.plantType == (int)SeedType.SEED_PUMPKINSHELL)
                 {
-                    plantInfoString = "Damaged ";
+                    string healthState = "Damaged ";
                     if (plant.health > 1333)
-                        plantInfoString = "Chipped ";
+                        healthState = "Chipped ";
                     if (plant.health > 2666)
-                        plantInfoString = "";
+                        healthState = "";
+                    plantInfoString += healthState;
                 }
                 if(plant.plantType == (int)SeedType.SEED_TALLNUT)
                 {
-                    plantInfoString = "Crying ";
+                    string healthState = "Crying ";
                     if (plant.health > 2666)
-                        plantInfoString = "Chipped ";
+                        healthState = "Chipped ";
                     if (plant.health > 5333)
-                        plantInfoString = "";
+                        healthState = "";
+                    plantInfoString += healthState;
                 }
                 if(plant.plantType == (int)SeedType.SEED_GARLIC)
                 {
-                    plantInfoString = "Sad ";
+                    string healthState = "Sad ";
                     if (plant.health > 133)
-                        plantInfoString = "Nibbled ";
+                        healthState = "Nibbled ";
                     if (plant.health > 266)
-                        plantInfoString = "";
+                        healthState = "";
+                    plantInfoString += healthState;
                 }
                 plantInfoString += Consts.plantNames[plant.plantType];
                 if (plant.plantType != (int)SeedType.SEED_PUMPKINSHELL && plant.hasPumpkin)
