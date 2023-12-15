@@ -567,7 +567,7 @@ namespace PvZA11y.Widgets
                 case 3:
                     return "Aquarium";
                 case 4:
-                    return "Tree Of Life";
+                    return "Tree Of Wisdom";
                 default:
                     return null;
             }
