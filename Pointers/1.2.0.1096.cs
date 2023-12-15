@@ -83,6 +83,8 @@ namespace PvZA11y
 
             ret.lastStandButtonVisible = ",164,105";
 
+            ret.playerChallengeScoreOffsetInt = 0x58;
+
             return ret;
         }
     }

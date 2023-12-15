@@ -184,8 +184,8 @@ namespace PvZA11y
 
         public int GetChallengeScore(int challengeID)
         {
-            SetPlayerPurchase((int)StoreItem.ZenTreeFood, -1000);
             int challengeOffset = challengeID * 4;
+            
             return mem.ReadInt(ptr.playerInfoChain + "," + (ptr.playerChallengeScoreOffsetInt + challengeOffset).ToString("X2"));
         }
 
