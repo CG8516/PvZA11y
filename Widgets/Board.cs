@@ -799,9 +799,40 @@ namespace PvZA11y.Widgets
                     else
                         plantInfoString = "Ready ";
                 }
+                if(plant.plantType == (int)SeedType.SEED_WALLNUT || plant.plantType == (int)SeedType.SEED_PUMPKINSHELL)
+                {
+                    plantInfoString = "Damaged ";
+                    if (plant.health > 1333)
+                        plantInfoString = "Chipped ";
+                    if (plant.health > 2666)
+                        plantInfoString = "";
+                }
+                if(plant.plantType == (int)SeedType.SEED_TALLNUT)
+                {
+                    plantInfoString = "Crying ";
+                    if (plant.health > 2666)
+                        plantInfoString = "Chipped ";
+                    if (plant.health > 5333)
+                        plantInfoString = "";
+                }
+                if(plant.plantType == (int)SeedType.SEED_GARLIC)
+                {
+                    plantInfoString = "Sad ";
+                    if (plant.health > 133)
+                        plantInfoString = "Nibbled ";
+                    if (plant.health > 266)
+                        plantInfoString = "";
+                }
                 plantInfoString += Consts.plantNames[plant.plantType];
                 if (plant.plantType != (int)SeedType.SEED_PUMPKINSHELL && plant.hasPumpkin)
-                    plantInfoString += " with pumpkin shield";
+                {
+                    string pumpkinState = " damaged ";
+                    if (plant.pumpkinHealth > 1333)
+                        pumpkinState = " chipped ";
+                    if (plant.pumpkinHealth > 2666)
+                        pumpkinState = " ";
+                    plantInfoString += " with" + pumpkinState + "pumpkin shield";
+                }
 
                 if (plant.plantType == (int)SeedType.SEED_MAGNETSHROOM && plant.magItem != 0)
                 {

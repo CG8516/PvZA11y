@@ -602,6 +602,9 @@ namespace PvZA11y
             public bool hasLadder;
             public bool squished;
             public bool sleeping;
+
+            public int health;
+            public int pumpkinHealth;
         }
 
         //TODO: Move to board class
@@ -714,6 +717,10 @@ namespace PvZA11y
             int state = 0;
             int magItem = 0;
             bool rightCobCannon = false;
+            int health = 0;
+            int pumpkinHealth = 0;
+            int lilypadHealth = 0;
+            int flowerpotHealth = 0;
             for(int i =0; i < plants.Count; i++)
             {
                 if (plants[i].column == x - 1 && plants[i].row == y && plants[i].plantType == (int)SeedType.SEED_COBCANNON)
@@ -728,15 +735,25 @@ namespace PvZA11y
                     continue;
 
                 if (plants[i].plantType == (int)SeedType.SEED_PUMPKINSHELL)
+                {
                     hasPumpkin = true;
+                    pumpkinHealth = plants[i].health;
+                }
                 else if (plants[i].plantType == (int)SeedType.SEED_LILYPAD)
+                {
                     hasLillypad = true;
+                    lilypadHealth = plants[i].health;
+                }
                 else if (plants[i].plantType == (int)SeedType.SEED_FLOWERPOT)
+                {
                     hasPot = true;
+                    flowerpotHealth = plants[i].health;
+                }
                 else
                 {
                     plantID = plants[i].plantType;
                     state = plants[i].state;
+                    health = plants[i].health;
                 }
                 
                 if (plants[i].magItem != 0)
@@ -769,13 +786,24 @@ namespace PvZA11y
             plant.state = state;
             plant.magItem = magItem;
             plant.hasLadder = hasLadder;
+            plant.pumpkinHealth = pumpkinHealth;
+            plant.health = health;
 
             if (plant.hasLillypad && plant.plantType == -1)
+            {
                 plant.plantType = (int)SeedType.SEED_LILYPAD;
+                plant.health = lilypadHealth;
+            }
             if (plant.hasPot && plant.plantType == -1)
+            {
                 plant.plantType = (int)SeedType.SEED_FLOWERPOT;
+                plant.health = flowerpotHealth;
+            }
             if (plant.hasPumpkin && plant.plantType == -1)
+            {
                 plant.plantType = (int)SeedType.SEED_PUMPKINSHELL;
+                plant.health = pumpkinHealth;
+            }
 
             return plant;
         }
@@ -805,6 +833,7 @@ namespace PvZA11y
                     p.plantType = mem.ReadInt(memIO.ptr.boardChain + ",c4," + (index + 0x24).ToString("X2"));
                     p.column = mem.ReadInt(memIO.ptr.boardChain + ",c4," + (index + 0x28).ToString("X2"));
                     p.state = mem.ReadInt(memIO.ptr.boardChain + ",c4," + (index + 0x3c).ToString("X2"));
+                    p.health = mem.ReadInt(memIO.ptr.boardChain + ",c4," + (index + 0x40).ToString("X2"));
 
                     //magnetItems: c8
                     for(int mag = 0; mag < 5; mag++)
