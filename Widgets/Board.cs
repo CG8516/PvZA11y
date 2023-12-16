@@ -628,10 +628,14 @@ namespace PvZA11y.Widgets
             }
             if (gameMode is GameMode.Beghouled)
             {
-                Program.GameplayTutorial(new string[] { "Welcome to be-ghouled!", "In this mode, you'll need to match triplets of plants.", "To do that, select a plant with the deny button, then press a directional button.", "This will drag the plant in the direction you choose, but only if a match can be made." });
+                Program.GameplayTutorial(new string[] { "In this mode, you'll need to match triplets of plants.", "To do that, select a plant with the deny button, then press a directional button.", "This will drag the plant in the direction you choose, but only if a match can be made." });
                 Program.GameplayTutorial(new string[] { "Once a match has been made, the matched plants will disappear, and the plants above will fall down to fill their place.", "You'll also get some sun for each match, which you can use to upgrade your plants.", "Upgrading plants will help, because you also need to defend your house at the same time!" });
                 Program.GameplayTutorial(new string[] { "If a zombie eats one of your plants, it will create a crater, which will obstruct your matches.", "You can fill a random crater by purchasing the crater fill item for 200 sun.", "To win the game, you'll need to make 75 matches." });
                 Program.GameplayTutorial(new string[] { "You may want to adjust your accessibility options, to help focus on just the plants, rather than the zombies.", "There are also some be-ghouled accessibility options, which can assist with finding matches."});
+            }
+            else if(gameMode is GameMode.PortalCombat)
+            {
+                Program.GameplayTutorial(new string[] { "This minigame features four portals. Two of them are square, and the other two are round.", "Any zombie, projectile, or lawnmower that passes through a portal, will teleport to the other one of the same shape.", "While playing, a random portal may be picked and moved somewhere else on the lawn. You will be notified when this happens.", "This level features a conveyor belt for incoming plants." });
             }
         }
 
@@ -746,6 +750,8 @@ namespace PvZA11y.Widgets
             bool hasCrater = false;
             bool hasGravestone = false;
             bool hasIce = CheckIceAtTile();
+            bool hasSquarePortal = false;
+            bool hasCirclePortal = false;
             for (int i = 0; i < gridItems.Count; i++)
             {
                 if (gridItems[i].x == gridInput.cursorX && gridItems[i].y == gridInput.cursorY)
@@ -756,7 +762,18 @@ namespace PvZA11y.Widgets
                         vaseType = gridItems[i].state;
                     else if (gridItems[i].type == (int)GridItemType.Crater)
                         hasCrater = true;
-
+                    else if (gridItems[i].type == (int)GridItemType.PortalCircle)
+                        hasCirclePortal = true;
+                    else if (gridItems[i].type == (int)GridItemType.PortalSquare)
+                        hasSquarePortal = true;
+                }
+                //Sometimes portals in 'portal combat' minigame spawn in column 9, but display in column 8
+                if(gridInput.cursorX == 8 && gridItems[i].x == 9 && gridItems[i].y == gridInput.cursorY)
+                {
+                    if (gridItems[i].type == (int)GridItemType.PortalCircle)
+                        hasCirclePortal = true;
+                    else if (gridItems[i].type == (int)GridItemType.PortalSquare)
+                        hasSquarePortal = true;
                 }
             }
 
@@ -797,6 +814,10 @@ namespace PvZA11y.Widgets
                     plantInfoString = "Ice";
                 else if (starfruitTemplate)
                     plantInfoString = "Starfruit guide";
+                else if (hasCirclePortal)
+                    plantInfoString = "Round portal";
+                else if (hasSquarePortal)
+                    plantInfoString = "Square portal";
                 else
                 {
                     if (informEmptyTiles)
@@ -805,7 +826,7 @@ namespace PvZA11y.Widgets
                         plantInfoString = null;
                 }
 
-                if ((hasCrater || hasGravestone || vaseType != -1 || hasIce || starfruitTemplate) && beepOnFound)
+                if ((hasCrater || hasGravestone || vaseType != -1 || hasIce || starfruitTemplate || hasCirclePortal || hasSquarePortal) && beepOnFound)
                     Program.PlayTone(1.0f- rightVol, rightVol, freq, freq, 100, SignalGeneratorType.SawTooth);
                 else if(beepOnEmpty)
                 {
@@ -815,7 +836,6 @@ namespace PvZA11y.Widgets
             }
             else
             {
-                Console.WriteLine("PlantID: " + plant.plantType);
                 if (plant.squished)
                     plantInfoString = "Squished ";
                 if (plant.sleeping)
@@ -934,6 +954,11 @@ namespace PvZA11y.Widgets
                             break;
                     }
                 }
+
+                if (hasCirclePortal)
+                    plantInfoString += " and Round portal";
+                else if (hasSquarePortal)
+                    plantInfoString += " and Square portal";
 
                 if (beepOnFound)
                     Program.PlayTone(1.0f- rightVol, rightVol, freq, freq, 100, SignalGeneratorType.SawTooth);

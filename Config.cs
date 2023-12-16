@@ -42,7 +42,7 @@ namespace PvZA11y
             public bool AutoCollectItems = true;
             public bool SayTilePosOnMove = false;
             public bool GameplayTutorial = true;
-            public bool SayPlantOnTileMove = false;
+            public bool SayPlantOnTileMove = true;
             public bool BeepWhenPlantFound = true;
             public bool BeepWhenZombieFound = true;
             public bool SayZombieOnTileMove = false;
