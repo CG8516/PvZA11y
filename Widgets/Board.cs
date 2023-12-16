@@ -23,6 +23,8 @@ namespace PvZA11y.Widgets
         bool shovelPressedLast; //Whether the shovel was the last input (required for shovel confirmation mode)
         int animatingSunAmount;
 
+        bool doneBowlingTutorial = false;
+
         public struct Zombie
         {
             public int zombieType;
@@ -62,7 +64,7 @@ namespace PvZA11y.Widgets
             public bool active;
         }
 
-        public Board(MemoryIO memIO, string pointerChain = "") : base(memIO, pointerChain)
+        public Board(MemoryIO memIO, string pointerChain = "", bool tempOnly = false) : base(memIO, pointerChain)
         {
             //Get width/height for current level
 
@@ -93,7 +95,7 @@ namespace PvZA11y.Widgets
 
             gridInput = new GridInput(width, height, false);
 
-            if(Config.current.GameplayTutorial)
+            if(Config.current.GameplayTutorial && !tempOnly)
                 DoTutorials();
         }
 
@@ -579,7 +581,6 @@ namespace PvZA11y.Widgets
                 if (level == 5)
                 {
                     Program.GameplayTutorial(new string[] { "Pressing the deny button will dig up the plant at your current board position.", "Move around the board, and use the Info2 button to find the three peashooters.", "Shovel all three peashooters to continue." });
-                    Program.GameplayTutorial(new string[] { "You will soon be playing a conveyor level, where your deck is replaced with a conveyor belt.", "As you play, plants will arrive and build up on the conveyor belt.", "When you place a plant, it is removed from the conveyor belt." });
                 }
                 if (level == 6)
                 {
@@ -626,17 +627,49 @@ namespace PvZA11y.Widgets
                     Program.GameplayTutorial(new string[] { "Dr.Zomboss can also be frozen with ice-shrooms, extending your attack time.", "Good luck!" });
                 }
             }
-            if (gameMode is GameMode.Beghouled)
+            if (gameMode is GameMode.ZomBotany)
+                Program.GameplayTutorial(new string[] { "This is ZomBotany.", "In this mode, the zombies have swapped their heads with plants!", "Zombies with a plant head will behave very similarly to the plant they've become.", "This takes place in your front yard, during the day." });
+            else if (gameMode is GameMode.SlotMachine)
+                Program.GameplayTutorial(new string[] { "In this game, your deck has been replaced with an old casino slot machine.", "Use the Info3 button to spend 25 sun and spin the slots.", "If you get two or three of a kind, you'll win plants, or some sun.", "Use the cycleLeft and cycleRight buttons to find out what plant you've won.", "Save up 2000 sun while defending your front yard, to win the game." });
+            else if (gameMode is GameMode.ItsRainingSeeds)
+                Program.GameplayTutorial(new string[] { "In this game, you have no deck.", "Plant seed packets will fall from the sky as you play, similarly to a conveyor belt, but they will disappear if you don't use them quickly enough.", "The game takes place at night in your foggy backyard pool." });
+            else if (gameMode is GameMode.Beghouled)
             {
                 Program.GameplayTutorial(new string[] { "In this mode, you'll need to match triplets of plants.", "To do that, select a plant with the deny button, then press a directional button.", "This will drag the plant in the direction you choose, but only if a match can be made." });
                 Program.GameplayTutorial(new string[] { "Once a match has been made, the matched plants will disappear, and the plants above will fall down to fill their place.", "You'll also get some sun for each match, which you can use to upgrade your plants.", "Upgrading plants will help, because you also need to defend your house at the same time!" });
                 Program.GameplayTutorial(new string[] { "If a zombie eats one of your plants, it will create a crater, which will obstruct your matches.", "You can fill a random crater by purchasing the crater fill item for 200 sun.", "To win the game, you'll need to make 75 matches." });
-                Program.GameplayTutorial(new string[] { "You may want to adjust your accessibility options, to help focus on just the plants, rather than the zombies.", "There are also some be-ghouled accessibility options, which can assist with finding matches."});
+                Program.GameplayTutorial(new string[] { "You may want to adjust your accessibility options, to help focus on just the plants, rather than the zombies.", "There are also some be-ghouled accessibility options, which can assist with finding matches." });
             }
-            else if(gameMode is GameMode.PortalCombat)
-            {
-                Program.GameplayTutorial(new string[] { "This minigame features four portals. Two of them are square, and the other two are round.", "Any zombie, projectile, or lawnmower that passes through a portal, will teleport to the other one of the same shape.", "While playing, a random portal may be picked and moved somewhere else on the lawn. You will be notified when this happens.", "This level features a conveyor belt for incoming plants." });
-            }
+            else if (gameMode is GameMode.Invisighoul)
+                Program.GameplayTutorial(new string[] { "All zombies are completely invisible in this mode, which offers quite the... oh, wait... this changes absolutely nothing.", "Maybe a future mod update will add some new challenge to this mode.", "It's a conveyor belt level in your backyard at night btw." });   //Can't wait for first comment about this, haha
+            else if (gameMode is GameMode.SeeingStars)
+                Program.GameplayTutorial(new string[] { "In this mode, you'll need to plant starfruits on your front yard, to make a large star shape.", "You'll find some placeholder tiles, which can only have startfruits planted there.", "Fill all of the starfruit tiles to win the game.", });
+            else if (gameMode is GameMode.Zombiquarium)
+                Program.GameplayTutorial(new string[] { "This mode is not currently accessible.", "Check back again in a future update." });
+            else if (gameMode is GameMode.BeghouledTwist)
+                Program.GameplayTutorial(new string[] { "This mode is not currently accessible.", "Check back again in a future update." });
+            else if (gameMode is GameMode.BigTroubleLittleZombie)
+                Program.GameplayTutorial(new string[] { "This is the same minigame you experience in level 3,5, but much harder.", "You'll have to defeat huge swarms of tiny zombies, which have less health than full zombies, but they move much faster and deal the same damage.", "This is a conveyor belt level, and takes place in your back yard during the day." });
+            else if (gameMode is GameMode.PortalCombat)
+                Program.GameplayTutorial(new string[] { "This minigame features four portals. Two of them are square, and the other two are round.", "Any zombie, projectile, or lawnmower that passes through a portal, will teleport to the other one of the same shape.", "While playing, a random portal may be picked and moved somewhere else on the lawn. You will be notified when this happens.", "This level features a conveyor belt, and takes place in your front yard at night." });
+            else if (gameMode is GameMode.ColumnLikeYouSeeEm)
+                Program.GameplayTutorial(new string[] { "This minigame takes place on your roof.", "Placing a plant in any row will fill the entire column with that plant.", "You'll receive plants on a conveyor." });
+            else if (gameMode is GameMode.BobsledBonanza)
+                Program.GameplayTutorial(new string[] { "This minigame takes place in your backyard during the day.", "The level starts with long ice trails in the four grass rows.", "Bobsled zombies will quickly slide in on these trails in groups of four.", "Your only goal is to survive.", "There are four waves of zombies." });
+            else if (gameMode is GameMode.ZombieNimbleZombieQuick)
+                Program.GameplayTutorial(new string[] { "This game runs at two times the normal speed, and features many pole-vaulting and dolphin-rider zombies.", "Defend your daytime backyard through four waves of zombies, to win the game." });
+            else if (gameMode is GameMode.WhackAZombie)
+                Program.GameplayTutorial(new string[] { "This is the standalone Whack-A-Zombie minigames.", "This is a more difficult version of the same minigame on level 2,5." });   //cop-out?
+            else if (gameMode is GameMode.LastStand)
+                Program.GameplayTutorial(new string[] { "In this game, which takes place in your backyard during the day,", "no sun will fall from the sky, and you'll be unable to choose any sun-producing plants.", "You start the game with 5,000 sun, and are given as much time as needed to prepare your lawn.", "When you're ready to begin, press the option/freeze input, and the wave will begin.", "At the end of a wave, you'll be given some additional sun, and time to prepare once again.", "Win the game by surviving through five waves." });
+            else if (gameMode is GameMode.ZomBotany2)
+                Program.GameplayTutorial(new string[] { "This minigame is the same as ZomBotany, but with many new types of plant-headed zombies.", "It also takes place in your front yard, during the day." });
+            else if (gameMode is GameMode.WallnutBowling2)
+                Program.GameplayTutorial(new string[] { "This is wall-nut bowling 2!", "It's pretty much the same as the first wall-nut bowling, but much harder.", "You'll also sometimes receive giant wall-nuts, which will always roll directly over anything that gets in their way, without ricocheting.", "This is a daytime front yard level." });
+            else if (gameMode is GameMode.PogoParty)
+                Program.GameplayTutorial(new string[] { "In this minigame, you must defend your roof from swarms of pogo zombies." });
+            else if (gameMode is GameMode.DrZombossRevenge)
+                Program.GameplayTutorial(new string[] { "This minigame is a harder version of final boss of adventure mode.", "Dr. ZomBoss will have twice as much health, and will send zombies more frequently." });
         }
 
         int getIzombieBrainCount(bool thisRowOnly = false)
@@ -1443,7 +1476,16 @@ namespace PvZA11y.Widgets
                 bool inBowling = gameMode == GameMode.WallnutBowling || gameMode == GameMode.WallnutBowling2;
                 inBowling |= memIO.GetPlayerLevel() == 5 && ConveyorBeltCounter() > 0; //converyorBeltCounter >0, means we're passed the peashooter-shovelling part.
                 if (inBowling)
+                {
+                    if(!doneBowlingTutorial && Config.current.GameplayTutorial && gameMode != GameMode.WallnutBowling2)
+                    {
+                        Program.GameplayTutorial(new string[] { "This is wall-nut bowling.", "Your deck at the top has been replaced with a conveyor belt.", "As you play, plants will arrive and build up on the conveyor belt.", "When you place a plant, it will be removed from the belt." });
+                        Program.GameplayTutorial(new string[] { "You will be confined to the left three columns, and you will start receiving wall-nuts on the conveyor belt.", "When you place a wall-nut, it will roll from where you place it, to the right of the screen.", "Zombies will arrive as normal, and you must bowl them over to defend your house." });
+                        Program.GameplayTutorial(new string[] { "When a wallnut rolls into a zombie, it will ricochet and begin moving diagonally up-right or down-right.", "You will also occasionally receive explode-o-nuts, which will also roll, but will explode like a cherry bomb when they hit a zombie." });
+                        doneBowlingTutorial = true;
+                    }
                     maxX = 2;
+                }
 
                 //bool inIZombie = gameMode >= (int)GameMode.PUZZLE_I_ZOMBIE_1 && gameMode <= (int)GameMode.PUZZLE_I_ZOMBIE_ENDLESS;
                 //if (inIZombie)
@@ -1707,7 +1749,7 @@ namespace PvZA11y.Widgets
             }
 
             //Place plant
-            if(intent == InputIntent.Confirm && plants[seedbankSlot].packetType >= 0)
+            if(intent == InputIntent.Confirm && (plants[seedbankSlot].packetType >= 0 || inRainingSeeds))
             {
                 bool isCobCannon = Program.GetPlantAtCell(gridInput.cursorX, gridInput.cursorY).plantType == (int)SeedType.SEED_COBCANNON;
                 isCobCannon |= Program.GetCursorType() == 8;

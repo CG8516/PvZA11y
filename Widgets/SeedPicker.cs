@@ -360,7 +360,7 @@ namespace PvZA11y.Widgets
             //Inform user which zombies will be present in this level
             if(intent is InputIntent.Info1)
             {
-                Widgets.Board tempBoard = new Board(memIO);
+                Widgets.Board tempBoard = new Board(memIO, "", true);
                 var zombiesThisLevel = tempBoard.GetZombies(true);
                 List<int> zombieTypes = new List<int>();
                 foreach(var zombie in zombiesThisLevel)
