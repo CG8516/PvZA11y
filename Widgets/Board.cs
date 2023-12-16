@@ -59,6 +59,7 @@ namespace PvZA11y.Widgets
             public int imitaterType;
             public bool isRefreshing;
             public float absX;
+            public bool active;
         }
 
         public Board(MemoryIO memIO, string pointerChain = "") : base(memIO, pointerChain)
@@ -390,7 +391,7 @@ namespace PvZA11y.Widgets
                 plant.packetType = BitConverter.ToInt32(plantBytes, byteIndex + 0x34);
                 plant.imitaterType = BitConverter.ToInt32(plantBytes, byteIndex + 0x38);
                 plant.isRefreshing = BitConverter.ToBoolean(plantBytes, byteIndex + 0x49);
-
+                plant.active = BitConverter.ToBoolean(plantBytes, byteIndex + 0x48);
                 //Console.WriteLine(plant.offsetX);
                 //Console.WriteLine(plant.packetType);
 
@@ -448,6 +449,24 @@ namespace PvZA11y.Widgets
 
             return info;
 
+        }
+
+        void DragPlant(InputIntent intent)
+        {
+            bool mPaused = memIO.GetBoardPaused();
+            memIO.SetBoardPaused(false);
+            Vector2 cellPos = GetBoardCellPosition();
+            Vector2 dragPos = cellPos;
+            if (intent is InputIntent.Up)
+                dragPos.Y -= 0.1f;
+            if (intent is InputIntent.Down)
+                dragPos.Y += 0.1f;
+            if (intent is InputIntent.Left)
+                dragPos.X -= 0.1f;
+            if (intent is InputIntent.Right)
+                dragPos.X += 0.1f;
+            Program.Click(cellPos.X, cellPos.Y, dragPos.X, dragPos.Y);
+            memIO.SetBoardPaused(mPaused);
         }
 
         //TODO: Split code into method which obtains cell position, one that obtains seedbank/conveyor pos, one that clicks, one that moves the mouse.
@@ -519,79 +538,100 @@ namespace PvZA11y.Widgets
 
         void DoTutorials()
         {
-            if (memIO.GetAdventureCompletions() > 0)
-                return;
-            int level = memIO.GetPlayerLevel();
-            if(level == 1)
+            GameMode gameMode = (GameMode)memIO.GetGameMode();
+
+            if (gameMode is GameMode.Adventure)
             {
-                Program.GameplayTutorial(new string[] { "Use your directional keys to navigate tutorial text.", "To close a tutorial, press the confirm button."});
-                Program.GameplayTutorial(new string[] { "You are presented with a grid-like lawn, 9 tiles long, and one tile high.", "Your house is on the left, and zombies will soon appear from the right.", "You'll need to use plants to stop the zombies from breaking into your house, and eating your brain." });
-                Program.GameplayTutorial(new string[] { "A deck at the top of the screen contains all the plants you can place on the lawn.", "Placing plants will cost sun, and will trigger a cooldown before you can place the same plant again.", "Sun falls from the sky, and will be automatically collected as you play.", "Press the Info3 button to read your sun count."});
-                Program.GameplayTutorial(new string[] { "After the tutorial, place a plant with the confirm button.", "Most shooting plants will shoot from their placed position, towards the right of the screen.", "You will need to place two plants before the game will start.", "Soon, zombies will start appearing. You can detect them with your zombie-sonar, which is the Info1 button."});
-                Program.GameplayTutorial(new string[] { "And finally, you may occasionally hear advice telling you to click on things.", "This is part of the game's built-in tutorial, and can be ignored." });
+                int level = memIO.GetPlayerLevel();
+
+                if (memIO.GetAdventureCompletions() > 0)
+                {
+                    if (level == 1)
+                    {
+                        Program.GameplayTutorial(new string[] { "Welcome to new game plus!", "You'll be able to replay adventure mode, but this time with added difficulty.", "Additionally, Dave will select three plants for every level, which you can not change.", "Good luck!" });
+                    }
+                    return;
+                }
+
+
+                if (level == 1)
+                {
+                    Program.GameplayTutorial(new string[] { "Use your directional keys to navigate tutorial text.", "To close a tutorial, press the confirm button." });
+                    Program.GameplayTutorial(new string[] { "You are presented with a grid-like lawn, 9 tiles long, and one tile high.", "Your house is on the left, and zombies will soon appear from the right.", "You'll need to use plants to stop the zombies from breaking into your house, and eating your brain." });
+                    Program.GameplayTutorial(new string[] { "A deck at the top of the screen contains all the plants you can place on the lawn.", "Placing plants will cost sun, and will trigger a cooldown before you can place the same plant again.", "Sun falls from the sky, and will be automatically collected as you play.", "Press the Info3 button to read your sun count." });
+                    Program.GameplayTutorial(new string[] { "After the tutorial, place a plant with the confirm button.", "Most shooting plants will shoot from their placed position, towards the right of the screen.", "You will need to place two plants before the game will start.", "Soon, zombies will start appearing. You can detect them with your zombie-sonar, which is the Info1 button." });
+                    Program.GameplayTutorial(new string[] { "And finally, you may occasionally hear advice telling you to click on things.", "This is part of the game's built-in tutorial, and can be ignored." });
+                }
+                if (level == 2)
+                {
+                    Program.GameplayTutorial(new string[] { "Two more rows of lawn have been unrolled, making it a 9 by 3 grid.", "You've also unlocked a new plant, which you can select with the cycleLeft and cycleRight buttons" });
+                    Program.GameplayTutorial(new string[] { "Sunflowers are extremely important, as they produce sun, which is a vital resource for building your defenses.", "You'll want to place at least one sunflower for each row.", "When navigating the board, you can check which plant has been placed in a tile, by pressing the Info2 button." });
+                    Program.GameplayTutorial(new string[] { "Keep in mind that the zombie sonar is for the current row only.", "You'll need to move up and down on the board, to detect zombies in each row." });
+                }
+                if (level == 3)
+                {
+                    Program.GameplayTutorial(new string[] { "You can use the option button to freeze the game.", "This is slightly different to pausing, as it will not open the pause menu.", "You will still be able to interact with the board, but all gameplay will be frozen.", "Don't forget to unfreeze with the option button again." });
+                }
+                if (level == 4)
+                {
+                    Program.GameplayTutorial(new string[] { "The final two rows of the lawn have been unrolled, making it a 9 by 5 grid.", "Each plant has unique stats, including how long it takes to refresh." });
+                }
+                if (level == 5)
+                {
+                    Program.GameplayTutorial(new string[] { "Pressing the deny button will dig up the plant at your current board position.", "Move around the board, and use the Info2 button to find the three peashooters.", "Shovel all three peashooters to continue." });
+                    Program.GameplayTutorial(new string[] { "You will soon be playing a conveyor level, where your deck is replaced with a conveyor belt.", "As you play, plants will arrive and build up on the conveyor belt.", "When you place a plant, it is removed from the conveyor belt." });
+                }
+                if (level == 6)
+                {
+                    Program.GameplayTutorial(new string[] { "Each row has a lawn mower on the left side.", "If a zombie reaches a lawnmower, it will be activated and shred all zombies in that row.", "Once a lawnmower has been used, it won't come back until the level restarts, or a new one begins." });
+                    Program.GameplayTutorial(new string[] { "Also, watch out for pole-vaulting zombies! They're fast, quiet, and jump over the first plant they run into!" });
+                }
+                if (level == 10)
+                {
+                    Program.GameplayTutorial(new string[] { "This is another conveyor belt level, similar to the bowling minigame.", "Plants will stop arriving when the belt gets full.", "Placing a plant will make room on the belt, and it will start moving again." });
+                }
+                if (level == 11)
+                {
+                    Program.GameplayTutorial(new string[] { "The sun has set; leaving you with new challenges to face in this moonlit night.", "You'll find gravstones scattered around your front yard, which can not be planted on.", "And on the final wave of each level, additional zombies will emerge from the graves." });
+                }
+                if (level == 15)
+                {
+                    Program.GameplayTutorial(new string[] { "This is Whack-A-Zombie.", "Zombies will quickly rise from graves around the lawn.", "You need to quickly find each zombie, then press the deny button to whack them with your mallet.", "Some zombies take more than one hit, and some will drop sun for you to use." });
+                }
+                if (level == 21)
+                {
+                    Program.GameplayTutorial(new string[] { "Your backyard has six rows of tiles, with an in-ground pool taking up the two middle rows.", "Only aquatic plants can be placed in the pool, however, you can place non-aquatic plants on top of lillypads." });
+                }
+                if (level == 31)
+                {
+                    Program.GameplayTutorial(new string[] { "As the moon takes the suns place in the sky, it brings a thick rolling fog with it." });
+                }
+                if (level == 35)
+                {
+                    Program.GameplayTutorial(new string[] { "This is VaseBreaker, which takes place at night in your front yard.", "There are columns of vases on the right side of your lawn.", "Press confirm on a vase to break it open.", "Breaking a vase can spawn a zombie, or put a plant in your hand.", "Your goal is to break all the vases, and defeat all the zombies." });
+                }
+                if (level == 36)
+                {
+                    Program.GameplayTutorial(new string[] { "Digger zombies will flank your plants by tunneling under your lawn, and emerging on the left.", "They walk from where they emerge, to the right, eating any plants that get in their way." });
+                }
+                if (level == 41)
+                {
+                    Program.GameplayTutorial(new string[] { "The roof slopes up from left to right, with a flat section on the right four columns.", "Most shooting plants will be useless on the left four columns, as their projectiles will hit the slope.", "Catapulting plants will lob projectiles up and to the right, making them effective from any column." });
+                    Program.GameplayTutorial(new string[] { "Additionally, you can not plant on roof tiles.", "You will need to plant in flowerpots, similarly to lillypads in the pool.", "It is also day now, so mushrooms will be useless." });
+                }
+                if (level == 50)
+                {
+                    Program.GameplayTutorial(new string[] { "This is it, the final level.", "Dr.Zomboss is in the cockpit of a giant robot.", "He will be invincible, until he lowers his head onto the screen.", "Your zombie sonar will inform you of when he is vulnerable.", "When he lowers his head, he can be attacked from plants in any row." });
+                    Program.GameplayTutorial(new string[] { "Dr.Zomboss will open his mouth, to release a large ball of fire, or ice.", "Fireballs and Iceballs will slowly roll from right to left, squashing any plants in their path.", "Fireballs can be extinguished from any row, but iceballs will need to be melted from the same row." });
+                    Program.GameplayTutorial(new string[] { "Dr.Zomboss can also be frozen with ice-shrooms, extending your attack time.", "Good luck!" });
+                }
             }
-            if(level == 2)
+            if (gameMode is GameMode.Beghouled)
             {
-                Program.GameplayTutorial(new string[] { "Two more rows of lawn have been unrolled, making it a 9 by 3 grid.", "You've also unlocked a new plant, which you can select with the cycleLeft and cycleRight buttons" });
-                Program.GameplayTutorial(new string[] { "Sunflowers are extremely important, as they produce sun, which is a vital resource for building your defenses.", "You'll want to place at least one sunflower for each row.", "When navigating the board, you can check which plant has been placed in a tile, by pressing the Info2 button." });
-                Program.GameplayTutorial(new string[] { "Keep in mind that the zombie sonar is for the current row only.", "You'll need to move up and down on the board, to detect zombies in each row." });
-            }
-            if(level == 3)
-            {
-                Program.GameplayTutorial(new string[] { "You can use the option button to freeze the game.", "This is slightly different to pausing, as it will not open the pause menu.", "You will still be able to interact with the board, but all gameplay will be frozen.", "Don't forget to unfreeze with the option button again." });
-            }
-            if(level == 4)
-            {
-                Program.GameplayTutorial(new string[] { "The final two rows of the lawn have been unrolled, making it a 9 by 5 grid.", "Each plant has unique stats, including how long it takes to refresh."});
-            }
-            if(level == 5)
-            {
-                Program.GameplayTutorial(new string[] { "Pressing the deny button will dig up the plant at your current board position.", "Move around the board, and use the Info2 button to find the three peashooters.", "Shovel all three peashooters to continue." });
-                Program.GameplayTutorial(new string[] { "You will soon be playing a conveyor level, where your deck is replaced with a conveyor belt.", "As you play, plants will arrive and build up on the conveyor belt.", "When you place a plant, it is removed from the conveyor belt." });
-            }
-            if(level == 6)
-            {
-                Program.GameplayTutorial(new string[] { "Each row has a lawn mower on the left side.", "If a zombie reaches a lawnmower, it will be activated and shred all zombies in that row.", "Once a lawnmower has been used, it won't come back until the level restarts, or a new one begins." });
-                Program.GameplayTutorial(new string[] { "Also, watch out for pole-vaulting zombies! They're fast, quiet, and jump over the first plant they run into!" });
-            }
-            if(level == 10)
-            {
-                Program.GameplayTutorial(new string[] { "This is another conveyor belt level, similar to the bowling minigame.", "Plants will stop arriving when the belt gets full.", "Placing a plant will make room on the belt, and it will start moving again." });
-            }
-            if(level == 11)
-            {
-                Program.GameplayTutorial(new string[] { "The sun has set; leaving you with new challenges to face in this moonlit night.", "You'll find gravstones scattered around your front yard, which can not be planted on.", "And on the final wave of each level, additional zombies will emerge from the graves." });
-            }
-            if(level == 15)
-            {
-                Program.GameplayTutorial(new string[] { "This is Whack-A-Zombie.", "Zombies will quickly rise from graves around the lawn.", "You need to quickly find each zombie, then press the deny button to whack them with your mallet.", "Some zombies take more than one hit, and some will drop sun for you to use." });
-            }
-            if(level == 21)
-            {
-                Program.GameplayTutorial(new string[] { "Your backyard has six rows of tiles, with an in-ground pool taking up the two middle rows.", "Only aquatic plants can be placed in the pool, however, you can place non-aquatic plants on top of lillypads." });
-            }
-            if(level == 31)
-            {
-                Program.GameplayTutorial(new string[] { "As the moon takes the suns place in the sky, it brings a thick rolling fog with it." });
-            }
-            if(level == 35)
-            {
-                Program.GameplayTutorial(new string[] { "This is VaseBreaker, which takes place at night in your front yard.", "There are columns of vases on the right side of your lawn.", "Press confirm on a vase to break it open.", "Breaking a vase can spawn a zombie, or put a plant in your hand.", "Your goal is to break all the vases, and defeat all the zombies." });
-            }
-            if(level == 36)
-            {
-                Program.GameplayTutorial(new string[] { "Digger zombies will flank your plants by tunneling under your lawn, and emerging on the left.", "They walk from where they emerge, to the right, eating any plants that get in their way." });
-            }
-            if (level == 41)
-            {
-                Program.GameplayTutorial(new string[] { "The roof slopes up from left to right, with a flat section on the right four columns.", "Most shooting plants will be useless on the left four columns, as their projectiles will hit the slope.", "Catapulting plants will lob projectiles up and to the right, making them effective from any column." });
-                Program.GameplayTutorial(new string[] { "Additionally, you can not plant on roof tiles.", "You will need to plant in flowerpots, similarly to lillypads in the pool.", "It is also day now, so mushrooms will be useless." });
-            }
-            if(level == 50)
-            {
-                Program.GameplayTutorial(new string[] { "This is it, the final level.", "Dr.Zomboss is in the cockpit of a giant robot.", "He will be invincible, until he lowers his head onto the screen.", "Your zombie sonar will inform you of when he is vulnerable.", "When he lowers his head, he can be attacked from plants in any row." });
-                Program.GameplayTutorial(new string[] { "Dr.Zomboss will open his mouth, to release a large ball of fire, or ice.", "Fireballs and Iceballs will slowly roll from right to left, squashing any plants in their path.", "Fireballs can be extinguished from any row, but iceballs will need to be melted from the same row." });
-                Program.GameplayTutorial(new string[] { "Dr.Zomboss can also be frozen with ice-shrooms, extending your attack time.", "Good luck!" });
+                Program.GameplayTutorial(new string[] { "Welcome to be-ghouled!", "In this mode, you'll need to match triplets of plants.", "To do that, select a plant with the deny button, then press a directional button.", "This will drag the plant in the direction you choose, but only if a match can be made." });
+                Program.GameplayTutorial(new string[] { "Once a match has been made, the matched plants will disappear, and the plants above will fall down to fill their place.", "You'll also get some sun for each match, which you can use to upgrade your plants.", "Upgrading plants will help, because you also need to defend your house at the same time!" });
+                Program.GameplayTutorial(new string[] { "If a zombie eats one of your plants, it will create a crater, which will obstruct your matches.", "You can fill a random crater by purchasing the crater fill item for 200 sun.", "To win the game, you'll need to make 75 matches." });
+                Program.GameplayTutorial(new string[] { "You may want to adjust your accessibility options, to help focus on just the plants, rather than the zombies.", "There are also some be-ghouled accessibility options, which can assist with finding matches."});
             }
         }
 
@@ -619,6 +659,7 @@ namespace PvZA11y.Widgets
             
             bool inSlotMachine = gameMode is GameMode.SlotMachine;
             bool inZombiquarium = gameMode is GameMode.Zombiquarium;
+            bool inBeghouled = gameMode is GameMode.Beghouled;
             if (inSlotMachine)
             {
                 bool slotReady = memIO.mem.ReadInt(memIO.ptr.boardChain + ",178,54") == 0;
@@ -646,6 +687,20 @@ namespace PvZA11y.Widgets
                 if (seedbankSlot == 2 && sunAmount >= 5 && brainCount < 3)
                     return true;
 
+                return false;
+            }
+            if(inBeghouled)
+            {
+                if (seedbankSlot == 0 && sunAmount >= 1000)
+                    return true;
+                if (seedbankSlot == 1 && sunAmount >= 500)
+                    return true;
+                if (seedbankSlot == 2 && sunAmount >= 250)
+                    return true;
+                if (seedbankSlot == 3 && sunAmount >= 100)
+                    return true;
+                if (seedbankSlot == 4 && sunAmount >= 200)
+                    return true;
                 return false;
             }
 
@@ -727,6 +782,10 @@ namespace PvZA11y.Widgets
                 typeString = rowType == 0 ? "dirt" : rowType == 1 ? "grass" : rowType == 2 ? "water" : "";
                 if (levelType == LevelType.Roof || levelType == LevelType.Boss)
                     typeString = "roof";
+
+                bool inBeghouled = memIO.GetGameMode() == (int)GameMode.Beghouled;
+                if (inBeghouled && gridInput.cursorX < 8)
+                    hasCrater = true;
 
                 if (hasCrater)
                     plantInfoString = "Crater";
@@ -1028,6 +1087,264 @@ namespace PvZA11y.Widgets
             return poleVaultingCount + footballCount + bobsledCount;
         }
 
+        void SunWarning(int sunAmount, int sunCost)
+        {
+            string warning = "Not enough sun! " + sunAmount + " out of " + sunCost;
+            Console.WriteLine(warning);
+            Program.PlayTone(1, 1, 300, 300, 50, SignalGeneratorType.Square);
+            Program.PlayTone(1, 1, 275, 275, 50, SignalGeneratorType.Square, 50);
+            Program.Say(warning, true);
+        }
+
+        //Don't look at this, please.
+        //If you aren't blind already, you may want to gouge your eyeballs out after seeing this.
+        bool BeghouledMatchablePlant()
+        {
+            var allPlants = Program.GetPlantsOnBoard();
+            Program.PlantOnBoard thisPlant = new Program.PlantOnBoard();
+            thisPlant.plantType = -1;
+            foreach(var plant in allPlants)
+            {
+                if(plant.row == gridInput.cursorY && plant.column == gridInput.cursorX)
+                {
+                    thisPlant = plant;
+                    break;
+                }
+            }
+            if (thisPlant.plantType == -1)
+                return false;
+
+            //Sort plants to a 2d array for faster lookups
+            Program.PlantOnBoard[,] gridPlants = new Program.PlantOnBoard[5, 8];
+            for(int y = 0; y < 5; y++)
+            {
+                for (int x = 0; x < 8; x++)
+                    gridPlants[y, x] = new Program.PlantOnBoard() { plantType = -1 };
+            }
+            foreach(var plant in allPlants)
+                gridPlants[plant.row, plant.column] = plant;
+
+            //Is there a nicer way to do this?
+            //I bet there's some super-clean, smart way to do this.
+            //But I'm not smart. I'm an ape. It will take me longer to think about an ideal solution than it would take for me to bruteforce this.
+
+            bool dragThisToMatch = false;   //Whether this plant is the one that needs to be moved for a match
+            bool partOfMatch = false;   //Whether this plant is part of a match when moving another plant
+
+            //Drag-up matches
+            if(thisPlant.row > 0)
+            {
+                //Drag up to be middle plant in horizontal match
+                if (thisPlant.column > 0 && thisPlant.column < 7 && gridPlants[thisPlant.row - 1, thisPlant.column - 1].plantType == thisPlant.plantType && gridPlants[thisPlant.row - 1, thisPlant.column + 1].plantType == thisPlant.plantType)
+                    dragThisToMatch = true;
+                //Drag up to be left plant in horizontal match
+                if (thisPlant.column < 6 && gridPlants[thisPlant.row - 1, thisPlant.column + 1].plantType == thisPlant.plantType && gridPlants[thisPlant.row - 1, thisPlant.column + 2].plantType == thisPlant.plantType)
+                    dragThisToMatch = true;
+                //Drag up to be right plant in horizontal match
+                if (thisPlant.column > 1 && gridPlants[thisPlant.row - 1, thisPlant.column - 1].plantType == thisPlant.plantType && gridPlants[thisPlant.row - 1, thisPlant.column - 2].plantType == thisPlant.plantType)
+                    dragThisToMatch = true;
+                //Drag up to be bottom of vertical match
+                if (thisPlant.row > 2 && gridPlants[thisPlant.row - 2, thisPlant.column].plantType == thisPlant.plantType && gridPlants[thisPlant.row - 3, thisPlant.column].plantType == thisPlant.plantType)
+                    dragThisToMatch = true;
+            }
+            //Drag-down matches
+            if (!dragThisToMatch && thisPlant.row < 4)
+            {
+                //Drag down to be middle plant in horizontal match
+                if (thisPlant.column > 0 && thisPlant.column < 7 && gridPlants[thisPlant.row + 1, thisPlant.column - 1].plantType == thisPlant.plantType && gridPlants[thisPlant.row + 1, thisPlant.column + 1].plantType == thisPlant.plantType)
+                    dragThisToMatch = true;
+                //Drag down to be left plant in horizontal match
+                if (thisPlant.column < 6 && gridPlants[thisPlant.row + 1, thisPlant.column + 1].plantType == thisPlant.plantType && gridPlants[thisPlant.row + 1, thisPlant.column + 2].plantType == thisPlant.plantType)
+                    dragThisToMatch = true;
+                //Drag down to be right plant in horizontal match
+                if (thisPlant.column > 1 && gridPlants[thisPlant.row + 1, thisPlant.column - 1].plantType == thisPlant.plantType && gridPlants[thisPlant.row + 1, thisPlant.column - 2].plantType == thisPlant.plantType)
+                    dragThisToMatch = true;
+                //Drag down to be top of vertical match
+                if (thisPlant.row < 2 && gridPlants[thisPlant.row + 2, thisPlant.column].plantType == thisPlant.plantType && gridPlants[thisPlant.row + 3, thisPlant.column].plantType == thisPlant.plantType)
+                    dragThisToMatch = true;
+            }
+
+            //Drag-left matches
+            if (!dragThisToMatch && thisPlant.column > 0)
+            {
+                //Drag left to be middle plant in vertical match
+                if (thisPlant.row > 0 && thisPlant.row < 4 && gridPlants[thisPlant.row - 1, thisPlant.column - 1].plantType == thisPlant.plantType && gridPlants[thisPlant.row + 1, thisPlant.column - 1].plantType == thisPlant.plantType)
+                    dragThisToMatch = true;
+                //Drag left to be top plant in vertical match
+                if (thisPlant.row < 3 && gridPlants[thisPlant.row + 1, thisPlant.column - 1].plantType == thisPlant.plantType && gridPlants[thisPlant.row + 2, thisPlant.column - 1].plantType == thisPlant.plantType)
+                    dragThisToMatch = true;
+                //Drag left to be bottom plant in vertical match
+                if (thisPlant.row > 1 && gridPlants[thisPlant.row - 1, thisPlant.column - 1].plantType == thisPlant.plantType && gridPlants[thisPlant.row - 2, thisPlant.column - 1].plantType == thisPlant.plantType)
+                    dragThisToMatch = true;
+                //Drag left to be right of horizontal match
+                if (thisPlant.column > 2 && gridPlants[thisPlant.row, thisPlant.column-2].plantType == thisPlant.plantType && gridPlants[thisPlant.row, thisPlant.column-3].plantType == thisPlant.plantType)
+                    dragThisToMatch = true;
+            }
+            //Drag-right matches
+            if (!dragThisToMatch && thisPlant.column < 7)
+            {
+                //Drag left to be middle plant in vertical match
+                if (thisPlant.row > 0 && thisPlant.row < 4 && gridPlants[thisPlant.row - 1, thisPlant.column + 1].plantType == thisPlant.plantType && gridPlants[thisPlant.row + 1, thisPlant.column + 1].plantType == thisPlant.plantType)
+                    dragThisToMatch = true;
+                //Drag left to be top plant in vertical match
+                if (thisPlant.row < 3 && gridPlants[thisPlant.row + 1, thisPlant.column + 1].plantType == thisPlant.plantType && gridPlants[thisPlant.row + 2, thisPlant.column + 1].plantType == thisPlant.plantType)
+                    dragThisToMatch = true;
+                //Drag left to be bottom plant in vertical match
+                if (thisPlant.row > 1 && gridPlants[thisPlant.row - 1, thisPlant.column + 1].plantType == thisPlant.plantType && gridPlants[thisPlant.row - 2, thisPlant.column + 1].plantType == thisPlant.plantType)
+                    dragThisToMatch = true;
+                //Drag right to be left of horizontal match
+                if (thisPlant.column < 5 && gridPlants[thisPlant.row, thisPlant.column + 2].plantType == thisPlant.plantType && gridPlants[thisPlant.row, thisPlant.column + 3].plantType == thisPlant.plantType)
+                    dragThisToMatch = true;
+            }
+
+            if (dragThisToMatch)
+                return true;
+
+            if (Config.current.BeghouledMatchAssist == 1)
+                return dragThisToMatch;
+
+            //My god this is bad
+
+
+            //Check if can be part of horizontal match
+
+            //Check if plant can be right-most in a horizontal three, matching with plant diagonal down-left and left two (diagonal down-left drags up to match) (triangle shape)
+            if (thisPlant.column > 1 && thisPlant.row < 4 && gridPlants[thisPlant.row, thisPlant.column - 2].plantType == thisPlant.plantType && gridPlants[thisPlant.row + 1, thisPlant.column - 1].plantType == thisPlant.plantType)
+                partOfMatch = true;
+            //Same as previous, but diagonal up-left instead of down-left
+            if (thisPlant.column > 1 && thisPlant.row > 0 && gridPlants[thisPlant.row, thisPlant.column - 2].plantType == thisPlant.plantType && gridPlants[thisPlant.row - 1, thisPlant.column - 1].plantType == thisPlant.plantType)
+                partOfMatch = true;
+            //Check if plant can be left-most in a horizontal three, matching with plant diagonal down-right and right two (diagonal down-right drags up to match)
+            if (thisPlant.column < 6 && thisPlant.row < 4 && gridPlants[thisPlant.row, thisPlant.column + 2].plantType == thisPlant.plantType && gridPlants[thisPlant.row + 1, thisPlant.column + 1].plantType == thisPlant.plantType)
+                partOfMatch = true;
+            //Same as previous, but diagonal up-right instead of down-right
+            if (thisPlant.column < 6 && thisPlant.row > 0 && gridPlants[thisPlant.row, thisPlant.column + 2].plantType == thisPlant.plantType && gridPlants[thisPlant.row - 1, thisPlant.column + 1].plantType == thisPlant.plantType)
+                partOfMatch = true;
+
+            if (partOfMatch)
+                return true;
+
+            //Check if can be leftmost in horizontal three, matching with plant directly to right, and plant x+2 y+1 (L shape)
+            if (thisPlant.column < 6 && thisPlant.row < 4 && gridPlants[thisPlant.row, thisPlant.column + 1].plantType == thisPlant.plantType && gridPlants[thisPlant.row + 1, thisPlant.column + 2].plantType == thisPlant.plantType)
+                partOfMatch = true;
+            //Check if can be leftmost in horizontal three, matching with plant directly to right, and plant x+2 y-1 (L shape)
+            if (thisPlant.column < 6 && thisPlant.row > 0 && gridPlants[thisPlant.row, thisPlant.column + 1].plantType == thisPlant.plantType && gridPlants[thisPlant.row - 1, thisPlant.column + 2].plantType == thisPlant.plantType)
+                partOfMatch = true;
+            //Check if can be rightmost in horizontal three, matching with plant directly to left, and plant x-2 y+1 (L shape)
+            if (thisPlant.column > 1 && thisPlant.row < 4 && gridPlants[thisPlant.row, thisPlant.column - 1].plantType == thisPlant.plantType && gridPlants[thisPlant.row + 1, thisPlant.column - 2].plantType == thisPlant.plantType)
+                partOfMatch = true;
+            //Check if can be rightmost in horizontal three, matching with plant directly to left, and plant x-2 y-1 (L shape)
+            if (thisPlant.column > 1 && thisPlant.row > 0 && gridPlants[thisPlant.row, thisPlant.column - 1].plantType == thisPlant.plantType && gridPlants[thisPlant.row - 1, thisPlant.column - 2].plantType == thisPlant.plantType)
+                partOfMatch = true;
+
+            if (partOfMatch)
+                return true;
+
+            //Check if plant can be middle of horizontal three, with same plant directly to left, and another diagonal down-right one.
+            if (thisPlant.column > 0 && thisPlant.column < 7 && thisPlant.row < 4 && gridPlants[thisPlant.row, thisPlant.column - 1].plantType == thisPlant.plantType && gridPlants[thisPlant.row + 1, thisPlant.column + 1].plantType == thisPlant.plantType)
+                partOfMatch = true;
+            //Check if plant can be middle of horizontal three, with same plant directly to left, and another diagonal up-right one.
+            if (thisPlant.column > 0 && thisPlant.column < 7 && thisPlant.row > 0 && gridPlants[thisPlant.row, thisPlant.column - 1].plantType == thisPlant.plantType && gridPlants[thisPlant.row - 1, thisPlant.column + 1].plantType == thisPlant.plantType)
+                partOfMatch = true;
+            //Check if plant can be middle of horizontal three, with same plant directly to right, and another diagonal down-left one.
+            if (thisPlant.column > 0 && thisPlant.column < 7 && thisPlant.row < 4 && gridPlants[thisPlant.row, thisPlant.column + 1].plantType == thisPlant.plantType && gridPlants[thisPlant.row + 1, thisPlant.column - 1].plantType == thisPlant.plantType)
+                partOfMatch = true;
+            //Check if plant can be middle of horizontal three, with same plant directly to right, and another diagonal up-left one.
+            if (thisPlant.column > 0 && thisPlant.column < 7 && thisPlant.row > 0 && gridPlants[thisPlant.row, thisPlant.column + 1].plantType == thisPlant.plantType && gridPlants[thisPlant.row - 1, thisPlant.column - 1].plantType == thisPlant.plantType)
+                partOfMatch = true;
+
+            if (partOfMatch)
+                return true;
+
+            //Check if plant can be left of horizontal three, matching with plant directly to the right, and the plant at x+3 (right-most plant slides left)
+            if (thisPlant.column < 5 && gridPlants[thisPlant.row, thisPlant.column + 1].plantType == thisPlant.plantType && gridPlants[thisPlant.row, thisPlant.column + 3].plantType == thisPlant.plantType)
+                partOfMatch = true;
+            //Check if plant can be right of horizontal three, matching with plant directly to the left, and the plant at x-3 (left-most plant slides right)
+            if (thisPlant.column > 2 && gridPlants[thisPlant.row, thisPlant.column - 1].plantType == thisPlant.plantType && gridPlants[thisPlant.row, thisPlant.column - 3].plantType == thisPlant.plantType)
+                partOfMatch = true;
+            //check if plant can be middle of horizontal three, matching with plant directly to left, and plant at x+2 (rightmost plant slides left)
+            if (thisPlant.column > 0 && thisPlant.column < 6 && gridPlants[thisPlant.row, thisPlant.column - 1].plantType == thisPlant.plantType && gridPlants[thisPlant.row, thisPlant.column + 2].plantType == thisPlant.plantType)
+                partOfMatch = true;
+            //check if plant can be middle of horizontal three, matching with plant directly to right, and plant at x-2 (leftmost plant slides right)
+            if (thisPlant.column > 1 && thisPlant.column < 7 && gridPlants[thisPlant.row, thisPlant.column + 1].plantType == thisPlant.plantType && gridPlants[thisPlant.row, thisPlant.column - 2].plantType == thisPlant.plantType)
+                partOfMatch = true;
+
+
+            if (partOfMatch)
+                return true;
+
+            //check if can be part of vertical match
+
+
+            //Check if plant can be bottom of vertical three, with same plant two above, and same plant diagonal up-left one (< shape)
+            if (thisPlant.column > 0 && thisPlant.row > 1 && gridPlants[thisPlant.row - 1, thisPlant.column - 1].plantType == thisPlant.plantType && gridPlants[thisPlant.row - 2, thisPlant.column].plantType == thisPlant.plantType)
+                partOfMatch = true;
+            //Check if plant can be bottom of vertical three, with same plant two above, and same plant diagonal up-right one (> shape)
+            if (thisPlant.column < 7 && thisPlant.row > 1 && gridPlants[thisPlant.row - 1, thisPlant.column + 1].plantType == thisPlant.plantType && gridPlants[thisPlant.row - 2, thisPlant.column].plantType == thisPlant.plantType)
+                partOfMatch = true;
+            //Check if plant can be top of vertical three, with same plant two below, and same plant diagonal down-left one (< shape)
+            if (thisPlant.column > 0 && thisPlant.row < 3 && gridPlants[thisPlant.row + 1, thisPlant.column - 1].plantType == thisPlant.plantType && gridPlants[thisPlant.row + 2, thisPlant.column].plantType == thisPlant.plantType)
+                partOfMatch = true;
+            //Check if plant can be top of vertical three, with same plant two below, and same plant diagonal down-right one (> shape)
+            if (thisPlant.column < 7 && thisPlant.row < 3 && gridPlants[thisPlant.row + 1, thisPlant.column + 1].plantType == thisPlant.plantType && gridPlants[thisPlant.row + 2, thisPlant.column].plantType == thisPlant.plantType)
+                partOfMatch = true;
+
+            if (partOfMatch)
+                return true;
+
+            //Pls send help
+
+            //Check if plant can be bottom of vertical three, with same plant directly above, and another at x+1,y+2 (backwards 7 shape)
+            if (thisPlant.column < 7 && thisPlant.row > 1 && gridPlants[thisPlant.row - 1, thisPlant.column].plantType == thisPlant.plantType && gridPlants[thisPlant.row - 2, thisPlant.column + 1].plantType == thisPlant.plantType)
+                partOfMatch = true;
+            //Check if plant can be bottom of vertical three, with same plant directly above, and another at x-1,y+2 (7 shape)
+            if (thisPlant.column > 0 && thisPlant.row > 1 && gridPlants[thisPlant.row - 1, thisPlant.column].plantType == thisPlant.plantType && gridPlants[thisPlant.row - 2, thisPlant.column - 1].plantType == thisPlant.plantType)
+                partOfMatch = true;
+            //Check if plant can be top of vertical three, with same plant directly below, and another at x+1,y-2 (L shape)
+            if (thisPlant.column < 7 && thisPlant.row < 3 && gridPlants[thisPlant.row + 1, thisPlant.column].plantType == thisPlant.plantType && gridPlants[thisPlant.row + 2, thisPlant.column + 1].plantType == thisPlant.plantType)
+                partOfMatch = true;
+            //Check if plant can be top of vertical three, with same plant directly below, and another at x-1,y-2 (backwards L shape)
+            if (thisPlant.column > 0 && thisPlant.row < 3 && gridPlants[thisPlant.row + 1, thisPlant.column].plantType == thisPlant.plantType && gridPlants[thisPlant.row + 2, thisPlant.column - 1].plantType == thisPlant.plantType)
+                partOfMatch = true;
+
+            if (partOfMatch)
+                return true;
+
+            //Check if plant be middle of vertical three, with one directly below, and another diagonal up-left (y-1,x-1)
+            if (thisPlant.column > 0 && thisPlant.row > 0 && thisPlant.row < 4 && gridPlants[thisPlant.row + 1, thisPlant.column].plantType == thisPlant.plantType && gridPlants[thisPlant.row - 1, thisPlant.column - 1].plantType == thisPlant.plantType)
+                partOfMatch = true;
+            //Check if plant be middle of vertical three, with one directly below, and another diagonal up-right (y-1,x+1)
+            if (thisPlant.column < 7 && thisPlant.row > 0 && thisPlant.row < 4 && gridPlants[thisPlant.row + 1, thisPlant.column].plantType == thisPlant.plantType && gridPlants[thisPlant.row - 1, thisPlant.column + 1].plantType == thisPlant.plantType)
+                partOfMatch = true;
+            //Check if plant be middle of vertical three, with one directly above, and another diagonal down-left (y+1,x-1)
+            if (thisPlant.column > 0 && thisPlant.row > 0 && thisPlant.row < 4 && gridPlants[thisPlant.row - 1, thisPlant.column].plantType == thisPlant.plantType && gridPlants[thisPlant.row + 1, thisPlant.column - 1].plantType == thisPlant.plantType)
+                partOfMatch = true;
+            //Check if plant be middle of vertical three, with one directly above, and another diagonal down-right (y+1,x+1)
+            if (thisPlant.column < 7 && thisPlant.row > 0 && thisPlant.row < 4 && gridPlants[thisPlant.row - 1, thisPlant.column].plantType == thisPlant.plantType && gridPlants[thisPlant.row + 1, thisPlant.column + 1].plantType == thisPlant.plantType)
+                partOfMatch = true;
+
+            if (partOfMatch)
+                return true;
+
+            //Check if plant can be top of vertical three, with one directly below, and another three below (lowest plant slides up)
+            if (thisPlant.row < 2 && gridPlants[thisPlant.row + 1, thisPlant.column].plantType == thisPlant.plantType && gridPlants[thisPlant.row + 3, thisPlant.column].plantType == thisPlant.plantType)
+                partOfMatch = true;
+            //Check if plant can be bottom of vertical three, with one directly above, and another three above (highest plant slides down)
+            if (thisPlant.row > 2 && gridPlants[thisPlant.row - 1, thisPlant.column].plantType == thisPlant.plantType && gridPlants[thisPlant.row - 3, thisPlant.column].plantType == thisPlant.plantType)
+                partOfMatch = true;
+            //Check if plant can be middle of vertical three, with one directly above, and another two below (lowest plant slides up)
+            if (thisPlant.row > 0 && thisPlant.row < 3 && gridPlants[thisPlant.row - 1, thisPlant.column].plantType == thisPlant.plantType && gridPlants[thisPlant.row + 2, thisPlant.column].plantType == thisPlant.plantType)
+                partOfMatch = true;
+            //Check if plant can be middle of vertical three, with one directly below, and another two above (highest plant slides down)
+            if (thisPlant.row < 4 && thisPlant.row > 1 && gridPlants[thisPlant.row + 1, thisPlant.column].plantType == thisPlant.plantType && gridPlants[thisPlant.row - 2, thisPlant.column].plantType == thisPlant.plantType)
+                partOfMatch = true;
+
+            //is... is it over?
+
+            return partOfMatch;
+        }
+
+
         public override void Interact(InputIntent intent)
         {
             if(intent == InputIntent.Option)
@@ -1090,6 +1407,7 @@ namespace PvZA11y.Widgets
 
             var plants = GetPlantsInBoardBank();
             GameMode gameMode = (GameMode)memIO.GetGameMode();
+            bool inBeghouled = gameMode == GameMode.Beghouled;
 
             if (prevX != gridInput.cursorX || prevY != gridInput.cursorY)
             {
@@ -1135,6 +1453,19 @@ namespace PvZA11y.Widgets
                             totalTileInfoStr += tileObjectInfo;
                     }
 
+                    if(inBeghouled && Config.current.BeghouledMatchAssist != 0)
+                    {
+                        //OOOOHHH boy, this will be crazy
+                        bool matchable = BeghouledMatchablePlant();
+                        if(matchable)
+                        {
+                            List<Program.ToneProperties> tones = new List<Program.ToneProperties>();
+                            tones.Add(new Program.ToneProperties() { leftVolume = 1, rightVolume = 1, startFrequency = 700, endFrequency = 700, duration = 100, signalType = SignalGeneratorType.Sin, startDelay = 0 });
+                            tones.Add(new Program.ToneProperties() { leftVolume = 1, rightVolume = 1, startFrequency = 800, endFrequency = 800, duration = 200, signalType = SignalGeneratorType.Sin, startDelay = 100 });
+                            Program.PlayTones(tones);
+                        }
+                    }
+
                     bool zombieFound = false;
                     if(Config.current.SayZombieOnTileMove || Config.current.BeepWhenZombieFound)
                     {
@@ -1172,7 +1503,7 @@ namespace PvZA11y.Widgets
 
 
                     
-                    if (!plantFound && !zombieFound)
+                    if ((!plantFound || !Config.current.BeepWhenPlantFound) && !zombieFound)
                         Program.PlayTone(1.0f - rightVol, rightVol, freq, freq, 100, SignalGeneratorType.Sin);
                 }
 
@@ -1258,9 +1589,11 @@ namespace PvZA11y.Widgets
             bool inIZombie = gameMode >= GameMode.IZombie1 && gameMode <= GameMode.IZombieEndless;
             bool inSlotMachine = gameMode == GameMode.SlotMachine;
 
+            bool cycleInputIntent = intent == InputIntent.CycleLeft || intent == InputIntent.CycleRight || (intent >= InputIntent.Slot1 && intent <= InputIntent.Slot10);
+
             //If user tries to switch seeds while holding one in vasebreaker or rainingSeeds, inform them of already held plant.
             //Otherwise, inform them of plant in newly switched slot
-            if (((intent == InputIntent.CycleLeft || intent == InputIntent.CycleRight) || (intent >= InputIntent.Slot1 && intent <= InputIntent.Slot10)) && (inVaseBreaker || inRainingSeeds || inSlotMachine))
+            if (cycleInputIntent && (inVaseBreaker || inRainingSeeds || inSlotMachine))
             {
                 heldPlantID = memIO.mem.ReadInt(memIO.ptr.boardChain + ",150,28");
                 if (heldPlantID != -1)
@@ -1270,57 +1603,82 @@ namespace PvZA11y.Widgets
                     Program.Say(plantStr, true);
                 }
             }
-            else if(inZombiquarium && ((intent is InputIntent.CycleLeft or InputIntent.CycleRight) || (intent >= InputIntent.Slot1 && intent <= InputIntent.Slot10)))
+            else if(cycleInputIntent)
             {
-                PlacePlant(seedbankSlot, seedbankSize, plants[seedbankSlot].offsetX, false, true, true);    //Update mouse position
+                PlacePlant(seedbankSlot, seedbankSize, plants[seedbankSlot].offsetX, false, true, true); //Move mouse cursor to aid sighted players in knowing which seed packet is selected
                 float frequency = 100.0f + (100.0f * seedbankSlot);
                 float rVolume = (float)seedbankSlot / (float)seedbankSize;
                 Program.PlayTone(1.0f - rVolume, rVolume, frequency, frequency, 100, SignalGeneratorType.Square);
 
-                string functionString = "";
-                switch(seedbankSlot)
+                if (inZombiquarium)
                 {
-                    case 0:
-                        functionString = "Buy snorkel zombie.";
-                        break;
-                    case 1:
-                        functionString = "Buy trophy.";
-                        break;
-                    case 2:
-                        functionString = "Brain food.";
-                        break;
+                    string functionString = "";
+                    switch (seedbankSlot)
+                    {
+                        case 0:
+                            functionString = "Buy snorkel zombie.";
+                            break;
+                        case 1:
+                            functionString = "Buy trophy.";
+                            break;
+                        case 2:
+                            functionString = "Brain food.";
+                            break;
+                    }
+
+                    Console.WriteLine(functionString);
+                    Program.Say(functionString);
+                }
+                else if(inBeghouled)
+                {
+                    string functionString = "";
+                    if (!plants[seedbankSlot].active)
+                        functionString = "Purchased. ";
+                    switch (seedbankSlot)
+                    {
+                        
+                        case 0:
+                            functionString += " Upgrade peashooters to repeaters.";
+                            break;
+                        case 1:
+                            functionString = " Upgrade puff-shrooms to fume-shrooms.";
+                            break;
+                        case 2:
+                            functionString = " Upgrade wall-nuts to tall-nuts.";
+                            break;
+                        case 3:
+                            functionString = " Shuffle plants.";
+                            break;
+                        case 4:
+                            functionString = " Repair crater.";
+                            break;
+                    }
+                    if (seedbankSlot == 0 && plants[0].packetType == -1)
+                        functionString = "Collect sun to unlock options";
+
+                    Console.WriteLine(functionString);
+                    Program.Say(functionString);
+                }
+                else
+                {
+                    if (plants.Count > 0)
+                    {
+                        int packetType = plants[seedbankSlot].packetType;
+                        if (packetType >= 0 && packetType < (int)SeedType.NUM_SEED_TYPES)
+                        {
+                            Console.WriteLine(Consts.plantNames[plants[seedbankSlot].packetType]);
+                            Program.Say(Consts.plantNames[plants[seedbankSlot].packetType], true);
+                        }
+                        else if (packetType >= 60 && packetType <= 74)
+                        {
+                            //iZombie levels
+                            string zombieInfo = Consts.zombieNames[Consts.iZombieNameIndex[packetType - 60]] + " : " + Consts.iZombieSunCosts[packetType - 60] + " sun";
+                            Console.WriteLine(zombieInfo);
+                            Program.Say(zombieInfo, true);
+                        }
+                    }
                 }
 
-                Console.WriteLine(functionString);
-                Program.Say(functionString);
-
-            }
-            else if((intent is InputIntent.CycleLeft or InputIntent.CycleRight) || (intent >= InputIntent.Slot1 && intent <= InputIntent.Slot10))
-            {
-                //Move mouse cursor to aid sighted players in knowing which seed packet is selected
-                //Program.PlacePlant(seedbankSize, plants[seedbankSlot].offsetX, false, true, true);
-                PlacePlant(seedbankSlot, seedbankSize, plants[seedbankSlot].offsetX, false, true, true);
-
-                float frequency = 100.0f + (100.0f * seedbankSlot);
-                float rVolume = (float)seedbankSlot / (float)seedbankSize;
-                Program.PlayTone(1.0f - rVolume, rVolume, frequency, frequency, 100, SignalGeneratorType.Square);
-
-                if (plants.Count > 0)
-                {
-                    int packetType = plants[seedbankSlot].packetType;
-                    if (packetType >= 0 && packetType < (int)SeedType.NUM_SEED_TYPES)
-                    {
-                        Console.WriteLine(Consts.plantNames[plants[seedbankSlot].packetType]);
-                        Program.Say(Consts.plantNames[plants[seedbankSlot].packetType], true);
-                    }
-                    else if (packetType >= 60 && packetType <=74)
-                    {
-                        //iZombie levels
-                        string zombieInfo = Consts.zombieNames[Consts.iZombieNameIndex[packetType - 60]] + " : " + Consts.iZombieSunCosts[packetType - 60] + " sun";
-                        Console.WriteLine(zombieInfo);
-                        Program.Say(zombieInfo, true);
-                    }
-                }
             }
 
             //Place plant
@@ -1328,25 +1686,19 @@ namespace PvZA11y.Widgets
             {
                 bool isCobCannon = Program.GetPlantAtCell(gridInput.cursorX, gridInput.cursorY).plantType == (int)SeedType.SEED_COBCANNON;
                 isCobCannon |= Program.GetCursorType() == 8;
-                
-                
+
+                int sunAmount = memIO.mem.ReadInt(memIO.ptr.boardChain + ",5578");
+                sunAmount += animatingSunAmount;
+
                 //Click where plant needs to go. Not where plant is located (we already grab plant when auto-collecting everything on screen)
                 if (inVaseBreaker || inRainingSeeds || isCobCannon || inSlotMachine)
                     PlacePlant(seedbankSlot, seedbankSize, plants[seedbankSlot].offsetX, false, false, false, false);
                 else if(inZombiquarium)
                 {
-                    int sunAmount = memIO.mem.ReadInt(memIO.ptr.boardChain + ",5578");
-                    sunAmount += animatingSunAmount;
                     int sunCost = seedbankSlot == 0 ? 100 : seedbankSlot == 1 ? 1000 : 5;
 
                     if(sunAmount < sunCost)
-                    {
-                        string warning = "Not enough sun! " + sunAmount + " out of " + sunCost;
-                        Console.WriteLine(warning);
-                        Program.PlayTone(1, 1, 300, 300, 50, SignalGeneratorType.Square);
-                        Program.PlayTone(1, 1, 275, 275, 50, SignalGeneratorType.Square, 50);
-                        Program.Say(warning, true);
-                    }
+                        SunWarning(sunAmount, sunCost);
                     else if (seedbankSlot == 2)
                         PlacePlant(seedbankSlot, seedbankSize, plants[seedbankSlot].offsetX, false, false, false, false);
                     else
@@ -1354,12 +1706,26 @@ namespace PvZA11y.Widgets
 
 
                 }
+                else if (inBeghouled)
+                {
+                    int sunCost = seedbankSlot == 0 ? 1000 : seedbankSlot == 1 ? 500 : seedbankSlot == 2 ? 250 : seedbankSlot == 3 ? 100 : 200;
+                    bool purchased = !plants[seedbankSlot].active;
+                    if (purchased)
+                    {
+                        Program.PlayTone(1, 1, 200, 200, 50, SignalGeneratorType.Square);
+                        Program.PlayTone(1, 1, 200, 200, 50, SignalGeneratorType.Square, 100);
+                        string info = "Already purchased.";
+                        Console.WriteLine(info);
+                        Program.Say(info);
+                    }
+                    else if (sunAmount < sunCost)
+                        SunWarning(sunAmount, sunCost);
+                    else
+                        PlacePlant(seedbankSlot, seedbankSize, plants[seedbankSlot].offsetX, true, false, false, false, true);
+                }
                 else if (plants[seedbankSlot].absX < 0.72f)
                 {
                     //Check if there's enough sun, and plant isn't on cooldown
-
-                    int sunAmount = memIO.mem.ReadInt(memIO.ptr.boardChain + ",5578");
-                    sunAmount += animatingSunAmount;
                     int sunCost = inIZombie? Consts.iZombieSunCosts[plants[seedbankSlot].packetType - 60] : Consts.plantCosts[plants[seedbankSlot].packetType];
 
                     bool notEnoughSun = sunAmount < sunCost;
@@ -1368,13 +1734,7 @@ namespace PvZA11y.Widgets
 
 
                     if (notEnoughSun && !isConveyorLevel && !inIZombie)
-                    {
-                        string warning = "Not enough sun! " + sunAmount + " out of " + sunCost;
-                        Console.WriteLine(warning);
-                        Program.PlayTone(1, 1, 300, 300, 50, SignalGeneratorType.Square);
-                        Program.PlayTone(1, 1, 275, 275, 50, SignalGeneratorType.Square, 50);
-                        Program.Say(warning, true);
-                    }
+                        SunWarning(sunAmount, sunCost);
                     else if (refreshing)
                     {
                         string warning = (((float)plants[seedbankSlot].refreshCounter / (float)plants[seedbankSlot].refreshTime) * 99.9f).ToString("0.") + "% refreshed";
@@ -1397,7 +1757,15 @@ namespace PvZA11y.Widgets
 
             if (intent == InputIntent.Deny)
             {
-                if(inWhackAZombie)
+                if(inBeghouled)
+                {
+                    var newIntent = Program.input.GetCurrentIntent();
+                    while (newIntent is InputIntent.None)
+                        newIntent = Program.input.GetCurrentIntent();
+                    if (newIntent is InputIntent.Up or InputIntent.Down or InputIntent.Left or InputIntent.Right)
+                        DragPlant(newIntent);
+                }
+                else if(inWhackAZombie)
                     PlacePlant(seedbankSlot, seedbankSize, plants[seedbankSlot].offsetX, false, false, false);
                 else if (Config.current.RequireShovelConfirmation)
                 {
@@ -1462,6 +1830,11 @@ namespace PvZA11y.Widgets
                     int sunAmount = memIO.mem.ReadInt(memIO.ptr.boardChain + ",5578");
                     sunAmount += animatingSunAmount;
                     info4String += " " + Program.FormatNumber(sunAmount) + " out of 2,000 sun";
+                }
+                else if (inBeghouled)
+                {
+                    int matches = memIO.mem.ReadInt(memIO.ptr.boardChain + ",178,60");  //TODO: URGENT: MAKE SURE WORKS ON BOTH GAME VERSIONS (ONLY TESTED ON STEAM)
+                    info4String += " " + matches + " out of 75 matches.";
                 }
                 else
                 {

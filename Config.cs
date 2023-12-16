@@ -51,6 +51,7 @@ namespace PvZA11y
             public bool BeepOnPacketReady = true;
             public bool ZombieSonarOnRowChange = false;
             public bool ZombieEnterAlert = true;
+            public int BeghouledMatchAssist = 1;
             
 
             //Core functionality

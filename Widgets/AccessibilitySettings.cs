@@ -63,6 +63,30 @@ namespace PvZA11y.Widgets
             Config.SaveConfig();
         }
 
+        void SetBeghouledMode(InputIntent intent, ref int value)
+        {
+            if (intent is InputIntent.Left)
+                value--;
+            if (intent is InputIntent.Right)
+                value++;
+
+            if (value < 0)
+                value = 2;
+            if (value > 2)
+                value = 0;
+
+            Config.SaveConfig();
+        }
+
+        string GetBeghouledMode(int value)
+        {
+            if (value == 1)
+                return "Easiest, When current plant can be dragged to make a match.";
+            if (value == 2)
+                return "Medium, When current plant can be part of a match, but might not be the one which needs to be dragged.";
+            return "Hardest, None.";
+        }
+
         string GetFloatOptionAsPercentage(float value)
         {
             return MathF.Round(value * 100.0f).ToString() + "%";
@@ -683,6 +707,7 @@ namespace PvZA11y.Widgets
             options.Add(new Option() { name = "Beep when current plant is ready", description = "Plays a cue when the current plant has refreshed, and you have enough sun to place it.", confirmAction = () => ToggleBool(ref Config.current.BeepOnPacketReady), valueGrabber = () => GetBoolOptionValue(Config.current.BeepOnPacketReady) });
             options.Add(new Option() { name = "Zombie Sonar on row change", description = "Automatically use the zombie sonar when changing rows.", confirmAction = () => ToggleBool(ref Config.current.ZombieSonarOnRowChange), valueGrabber = () => GetBoolOptionValue(Config.current.ZombieSonarOnRowChange) });
             options.Add(new Option() { name = "Zombie entry alert", description = "Plays an audio cue when a zombie enters from any point on the board.", confirmAction = () => ToggleBool(ref Config.current.ZombieEnterAlert), valueGrabber = () => GetBoolOptionValue(Config.current.ZombieEnterAlert) });
+            options.Add(new Option() { name = "Be-ghouled match assistance", description = "Match assistance mode for the be-ghouled minigame.", confirmAction = () => SetBeghouledMode(InputIntent.Right, ref Config.current.BeghouledMatchAssist), leftRightAction = (intent) => SetBeghouledMode(intent, ref Config.current.BeghouledMatchAssist),  valueGrabber = () => GetBeghouledMode(Config.current.BeghouledMatchAssist) });
 
             //Core
             options.Add(new Option() { name = "Restart on crash", description = "Automatically attempt to restart the mod if it crashes", confirmAction = () => ToggleBool(ref Config.current.RestartOnCrash), valueGrabber = () => GetBoolOptionValue(Config.current.RestartOnCrash) });

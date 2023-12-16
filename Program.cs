@@ -14,7 +14,7 @@ using PvZA11y.Widgets;
 using NAudio.Mixer;
 
 /*
-[PVZ-A11y Beta 1.9]
+[PVZ-A11y Beta 1.10]
 
 Blind and motor accessibility mod for Plants Vs Zombies.
 Allows input with rebindable keys and controller buttons, rather than requiring a mouse for input.
@@ -809,7 +809,7 @@ namespace PvZA11y
         }
 
         //TODO: Move to board class
-        static List<PlantOnBoard> GetPlantsOnBoard()
+        public static List<PlantOnBoard> GetPlantsOnBoard()
         {
             List<PlantOnBoard> plants = new List<PlantOnBoard>();
 
@@ -1768,6 +1768,10 @@ namespace PvZA11y
                     if (oldMsgDuration == 0 && messageDuration != 0)
                     {
                         string messageStr = mem.ReadString(memIO.ptr.boardChain + ",158,4","",128);
+                        if (messageStr.StartsWith("Click-and-drag"))
+                            messageStr = "Press the deny button, then a direction, to swap plants and make matches of three.";
+                        if (messageStr == "No possible moves!")
+                            messageStr = "Reshuffling to make possible moves.";
                         if (!messageStr.Contains("fell asleep"))
                         {
                             Console.WriteLine(messageStr);
