@@ -999,8 +999,9 @@ namespace PvZA11y.Widgets
 
             return plantInfoString;
         }
-        
-        string? GetZombieInfo(bool currentTileOnly = false, bool beepOnFound = true, bool beepOnNone = true, bool includeTileName = true)
+
+        //TODO: Clean this up. Passing 5 bools to a function is a pretty clear sign that the function needs to be split into different parts.
+        public string? GetZombieInfo(bool currentTileOnly = false, bool beepOnFound = true, bool beepOnNone = true, bool includeTileName = true, bool countOnly = false)
         {
             List<Zombie> zombies = GetZombies();
             int y = gridInput.cursorY;
@@ -1033,6 +1034,9 @@ namespace PvZA11y.Widgets
             }
             else
                 verboseZombieInfo = zombiesThisRow.Count.ToString() + ". ";
+
+            if (countOnly)
+                return verboseZombieInfo;
 
             zombiesThisRow.Sort((x, y) => (int)x.posX - (int)y.posX); //Sort by distance (so we can print/inform player in the correct order when speaking)
 
@@ -1560,12 +1564,14 @@ namespace PvZA11y.Widgets
                         }
                     }
 
-                    if(Config.current.ZombieSonarOnRowChange && prevY != gridInput.cursorY)
+                    if(Config.current.ZombieSonarOnRowChange > 0 && prevY != gridInput.cursorY)
                     {
-                        string? zombiesThisRow = GetZombieInfo();
+                        string? zombiesThisRow = GetZombieInfo(false, (Config.current.ZombieSonarOnRowChange == 1 || Config.current.ZombieSonarOnRowChange == 2), Config.current.ZombieSonarOnRowChange == 1 || Config.current.ZombieSonarOnRowChange == 2, Config.current.ZombieSonarOnRowChange == 1, Config.current.ZombieSonarOnRowChange == 3);
                         if (zombiesThisRow == null)
                             zombiesThisRow = "No Zombies";
-                        totalTileInfoStr += " " + zombiesThisRow;
+
+                        if(Config.current.ZombieSonarOnRowChange == 1 || Config.current.ZombieSonarOnRowChange == 3)
+                            totalTileInfoStr += " " + zombiesThisRow;
                     }
 
 

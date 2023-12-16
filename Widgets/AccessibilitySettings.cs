@@ -39,6 +39,21 @@ namespace PvZA11y.Widgets
 
         int optionIndex;
 
+        string GetZombieSonarValue(int value)
+        {
+            switch(value)
+            {
+                case 1:
+                    return "Full Sonar";
+                case 2:
+                    return "Beeps only";
+                case 3:
+                    return "Count only";
+                default:
+                    return "Off";
+            }
+        }
+
         string GetBoolOptionValue(bool value)
         {
             return value ? "On" : "Off";
@@ -63,7 +78,7 @@ namespace PvZA11y.Widgets
             Config.SaveConfig();
         }
 
-        void SetBeghouledMode(InputIntent intent, ref int value)
+        void SetIntValue(InputIntent intent, ref int value, int options)
         {
             if (intent is InputIntent.Left)
                 value--;
@@ -71,8 +86,8 @@ namespace PvZA11y.Widgets
                 value++;
 
             if (value < 0)
-                value = 2;
-            if (value > 2)
+                value = options-1;
+            if (value >= options)
                 value = 0;
 
             Config.SaveConfig();
@@ -85,6 +100,23 @@ namespace PvZA11y.Widgets
             if (value == 2)
                 return "Medium, When current plant can be part of a match, but might not be the one which needs to be dragged.";
             return "Hardest, None.";
+        }
+
+        string GetZombieSweepInterval(int value)
+        {
+            switch(value)
+            {
+                case 1:
+                    return "0.5 seconds";
+                case 2:
+                    return "1 second";
+                case 3:
+                    return "2 seconds";
+                case 4:
+                    return "3 seconds";
+                default:
+                    return "Off";
+            }
         }
 
         string GetFloatOptionAsPercentage(float value)
@@ -705,9 +737,10 @@ namespace PvZA11y.Widgets
             options.Add(new Option() { name = "Say lawnmower type", description = "When info4 is pressed, say what type of lawnmower is in the current lane, if any.", confirmAction = () => ToggleBool(ref Config.current.SayLawnmowerType), valueGrabber = () => GetBoolOptionValue(Config.current.SayLawnmowerType) });
             options.Add(new Option() { name = "Silent Fast zombie alert", description = "Plays an audio cue when a pole-vaulting or football zombie enters the board.", confirmAction = () => ToggleBool(ref Config.current.FastZombieAlert), valueGrabber = () => GetBoolOptionValue(Config.current.FastZombieAlert) });
             options.Add(new Option() { name = "Beep when current plant is ready", description = "Plays a cue when the current plant has refreshed, and you have enough sun to place it.", confirmAction = () => ToggleBool(ref Config.current.BeepOnPacketReady), valueGrabber = () => GetBoolOptionValue(Config.current.BeepOnPacketReady) });
-            options.Add(new Option() { name = "Zombie Sonar on row change", description = "Automatically use the zombie sonar when changing rows.", confirmAction = () => ToggleBool(ref Config.current.ZombieSonarOnRowChange), valueGrabber = () => GetBoolOptionValue(Config.current.ZombieSonarOnRowChange) });
+            options.Add(new Option() { name = "Zombie Sonar on row change", description = "Which zombie sonar mode to use when changing rows.", leftRightAction = (intent) => SetIntValue(intent, ref Config.current.ZombieSonarOnRowChange,4), confirmAction = () => SetIntValue(InputIntent.Right, ref Config.current.ZombieSonarOnRowChange, 4),  valueGrabber = () => GetZombieSonarValue(Config.current.ZombieSonarOnRowChange) });
             options.Add(new Option() { name = "Zombie entry alert", description = "Plays an audio cue when a zombie enters from any point on the board.", confirmAction = () => ToggleBool(ref Config.current.ZombieEnterAlert), valueGrabber = () => GetBoolOptionValue(Config.current.ZombieEnterAlert) });
-            options.Add(new Option() { name = "Be-ghouled match assistance", description = "Match assistance mode for the be-ghouled minigame.", confirmAction = () => SetBeghouledMode(InputIntent.Right, ref Config.current.BeghouledMatchAssist), leftRightAction = (intent) => SetBeghouledMode(intent, ref Config.current.BeghouledMatchAssist),  valueGrabber = () => GetBeghouledMode(Config.current.BeghouledMatchAssist) });
+            options.Add(new Option() { name = "Be-ghouled match assistance", description = "Match assistance mode for the be-ghouled minigame.", confirmAction = () => SetIntValue(InputIntent.Right, ref Config.current.BeghouledMatchAssist, 3), leftRightAction = (intent) => SetIntValue(intent, ref Config.current.BeghouledMatchAssist, 3),  valueGrabber = () => GetBeghouledMode(Config.current.BeghouledMatchAssist) });
+            options.Add(new Option() { name = "Zombie sonar sweep", description = "How frequently to perform whole-board zombie sonar sweeps.", confirmAction = () => SetIntValue(InputIntent.Right, ref Config.current.ZombieSonarInterval, 5), leftRightAction = (intent) => SetIntValue(intent, ref Config.current.ZombieSonarInterval, 5),  valueGrabber = () => GetZombieSweepInterval(Config.current.ZombieSonarInterval) });
 
             //Core
             options.Add(new Option() { name = "Restart on crash", description = "Automatically attempt to restart the mod if it crashes", confirmAction = () => ToggleBool(ref Config.current.RestartOnCrash), valueGrabber = () => GetBoolOptionValue(Config.current.RestartOnCrash) });

@@ -49,9 +49,10 @@ namespace PvZA11y
             public bool SayLawnmowerType = false;
             public bool FastZombieAlert = true;
             public bool BeepOnPacketReady = true;
-            public bool ZombieSonarOnRowChange = false;
+            public int ZombieSonarOnRowChange = 0;
             public bool ZombieEnterAlert = true;
             public int BeghouledMatchAssist = 1;
+            public int ZombieSonarInterval = 0;
             
 
             //Core functionality

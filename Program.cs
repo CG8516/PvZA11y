@@ -1726,6 +1726,8 @@ namespace PvZA11y
             bool packetWasReady = false;
             int prevSeedbankSlot = -1;
 
+            long lastSweep = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+
             while (true)
             {
                 //Ensure window/draw specs, and hwnd are accurate
@@ -1791,7 +1793,7 @@ namespace PvZA11y
                             messageStr = "Press the deny button, then a direction, to swap plants and make matches of three.";
                         if (messageStr == "No possible moves!")
                             messageStr = "Reshuffling to make possible moves.";
-                        if (!messageStr.Contains("fell asleep"))
+                        if (!messageStr.Contains("fell asleep") && !messageStr.Contains("Click on the shovel"))
                         {
                             Console.WriteLine(messageStr);
                             Say(messageStr, true);
@@ -1853,6 +1855,39 @@ namespace PvZA11y
                             }
                         }
                         PlayTones(zombieTones);
+                    }
+                    if(Config.current.ZombieSonarInterval > 0)
+                    {
+                        long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                        long timeGap = now - lastSweep;
+                        bool doSweep = false;
+                        if (Config.current.ZombieSonarInterval == 1 && timeGap >= 3000)
+                            doSweep = true;
+                        if (Config.current.ZombieSonarInterval == 2 && timeGap >= 2000)
+                            doSweep = true;
+                        if (Config.current.ZombieSonarInterval == 3 && timeGap >= 1000)
+                            doSweep = true;
+                        if (Config.current.ZombieSonarInterval == 4 && timeGap >= 500)
+                            doSweep = true;
+
+                        if (doSweep)
+                        {
+                            lastSweep = now;
+                            var zombies = ((Board)currentWidget).GetZombies();
+                            List<ToneProperties> tones = new List<ToneProperties>();
+                            foreach (var zombie in zombies)
+                            {
+                                float rVolume = zombie.posX / 900.0f;
+                                float lVolume = 1.0f - rVolume;
+                                int startDelay = (int)(zombie.posX / 2.0f);
+                                float freq = 1000.0f - ((zombie.row * 500.0f) / (float)((Board)currentWidget).gridInput.height);
+                                if (startDelay > 1000 || startDelay < 0)
+                                    continue;
+
+                                tones.Add(new ToneProperties() { leftVolume = lVolume, rightVolume = rVolume, startFrequency = freq, endFrequency = freq, duration = 100, signalType = SignalGeneratorType.Triangle, startDelay = startDelay });
+                            }
+                            PlayTones(tones);
+                        }
                     }
                 }
                 else
