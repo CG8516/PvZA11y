@@ -24,5 +24,12 @@ namespace PvZA11y.Widgets
         {
             return "Continue Game?\r\n" + "Do you want to continue your current game, or restart the level?";
         }
+
+        public override void Interact(InputIntent intent)
+        {
+            base.Interact(intent);
+            if (intent is InputIntent.Info1)
+                hasReadContent = false;
+        }
     }
 }

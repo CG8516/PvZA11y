@@ -1062,6 +1062,13 @@ namespace PvZA11y
 
             uint dialogID = mem.ReadUInt(ptrChain + memIO.ptr.dialogIDOffset);
 
+            if(dialogID == DialogIDs.stamCloudLocalChoice)
+            {
+                if (currentWidget is not SteamSaveChoice)
+                    return new SteamSaveChoice(memIO,ptrChain);
+                return currentWidget;
+            }
+
             //Console.WriteLine("Read dialogID: " + dialogID);
 
             if(currentWidget is null)
@@ -1678,14 +1685,26 @@ namespace PvZA11y
             }
 
 
-
+            Widget? tempWidget = GetActiveWidget(null);
             while (prevScene == GameScene.Loading)
             {
                 bool loadingComplete = mem.ReadByte(memIO.ptr.lawnAppPtr + ",86c,b9") > 0;  //lawnapp,titleScreen,loadingComplete
-                if (loadingComplete)
+
+                tempWidget = GetActiveWidget(tempWidget);
+                if(tempWidget is SteamSaveChoice)
                 {
-                    Click(0.5f, 0.5f);
+                    string? text = tempWidget.GetCurrentWidgetText();
+                    if(text != null)
+                    {
+                        Console.WriteLine(text);
+                        Say(text);
+                    }
+                    InputIntent tempIntent = input.GetCurrentIntent();
+                    if (tempIntent != InputIntent.None)
+                        tempWidget.Interact(tempIntent);
                 }
+                else if (loadingComplete)
+                    Click(0.5f, 0.5f);
                 prevScene = (GameScene)memIO.GetGameScene();
                 Task.Delay(100).Wait();
             }

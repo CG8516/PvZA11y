@@ -107,7 +107,7 @@ namespace PvZA11y.Widgets
                     break;
                 case (InputIntent.Info1):
                     SayTitle(true);
-                    break;
+                    return;
 
             }
 

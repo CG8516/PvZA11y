@@ -806,6 +806,7 @@ namespace PvZA11y
         public const int NumDialogs = 51; // Assuming there are 51 dialogs
         public const int ZombatarLicense = 52;
         public const int steamCloudSavingActive = 56;
+        public const int stamCloudLocalChoice = 57;
     }
 
     
