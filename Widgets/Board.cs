@@ -35,6 +35,11 @@ namespace PvZA11y.Widgets
             public int health;
             public int maxHealth;
             public bool hypnotized;
+            public bool armless;
+            public bool headless;
+            public bool holdingSomething;   //pole-vaulting, pogo, flag, digger
+            public int helmetState;    //cone/bucket/football/miner/wallnutHead/tallnutHead
+            public int shieldState;    //screen-door/ladder/newspaper
         }
 
         public struct LawnMower
@@ -171,6 +176,37 @@ namespace PvZA11y.Widgets
                 zombie.posX = memIO.mem.ReadFloat(memIO.ptr.boardChain + ",a8," + (index + 0x2c).ToString("X2"));
 
                 zombie.hypnotized = memIO.mem.ReadByte(memIO.ptr.boardChain + ",a8," + (index + 0xb8).ToString("X2")) == 1;
+                zombie.headless = memIO.mem.ReadByte(memIO.ptr.boardChain + ",a8," + (index + 0xba).ToString("X2")) == 0;
+                zombie.armless = memIO.mem.ReadByte(memIO.ptr.boardChain + ",a8," + (index + 0xbb).ToString("X2")) == 0;
+                zombie.holdingSomething = memIO.mem.ReadByte(memIO.ptr.boardChain + ",a8," + (index + 0xbc).ToString("X2")) == 1;
+
+                int helmetHealth = memIO.mem.ReadInt(memIO.ptr.boardChain + ",a8," + (index + 0xd0).ToString("X2"));
+                int helmetMax = memIO.mem.ReadInt(memIO.ptr.boardChain + ",a8," + (index + 0xd4).ToString("X2"));
+
+                zombie.helmetState = 0;
+                if (helmetHealth > 0 && helmetMax > 0)
+                {
+                    if (helmetHealth < helmetMax / 3)
+                        zombie.helmetState = 2;
+                    else if (helmetHealth < helmetMax / 1.5f)
+                        zombie.helmetState = 1;
+                }
+                else if (helmetMax > 0 && helmetHealth <= 0)
+                    zombie.helmetState = 3;
+
+                int shieldHealth = memIO.mem.ReadInt(memIO.ptr.boardChain + ",a8," + (index + 0xdc).ToString("X2"));
+                int shieldMax = memIO.mem.ReadInt(memIO.ptr.boardChain + ",a8," + (index + 0xe0).ToString("X2"));
+
+                zombie.shieldState = 0;
+                if (shieldHealth > 0 && shieldMax > 0)
+                {
+                    if (shieldHealth < shieldMax / 3)
+                        zombie.shieldState = 2;
+                    else if (shieldHealth < shieldMax / 1.5f)
+                        zombie.shieldState = 1;
+                }
+                else if (shieldMax > 0 && shieldHealth <= 0)
+                    zombie.shieldState = 3;
 
                 //Zomboss should be detected on the right
                 if (zombie.zombieType == (int)ZombieType.DrZomBoss)
@@ -663,7 +699,7 @@ namespace PvZA11y.Widgets
             else if (gameMode is GameMode.LastStand)
                 Program.GameplayTutorial(new string[] { "In this game, which takes place in your backyard during the day,", "no sun will fall from the sky, and you'll be unable to choose any sun-producing plants.", "You start the game with 5,000 sun, and are given as much time as needed to prepare your lawn.", "When you're ready to begin, press the option/freeze input, and the wave will begin.", "At the end of a wave, you'll be given some additional sun, and time to prepare once again.", "Win the game by surviving through five waves." });
             else if (gameMode is GameMode.ZomBotany2)
-                Program.GameplayTutorial(new string[] { "This minigame is the same as ZomBotany, but with many new types of plant-headed zombies.", "It also takes place in your front yard, during the day." });
+                Program.GameplayTutorial(new string[] { "This minigame is the same as ZomBotany, but with many new types of plant-headed zombies.", "It takes place in your back yard, during the day." });
             else if (gameMode is GameMode.WallnutBowling2)
                 Program.GameplayTutorial(new string[] { "This is wall-nut bowling 2!", "It's pretty much the same as the first wall-nut bowling, but much harder.", "You'll also sometimes receive giant wall-nuts, which will always roll directly over anything that gets in their way, without ricocheting.", "This is a daytime front yard level." });
             else if (gameMode is GameMode.PogoParty)
@@ -1103,7 +1139,50 @@ namespace PvZA11y.Widgets
                 if (zombiesThisRow[i].hypnotized)
                     verboseZombieInfo += "Hypnotized ";
 
-                verboseZombieInfo += zombieName + ", ";
+                string addonDescriptor = "";
+
+                if (zombiesThisRow[i].helmetState == 1 || zombiesThisRow[i].shieldState == 1)
+                    addonDescriptor = "Dinted ";
+                else if (zombiesThisRow[i].helmetState == 2 || zombiesThisRow[i].shieldState == 2)
+                    addonDescriptor = "Damaged ";
+                else if (zombiesThisRow[i].helmetState == 3 || zombiesThisRow[i].shieldState == 3)
+                    addonDescriptor = "Exposed ";
+
+                if (zombiesThisRow[i].zombieType == (int)ZombieType.Newspaper)
+                {
+                    if (zombiesThisRow[i].shieldState == 1)
+                        addonDescriptor = "Ripped ";
+                    else if (zombiesThisRow[i].shieldState == 2)
+                        addonDescriptor = "Shredded ";
+                    else if (zombiesThisRow[i].shieldState == 3)
+                        addonDescriptor = "Angry ";
+                }
+
+                if (zombiesThisRow[i].zombieType == (int)ZombieType.WallnutHead || zombiesThisRow[i].zombieType == (int)ZombieType.TallnutHead)
+                {
+                    if (zombiesThisRow[i].helmetState == 1)
+                        addonDescriptor = "Chipped ";
+                    else if (zombiesThisRow[i].helmetState == 2 || zombiesThisRow[i].helmetState == 3)
+                        addonDescriptor = "Damaged ";
+                }
+
+                if (zombiesThisRow[i].armless)
+                    addonDescriptor = "Armless ";
+                if (zombiesThisRow[i].headless)
+                    addonDescriptor = "Headless ";
+
+                if (zombiesThisRow[i].zombieType == (int)ZombieType.Digger && zombiesThisRow[i].holdingSomething)
+                    verboseZombieInfo += "Underground  ";
+                else if (zombiesThisRow[i].zombieType == (int)ZombieType.Pogo && !zombiesThisRow[i].holdingSomething)
+                    verboseZombieInfo += "Grounded ";
+                else if (zombiesThisRow[i].zombieType == (int)ZombieType.PoleVaulting && !zombiesThisRow[i].holdingSomething)
+                    verboseZombieInfo += "Tired ";
+                else if (zombiesThisRow[i].zombieType == (int)ZombieType.Balloon && zombiesThisRow[i].phase == 74)
+                    verboseZombieInfo += "Falling ";
+                else if (zombiesThisRow[i].zombieType == (int)ZombieType.Balloon && zombiesThisRow[i].phase == 75)
+                    verboseZombieInfo += "Grounded ";
+
+                verboseZombieInfo += addonDescriptor + zombieName + ", ";
             }
 
             if (beepOnFound)
