@@ -1861,13 +1861,13 @@ namespace PvZA11y
                         long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
                         long timeGap = now - lastSweep;
                         bool doSweep = false;
-                        if (Config.current.ZombieSonarInterval == 1 && timeGap >= 3000)
+                        if (Config.current.ZombieSonarInterval == 4 && timeGap >= 3000)
                             doSweep = true;
-                        if (Config.current.ZombieSonarInterval == 2 && timeGap >= 2000)
+                        if (Config.current.ZombieSonarInterval == 3 && timeGap >= 2000)
                             doSweep = true;
-                        if (Config.current.ZombieSonarInterval == 3 && timeGap >= 1000)
+                        if (Config.current.ZombieSonarInterval == 2 && timeGap >= 1000)
                             doSweep = true;
-                        if (Config.current.ZombieSonarInterval == 4 && timeGap >= 500)
+                        if (Config.current.ZombieSonarInterval == 1 && timeGap >= 500)
                             doSweep = true;
 
                         if (doSweep)
