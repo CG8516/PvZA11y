@@ -32,10 +32,6 @@ namespace PvZA11y.Widgets
             {
                 Program.GameplayTutorial(new string[] { "Now that you have more than six plants, you'll have to start each level by choosing which ones you want to use.", "Navigate the plant picker similarly to the board.", "Press confirm to select or deselect a plant.", "Once you've picked enough plants, you can begin the game by pressing the start button." });
             }
-            if (level == 37)
-            {
-                Program.GameplayTutorial(new string[] { "Starfruit shoots to the left, above, below, diagonal up-right, and diagonal down-right.", "They do not shoot directly in front of them." });
-            }
         }
 
         struct plantInPicker
