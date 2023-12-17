@@ -1840,7 +1840,11 @@ namespace PvZA11y
                         packetWasReady = false;
 
                     prevSeedbankSlot = ((Board)currentWidget).seedbankSlot;
-
+                    if(Config.current.ZombieKilledIndicator)
+                    {
+                        List<ToneProperties> tones = ((Board)currentWidget).FindDeadZombies();
+                        PlayTones(tones);
+                    }
                     if (Config.current.ZombieEnterAlert)
                     {
                         var enteredZombies = ((Board)currentWidget).GetZombies(false, true);

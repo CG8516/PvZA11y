@@ -53,6 +53,7 @@ namespace PvZA11y
             public bool ZombieEnterAlert = true;
             public int BeghouledMatchAssist = 1;
             public int ZombieSonarInterval = 0;
+            public bool ZombieKilledIndicator = false;
             
 
             //Core functionality

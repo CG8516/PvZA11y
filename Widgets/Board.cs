@@ -146,6 +146,38 @@ namespace PvZA11y.Widgets
             return lawnMowers;
         }
 
+        public List<Program.ToneProperties> FindDeadZombies()
+        {
+            List<Program.ToneProperties> tones = new List<Program.ToneProperties>();
+
+            int maxIndex = memIO.mem.ReadInt(memIO.ptr.boardChain + ",ac");
+            List<Zombie> zombies = new List<Zombie>();
+
+            for (int i = 0; i < maxIndex; i++)
+            {
+                int index = i * 360;
+                int health = memIO.mem.ReadInt(memIO.ptr.boardChain + ",a8," + (index + 0xc8).ToString("X2"));
+
+                //Set dead zombie health to -99999 when scanned with deadScanner for first time, to avoid replaying the scanner beep.
+                if (health <= 0 && health != -99999)
+                {
+                    memIO.mem.WriteMemory(memIO.ptr.boardChain + ",a8," + (index + 0xc8).ToString("X2"), "int", "-99999");
+
+                    int row = memIO.mem.ReadInt(memIO.ptr.boardChain + ",a8," + (index + 0x1c).ToString("X2"));
+                    float posX = memIO.mem.ReadFloat(memIO.ptr.boardChain + ",a8," + (index + 0x2c).ToString("X2"));
+
+                    float rVolume = posX / 900.0f;
+                    float lVolume = 1.0f - rVolume;
+                    float freq = 1000.0f - ((row * 500.0f) / (float)gridInput.height);
+                    float freq2 = freq + 50;
+                    tones.Add(new Program.ToneProperties() { leftVolume = lVolume, rightVolume = rVolume, startFrequency = freq, endFrequency = freq, duration = 50, signalType = SignalGeneratorType.SawTooth, startDelay = 0 });
+                    tones.Add(new Program.ToneProperties() { leftVolume = lVolume, rightVolume = rVolume, startFrequency = freq2, endFrequency = freq2, duration = 50, signalType = SignalGeneratorType.SawTooth, startDelay = 100 });
+                }
+            }
+
+            return tones;
+        }
+
         public List<Zombie> GetZombies(bool seedPicker = false, bool entryScanner = false)
         {
             int maxIndex = memIO.mem.ReadInt(memIO.ptr.boardChain + ",ac");
@@ -1987,6 +2019,25 @@ namespace PvZA11y.Widgets
                 {
                     int matches = memIO.mem.ReadInt(memIO.ptr.boardChain + ",178,60");  //TODO: URGENT: MAKE SURE WORKS ON BOTH GAME VERSIONS (ONLY TESTED ON STEAM)
                     info4String += " " + matches + " out of 75 matches.";
+                }
+                else if (gameMode == GameMode.SeeingStars)
+                {
+                    var boardPlants = Program.GetPlantsOnBoard();
+                    bool[] placedStars = Consts.SeeingStars.ToArray();
+                    foreach(var boardPlant in boardPlants)
+                    {
+                        if(boardPlant.plantType == (int)SeedType.SEED_STARFRUIT)
+                            placedStars[boardPlant.row * 9 + boardPlant.column] = false;
+                    }
+                    int remainingStars = 0;
+                    foreach(bool b in placedStars)
+                    {
+                        if (b)
+                            remainingStars++;
+                    }
+
+                    info4String = 14 - remainingStars + " out of 14 required stars";
+
                 }
                 else
                 {
