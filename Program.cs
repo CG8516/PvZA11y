@@ -1888,6 +1888,8 @@ namespace PvZA11y
                                 if (startDelay > 1000 || startDelay < 0)
                                     continue;
 
+                                if (zombie.zombieType == (int)ZombieType.DrZomBoss && (zombie.phase < 87 || zombie.phase > 89))
+                                    continue;
                                 tones.Add(new ToneProperties() { leftVolume = lVolume, rightVolume = rVolume, startFrequency = freq, endFrequency = freq, duration = 100, signalType = SignalGeneratorType.Triangle, startDelay = startDelay });
                             }
                             PlayTones(tones);

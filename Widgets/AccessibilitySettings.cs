@@ -119,6 +119,13 @@ namespace PvZA11y.Widgets
             }
         }
 
+        string GetZombieCycleMode(int value)
+        {
+            if (value == 0)
+                return "By ID . Ensures all zombies are cycled through in the same order.";
+            return "By distance. Cycle order will change based on zombie distance.";
+        }
+
         string GetFloatOptionAsPercentage(float value)
         {
             return MathF.Round(value * 100.0f).ToString() + "%";
@@ -562,6 +569,8 @@ namespace PvZA11y.Widgets
             new RequiredInput(){intent = InputIntent.Option, description = "Freeze/Unfreezes all plants/zombies. Also opens the store when in the Zen Garden."},
             new RequiredInput(){intent = InputIntent.CycleLeft, description = "Cycles left between plants, zen garden tools, and store pages."},
             new RequiredInput(){intent = InputIntent.CycleRight, description = "Cycles right between plants, zen garden tools, and store pages."},
+            new RequiredInput(){intent = InputIntent.ZombieMinus, description = "Cycle backwards through zombies on the lawn."},
+            new RequiredInput(){intent = InputIntent.ZombiePlus, description = "Cycle forwards through zombies on the lawn."},
             new RequiredInput(){intent = InputIntent.Info1, description = "1 of 4. Provides additional information."},
             new RequiredInput(){intent = InputIntent.Info2, description = "2 of 4. Provides additional information."},
             new RequiredInput(){intent = InputIntent.Info3, description = "3 of 4. Provides additional information."},
@@ -676,7 +685,7 @@ namespace PvZA11y.Widgets
             Dictionary<GamepadButtons, InputIntent> controllerBinds = new Dictionary<GamepadButtons, InputIntent>();
             foreach (var reqInput in requiredInputs)
             {
-                if (reqInput.intent >= InputIntent.Slot1 && reqInput.intent <= InputIntent.Slot10)
+                if ((reqInput.intent >= InputIntent.Slot1 && reqInput.intent <= InputIntent.Slot10) || reqInput.intent is InputIntent.ZombieMinus or InputIntent.ZombiePlus)
                     continue;
                 GamepadButtons pressedButton = GetControllerInputForAction(reqInput);
                 if (pressedButton != GamepadButtons.None)
@@ -742,6 +751,8 @@ namespace PvZA11y.Widgets
             options.Add(new Option() { name = "Be-ghouled match assistance", description = "Match assistance mode for the be-ghouled minigame.", confirmAction = () => SetIntValue(InputIntent.Right, ref Config.current.BeghouledMatchAssist, 3), leftRightAction = (intent) => SetIntValue(intent, ref Config.current.BeghouledMatchAssist, 3),  valueGrabber = () => GetBeghouledMode(Config.current.BeghouledMatchAssist) });
             options.Add(new Option() { name = "Zombie sonar sweep", description = "How frequently to perform whole-board zombie sonar sweeps.", confirmAction = () => SetIntValue(InputIntent.Right, ref Config.current.ZombieSonarInterval, 5), leftRightAction = (intent) => SetIntValue(intent, ref Config.current.ZombieSonarInterval, 5),  valueGrabber = () => GetZombieSweepInterval(Config.current.ZombieSonarInterval) });
             options.Add(new Option() { name = "Zombie death indicator", description = "Plays a sound cue when a zombie is dead.", confirmAction = () => ToggleBool(ref Config.current.ZombieKilledIndicator), valueGrabber = () => GetBoolOptionValue(Config.current.ZombieKilledIndicator) });
+            options.Add(new Option() { name = "Zombie cycle mode", description = "Which mode to use when cycling through zombies on the board.", confirmAction = () => SetIntValue(InputIntent.Right, ref Config.current.ZombieCycleMode, 2), leftRightAction = (intent) => SetIntValue(intent, ref Config.current.ZombieCycleMode, 2), valueGrabber = () => GetZombieCycleMode(Config.current.ZombieCycleMode) });
+            options.Add(new Option() { name = "Move when cycling zombies.", description = "Move your cursor to the zombie's position when cycling zombies", confirmAction = () => ToggleBool(ref Config.current.MoveOnZombieCycle), valueGrabber = () => GetBoolOptionValue(Config.current.MoveOnZombieCycle) });
 
             //Core
             options.Add(new Option() { name = "Restart on crash", description = "Automatically attempt to restart the mod if it crashes", confirmAction = () => ToggleBool(ref Config.current.RestartOnCrash), valueGrabber = () => GetBoolOptionValue(Config.current.RestartOnCrash) });

@@ -22,6 +22,7 @@ namespace PvZA11y.Widgets
         int heldPlantID;    //For VaseBreaker/ItsRainingSeeds
         bool shovelPressedLast; //Whether the shovel was the last input (required for shovel confirmation mode)
         int animatingSunAmount;
+        int currentZombieID;
 
         bool doneBowlingTutorial = false;
 
@@ -40,6 +41,7 @@ namespace PvZA11y.Widgets
             public bool holdingSomething;   //pole-vaulting, pogo, flag, digger
             public int helmetState;    //cone/bucket/football/miner/wallnutHead/tallnutHead
             public int shieldState;    //screen-door/ladder/newspaper
+            public int uniqueID;
         }
 
         public struct LawnMower
@@ -178,6 +180,36 @@ namespace PvZA11y.Widgets
             return tones;
         }
 
+        Zombie? CycleZombie(InputIntent intent)
+        {
+            var zombies = GetZombies();
+            
+            if (zombies.Count == 0)
+                return null;
+
+            if(Config.current.ZombieCycleMode == 0)
+                zombies.Sort((a, b) => a.uniqueID.CompareTo(b.uniqueID)); //Sort by id
+            else
+                zombies.Sort((a, b) => a.posX.CompareTo(b.posX)); //Sort by distance
+
+            int currentIndex = zombies.FindIndex((a) => a.uniqueID == currentZombieID);
+
+            if (currentIndex <= -1)
+                currentIndex = 0;
+            else if (intent is InputIntent.ZombieMinus)
+                currentIndex--;
+            else
+                currentIndex++;
+
+            if (currentIndex < 0)
+                currentIndex = zombies.Count - 1;
+            if (currentIndex >= zombies.Count)
+                currentIndex = 0;
+
+            currentZombieID = zombies[currentIndex].uniqueID;
+            return zombies[currentIndex];
+        }
+
         public List<Zombie> GetZombies(bool seedPicker = false, bool entryScanner = false)
         {
             int maxIndex = memIO.mem.ReadInt(memIO.ptr.boardChain + ",ac");
@@ -215,6 +247,7 @@ namespace PvZA11y.Widgets
                 int helmetHealth = memIO.mem.ReadInt(memIO.ptr.boardChain + ",a8," + (index + 0xd0).ToString("X2"));
                 int helmetMax = memIO.mem.ReadInt(memIO.ptr.boardChain + ",a8," + (index + 0xd4).ToString("X2"));
 
+                zombie.uniqueID = memIO.mem.ReadInt(memIO.ptr.boardChain + ",a8," + (index + 0x164).ToString("X2"));
                 zombie.helmetState = 0;
                 if (helmetHealth > 0 && helmetMax > 0)
                 {
@@ -436,9 +469,13 @@ namespace PvZA11y.Widgets
 
         List<plantInBoardBank> GetPlantsInBoardBank()
         {
-            List<plantInBoardBank> newPlants = new List<plantInBoardBank>();
+            List<plantInBoardBank> newPlants = new List<plantInBoardBank>(10);
+            while (newPlants.Count < 10)
+                newPlants.Add(new plantInBoardBank() { packetType = -1 });
 
             byte[] plantBytes = memIO.mem.ReadBytes(memIO.ptr.lawnAppPtr + ",868,15c,28", 800);    //yucky
+            if (plantBytes == null)
+                return newPlants;
 
             //On conveyor levels, for each plant at offsetX == 0, the max offsetX should decrease by idk something
             int maxX = 450;
@@ -472,14 +509,10 @@ namespace PvZA11y.Widgets
 
                 if (plant.absX < 0.72f)
                     //if (plant.offsetX < maxX - (stoppedPlants*50))
-                    newPlants.Add(plant);
+                    newPlants[i] = plant;
 
                 //Console.WriteLine("i: {0}, Index: {1}, Type: {2}", i, plants[i].index, plants[i].packetType);
             }
-
-            //Fill rest of list with empty plants
-            while (newPlants.Count < 10)
-                newPlants.Add(new plantInBoardBank() { packetType = -1 });
 
             return newPlants;
         }
@@ -1068,6 +1101,100 @@ namespace PvZA11y.Widgets
             return plantInfoString;
         }
 
+        int GetZombieColumn(float posX)
+        {
+            int[] tileLimitsFront = new int[] { 70, 130, 217, 297, 367, 485, 535, 627, 720 };
+            int[] tileLimitsPool = new int[] { 70, 145, 217, 305, 385, 470, 540, 627, 720 };
+            int[] tileLimitsRoof = new int[] { 35, 115, 195, 275, 355, 435, 515, 595, 720 };
+            LevelType lvlType = memIO.GetLevelType();
+            int[] tileLimits = lvlType is LevelType.Normal or LevelType.Night ? tileLimitsFront : lvlType is LevelType.Roof or LevelType.Boss ? tileLimitsRoof : tileLimitsPool;
+            int zombieColumn = 9;
+            for (int i = 0; i < tileLimits.Length; i++)
+            {
+                if (posX <= tileLimits[i])
+                {
+                    zombieColumn = i;
+                    break;
+                }
+            }
+
+            return zombieColumn;
+        }
+
+        string FormatSingleZombieInfo(Zombie zombie, bool includeTileName, ref int prevColumn)
+        {
+            bool zombossVulnerable = zombie.phase >= 87 && zombie.phase <= 89;
+            string zombieName = Consts.zombieNames[zombie.zombieType];
+            int zombieNameLen = zombieName.Length;
+            string infoPrepend = "";
+
+            int zombieColumn = GetZombieColumn(zombie.posX);
+
+            if (zombie.zombieType == (int)ZombieType.DrZomBoss && zombossVulnerable)
+                zombieName = "Zomboss Head";
+
+            if (zombieColumn > prevColumn)
+            {
+                prevColumn = zombieColumn;
+                if (includeTileName)
+                {
+                    string tileName = ((char)('A' + zombieColumn)).ToString();
+                    if (zombieColumn > 8)
+                        tileName = "Off-Board";
+                    infoPrepend += " " + tileName + ": ";
+                }
+            }
+
+            if (zombie.hypnotized)
+                infoPrepend += "Hypnotized ";
+
+            string addonDescriptor = "";
+
+            if (zombie.helmetState == 1 || zombie.shieldState == 1)
+                addonDescriptor = "Dinted ";
+            else if (zombie.helmetState == 2 || zombie.shieldState == 2)
+                addonDescriptor = "Damaged ";
+            else if (zombie.helmetState == 3 || zombie.shieldState == 3)
+                addonDescriptor = "Exposed ";
+
+            if (zombie.zombieType == (int)ZombieType.Newspaper)
+            {
+                if (zombie.shieldState == 1)
+                    addonDescriptor = "Ripped ";
+                else if (zombie.shieldState == 2)
+                    addonDescriptor = "Shredded ";
+                else if (zombie.shieldState == 3)
+                    addonDescriptor = "Angry ";
+            }
+
+            if (zombie.zombieType == (int)ZombieType.WallnutHead || zombie.zombieType == (int)ZombieType.TallnutHead)
+            {
+                if (zombie.helmetState == 1)
+                    addonDescriptor = "Chipped ";
+                else if (zombie.helmetState == 2 || zombie.helmetState == 3)
+                    addonDescriptor = "Damaged ";
+            }
+
+            if (zombie.armless)
+                addonDescriptor = "Armless ";
+            if (zombie.headless)
+                addonDescriptor = "Headless ";
+
+            if (zombie.zombieType == (int)ZombieType.Digger && zombie.holdingSomething)
+                infoPrepend += "Underground  ";
+            else if (zombie.zombieType == (int)ZombieType.Pogo && !zombie.holdingSomething)
+                infoPrepend += "Grounded ";
+            else if (zombie.zombieType == (int)ZombieType.PoleVaulting && !zombie.holdingSomething)
+                infoPrepend += "Tired ";
+            else if (zombie.zombieType == (int)ZombieType.Balloon && zombie.phase == 74)
+                infoPrepend += "Falling ";
+            else if (zombie.zombieType == (int)ZombieType.Balloon && zombie.phase == 75)
+                infoPrepend += "Grounded ";
+
+
+            return infoPrepend + addonDescriptor + zombieName;
+        }
+
         //TODO: Clean this up. Passing 5 bools to a function is a pretty clear sign that the function needs to be split into different parts.
         public string? GetZombieInfo(bool currentTileOnly = false, bool beepOnFound = true, bool beepOnNone = true, bool includeTileName = true, bool countOnly = false)
         {
@@ -1139,82 +1266,28 @@ namespace PvZA11y.Widgets
                 float rVolume = zombiesThisRow[i].posX / 900.0f;
                 float lVolume = 1.0f - rVolume;
                 int startDelay = (int)(zombiesThisRow[i].posX / 2.0f);
-                if (startDelay > 1000 || startDelay < 0)
+                if (startDelay > 1000)
                     continue;
+                if (startDelay < 0)
+                    startDelay = 0;
 
-                tones.Add(new Program.ToneProperties() { leftVolume = lVolume, rightVolume = rVolume, startFrequency = 300 + (i*10), endFrequency = 300 + (i*10), duration = 100, signalType = SignalGeneratorType.Sin, startDelay = startDelay });
+                bool zombossVulnerable = zombiesThisRow[i].phase >= 87 && zombiesThisRow[i].phase <= 89;
+                if (zombiesThisRow[i].zombieType == (int)ZombieType.DrZomBoss)
+                {
+                    if(zombossVulnerable)
+                        tones.Add(new Program.ToneProperties() { leftVolume = lVolume, rightVolume = rVolume, startFrequency = 300 + (i * 10), endFrequency = 300 + (i * 10), duration = 100, signalType = SignalGeneratorType.Sin, startDelay = startDelay });
+                }
+                else
+                   tones.Add(new Program.ToneProperties() { leftVolume = lVolume, rightVolume = rVolume, startFrequency = 300 + (i*10), endFrequency = 300 + (i*10), duration = 100, signalType = SignalGeneratorType.Sin, startDelay = startDelay });
 
                 if (zombiesThisRow[i].zombieType >= (int)ZombieType.CachedZombieTypes)
                     continue;
-                string zombieName = Consts.zombieNames[zombiesThisRow[i].zombieType];
-                int zombieNameLen = zombieName.Length;
 
-                int zombieColumn = (int)((zombiesThisRow[i].posX + 100.0f) / 100.0f);
-                if (zombieColumn < 0)
-                    zombieColumn = 0;
-                if (zombieColumn > 10)
-                    zombieColumn = 10;
 
-                if (zombiesThisRow[i].zombieType == (int)ZombieType.DrZomBoss)
-                {
-                    if (zombiesThisRow[i].phase >= 87 && zombiesThisRow[i].phase <= 89)
-                        zombieName = "Zomboss Head";
-                }
+                string thisZombieInfo = FormatSingleZombieInfo(zombiesThisRow[i], includeTileName, ref prevColumn);
 
-                if (zombieColumn > prevColumn)
-                {
-                    prevColumn = zombieColumn;
-                    if (includeTileName)
-                        verboseZombieInfo += " " + (char)('A' + zombieColumn) + ": ";
-                }
-
-                if (zombiesThisRow[i].hypnotized)
-                    verboseZombieInfo += "Hypnotized ";
-
-                string addonDescriptor = "";
-
-                if (zombiesThisRow[i].helmetState == 1 || zombiesThisRow[i].shieldState == 1)
-                    addonDescriptor = "Dinted ";
-                else if (zombiesThisRow[i].helmetState == 2 || zombiesThisRow[i].shieldState == 2)
-                    addonDescriptor = "Damaged ";
-                else if (zombiesThisRow[i].helmetState == 3 || zombiesThisRow[i].shieldState == 3)
-                    addonDescriptor = "Exposed ";
-
-                if (zombiesThisRow[i].zombieType == (int)ZombieType.Newspaper)
-                {
-                    if (zombiesThisRow[i].shieldState == 1)
-                        addonDescriptor = "Ripped ";
-                    else if (zombiesThisRow[i].shieldState == 2)
-                        addonDescriptor = "Shredded ";
-                    else if (zombiesThisRow[i].shieldState == 3)
-                        addonDescriptor = "Angry ";
-                }
-
-                if (zombiesThisRow[i].zombieType == (int)ZombieType.WallnutHead || zombiesThisRow[i].zombieType == (int)ZombieType.TallnutHead)
-                {
-                    if (zombiesThisRow[i].helmetState == 1)
-                        addonDescriptor = "Chipped ";
-                    else if (zombiesThisRow[i].helmetState == 2 || zombiesThisRow[i].helmetState == 3)
-                        addonDescriptor = "Damaged ";
-                }
-
-                if (zombiesThisRow[i].armless)
-                    addonDescriptor = "Armless ";
-                if (zombiesThisRow[i].headless)
-                    addonDescriptor = "Headless ";
-
-                if (zombiesThisRow[i].zombieType == (int)ZombieType.Digger && zombiesThisRow[i].holdingSomething)
-                    verboseZombieInfo += "Underground  ";
-                else if (zombiesThisRow[i].zombieType == (int)ZombieType.Pogo && !zombiesThisRow[i].holdingSomething)
-                    verboseZombieInfo += "Grounded ";
-                else if (zombiesThisRow[i].zombieType == (int)ZombieType.PoleVaulting && !zombiesThisRow[i].holdingSomething)
-                    verboseZombieInfo += "Tired ";
-                else if (zombiesThisRow[i].zombieType == (int)ZombieType.Balloon && zombiesThisRow[i].phase == 74)
-                    verboseZombieInfo += "Falling ";
-                else if (zombiesThisRow[i].zombieType == (int)ZombieType.Balloon && zombiesThisRow[i].phase == 75)
-                    verboseZombieInfo += "Grounded ";
-
-                verboseZombieInfo += addonDescriptor + zombieName + ", ";
+                //verboseZombieInfo += addonDescriptor + zombieName + ", ";
+                verboseZombieInfo += thisZombieInfo + ", ";
             }
 
             if (beepOnFound)
@@ -1766,6 +1839,50 @@ namespace PvZA11y.Widgets
 
             bool hasSeeds = seedbankSlot >= 0;
             seedbankSlot = seedbankSlot < 0 ? 0 : seedbankSlot; //cap index min to 0 again
+
+            if (intent is InputIntent.ZombieMinus or InputIntent.ZombiePlus)
+            {
+                Zombie? nullableZombie = CycleZombie(intent);
+                if(nullableZombie is null)
+                    Program.PlayTone(1, 1, 70, 70, 50, SignalGeneratorType.Square);
+                else
+                {
+                    Zombie cycleZombie = nullableZombie.Value;
+
+                    float rVolume = cycleZombie.posX / 900.0f;
+                    float lVolume = 1.0f - rVolume;
+                    int startDelay = (int)(cycleZombie.posX / 2.0f);
+                    float freq = 1000.0f - ((cycleZombie.row * 500.0f) / (float)gridInput.height);
+
+                    if (cycleZombie.zombieType == (int)ZombieType.DrZomBoss)
+                    {
+                        bool zombossVulnerable = cycleZombie.phase >= 87 && cycleZombie.phase <= 89;
+                        if (zombossVulnerable)
+                            Program.PlayTone(lVolume, rVolume, freq, freq, 100, SignalGeneratorType.Sin, 0);
+                    }
+                    else
+                        Program.PlayTone(lVolume, rVolume, freq, freq, 100, SignalGeneratorType.Sin, 0);
+
+                    int zombieColumn = GetZombieColumn(cycleZombie.posX);
+                    string tileName = ((char)('A' + zombieColumn)).ToString();
+                    if (zombieColumn > 8)
+                        tileName = "Right";
+
+                    tileName += " " + (cycleZombie.row + 1) + ", ";
+
+                    int prevColumn = -1;
+                    string zombieInfoStr = tileName + FormatSingleZombieInfo(cycleZombie,false, ref prevColumn);
+                    Console.WriteLine(zombieInfoStr);
+                    Program.Say(zombieInfoStr);
+
+                    if (Config.current.MoveOnZombieCycle)
+                    {
+                        gridInput.cursorX = zombieColumn;
+                        gridInput.cursorY = cycleZombie.row;
+                        MoveMouseToTile();
+                    }
+                }
+            }
 
             bool inVaseBreaker = VaseBreakerCheck();
             bool inRainingSeeds = gameMode == GameMode.ItsRainingSeeds;

@@ -54,6 +54,8 @@ namespace PvZA11y
             public int BeghouledMatchAssist = 1;
             public int ZombieSonarInterval = 0;
             public bool ZombieKilledIndicator = false;
+            public int ZombieCycleMode = 0;
+            public bool MoveOnZombieCycle = true;
             
 
             //Core functionality

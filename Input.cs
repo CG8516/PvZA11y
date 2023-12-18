@@ -27,6 +27,8 @@ namespace PvZA11y
         Option,     //Select
         CycleLeft,  //Lb
         CycleRight, //Rb
+        ZombieMinus,//Lt
+        ZombiePlus, //Rt
         Info1,      //X
         Info2,      //Y
         Info3,      //L3
@@ -59,6 +61,8 @@ namespace PvZA11y
         short xThreshold = 20000;
         short yThreshold = 20000;
 
+        int triggerThreshold = 250;
+
         ConcurrentQueue<InputIntent> inputQueue = new ConcurrentQueue<InputIntent>();
 
 
@@ -67,7 +71,7 @@ namespace PvZA11y
         int keyRepeatDelay = 100;   //Delay between key repetitions, after the initial timer has been exceeded
 
         //TODO: Make this a bit nicer
-        Dictionary<InputIntent, long> keyRepeatTimers = new Dictionary<InputIntent, long>() { { InputIntent.Up, 0 }, { InputIntent.Down, 0 }, { InputIntent.Left, 0 }, { InputIntent.Right, 0 }, { InputIntent.CycleLeft, 0 }, { InputIntent.CycleRight, 0 } };
+        Dictionary<InputIntent, long> keyRepeatTimers = new Dictionary<InputIntent, long>() { { InputIntent.Up, 0 }, { InputIntent.Down, 0 }, { InputIntent.Left, 0 }, { InputIntent.Right, 0 }, { InputIntent.CycleLeft, 0 }, { InputIntent.CycleRight, 0 }, { InputIntent.ZombieMinus, 0 }, { InputIntent.ZombiePlus, 0 } };
 
         public Input()
         {
@@ -173,6 +177,9 @@ namespace PvZA11y
                 keyBinds.Add((uint)VIRTUALKEY.VK_8, InputIntent.Slot8);
                 keyBinds.Add((uint)VIRTUALKEY.VK_9, InputIntent.Slot9);
                 keyBinds.Add((uint)VIRTUALKEY.VK_0, InputIntent.Slot10);
+
+                keyBinds.Add((uint)VIRTUALKEY.VK_OEM_COMMA, InputIntent.ZombieMinus);
+                keyBinds.Add((uint)VIRTUALKEY.VK_OEM_PERIOD, InputIntent.ZombiePlus);
 
                 Config.current.keyBinds = keyBinds;
                 Config.SaveConfig();
@@ -505,6 +512,30 @@ namespace PvZA11y
                     keyRepeatTimers[InputIntent.Up] = DateTime.UtcNow.Ticks + keyRepeatDelay * 10000;
                     intents.Add(InputIntent.Up);
                 }
+
+                //Left and right triggers as zombie minus/plus
+                if (state.Gamepad.LeftTrigger > triggerThreshold && prevState.Gamepad.LeftTrigger <= triggerThreshold)
+                {
+                    keyRepeatTimers[InputIntent.ZombieMinus] = DateTime.UtcNow.Ticks + initialKeyRepeatDelay * 10000;
+                    intents.Add(InputIntent.ZombieMinus);
+                }
+                else if (state.Gamepad.LeftTrigger > triggerThreshold && Config.current.KeyRepetition && keyRepeatTimers[InputIntent.ZombieMinus] < DateTime.UtcNow.Ticks)
+                {
+                    keyRepeatTimers[InputIntent.ZombieMinus] = DateTime.UtcNow.Ticks + keyRepeatDelay * 10000;
+                    intents.Add(InputIntent.ZombieMinus);
+                }
+
+                if (state.Gamepad.RightTrigger > triggerThreshold && prevState.Gamepad.RightTrigger <= triggerThreshold)
+                {
+                    keyRepeatTimers[InputIntent.ZombiePlus] = DateTime.UtcNow.Ticks + initialKeyRepeatDelay * 10000;
+                    intents.Add(InputIntent.ZombiePlus);
+                }
+                else if (state.Gamepad.RightTrigger > triggerThreshold && Config.current.KeyRepetition && keyRepeatTimers[InputIntent.ZombiePlus] < DateTime.UtcNow.Ticks)
+                {
+                    keyRepeatTimers[InputIntent.ZombiePlus] = DateTime.UtcNow.Ticks + keyRepeatDelay * 10000;
+                    intents.Add(InputIntent.ZombiePlus);
+                }
+
 
                 //Map right-stick as wheel selector for plant slot (generous deadzones to keep wheel segments more distinct)
                 if (state.Gamepad.RightThumbX > 27000 || state.Gamepad.RightThumbX < -27000 || state.Gamepad.RightThumbY > 27000 || state.Gamepad.RightThumbY < -27000)
