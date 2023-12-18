@@ -1079,6 +1079,13 @@ namespace PvZA11y
             int gameMode = memIO.GetGameMode();
             int gameScene = (int)memIO.GetGameScene();
 
+            if (dialogID == DialogIDs.CreditsPaused)
+            {
+                if (currentWidget is not ButtonPicker)
+                    return new ButtonPicker(memIO, ptrChain);
+                return currentWidget;
+            }
+
             if (gameScene == (int)GameScene.Credits)
             {
                 if(currentWidget is not Credits)

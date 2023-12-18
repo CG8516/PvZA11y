@@ -799,7 +799,7 @@ namespace PvZA11y
         public const int CrazyDave = 45;
         public const int StorePurchase = 46;
         public const int ZenSell = 47;
-        public const int Message = 48;
+        public const int CreditsPaused = 48;
         public const int Imitater = 49;
         public const int PurchasePacketSlot = 50;
 
