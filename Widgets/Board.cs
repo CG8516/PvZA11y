@@ -42,6 +42,8 @@ namespace PvZA11y.Widgets
             public int helmetState;    //cone/bucket/football/miner/wallnutHead/tallnutHead
             public int shieldState;    //screen-door/ladder/newspaper
             public int uniqueID;
+            public bool frozen;
+            public bool buttered;
         }
 
         public struct LawnMower
@@ -243,6 +245,8 @@ namespace PvZA11y.Widgets
                 zombie.headless = memIO.mem.ReadByte(memIO.ptr.boardChain + ",a8," + (index + 0xba).ToString("X2")) == 0;
                 zombie.armless = memIO.mem.ReadByte(memIO.ptr.boardChain + ",a8," + (index + 0xbb).ToString("X2")) == 0;
                 zombie.holdingSomething = memIO.mem.ReadByte(memIO.ptr.boardChain + ",a8," + (index + 0xbc).ToString("X2")) == 1;
+                zombie.frozen = memIO.mem.ReadInt(memIO.ptr.boardChain + ",a8," + (index + 0xac).ToString("X2")) > 0;
+                zombie.buttered = memIO.mem.ReadInt(memIO.ptr.boardChain + ",a8," + (index + 0xb0).ToString("X2")) > 0;
 
                 int helmetHealth = memIO.mem.ReadInt(memIO.ptr.boardChain + ",a8," + (index + 0xd0).ToString("X2"));
                 int helmetMax = memIO.mem.ReadInt(memIO.ptr.boardChain + ",a8," + (index + 0xd4).ToString("X2"));
@@ -1190,6 +1194,11 @@ namespace PvZA11y.Widgets
                 infoPrepend += "Falling ";
             else if (zombie.zombieType == (int)ZombieType.Balloon && zombie.phase == 75)
                 infoPrepend += "Grounded ";
+
+            if (zombie.frozen)
+                infoPrepend += "Icy ";
+            if (zombie.buttered)
+                infoPrepend += "Buttered ";
 
 
             return infoPrepend + addonDescriptor + zombieName;
