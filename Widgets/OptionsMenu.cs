@@ -48,25 +48,57 @@ namespace PvZA11y.Widgets
             ListItem[] listItems = new ListItem[itemCount];
 
             listItems[0] = new ListItem() { text = "Music Volume Slider", relativePos = musicSliderPos };
+            if (Config.current.SayAvailableInputs)
+                listItems[0].text += "\r\nInputs: Left and Right to decrease and increase value, Deny to close, Up and Down to scroll list.";
+            
             listItems[1] = new ListItem() { text = "SFX Volume Slider", relativePos = sfxSliderPos };
+            if (Config.current.SayAvailableInputs)
+                listItems[1].text += "\r\nInputs: Left and Right to decrease and increase value, Deny to close, Up and Down to scroll list.";
+
             listItems[2] = new ListItem() { text = "3D Acceleration Checkbox", relativePos = accelButtonPos };
+            if (Config.current.SayAvailableInputs)
+                listItems[2].text += "\r\nInputs: Confirm to toggle, Deny to close, Up and Down to scroll list.";
+
             listItems[3] = new ListItem() { text = "Fullscreen Checkbox", relativePos = fullscreenButtonPos };
+            if (Config.current.SayAvailableInputs)
+                listItems[3].text += "\r\nInputs: Confirm to toggle, Deny to close, Up and Down to scroll list.";
+
             int itemIndex = 4;
             if (almanacVisible)
+            {
                 listItems[itemIndex++] = new ListItem() { text = "View Almanac", relativePos = almanacPos };
+                if (Config.current.SayAvailableInputs)
+                    listItems[itemIndex-1].text += "\r\nInputs: Confirm to select, Deny to close, Up and Down to scroll list.";
+            }
             if (restartVisible)
+            {
                 listItems[itemIndex++] = new ListItem() { text = "Restart Level", relativePos = restartPos };
+                if (Config.current.SayAvailableInputs)
+                    listItems[itemIndex-1].text += "\r\nInputs: Confirm to select, Deny to close, Up and Down to scroll list.";
+            }
             if (mainMenuVisible)
             {
-                if(prevWidget != null && prevWidget is Widgets.MainMenu)
+                if (prevWidget != null && prevWidget is Widgets.MainMenu)
+                {
                     listItems[itemIndex++] = new ListItem() { text = "Credits", relativePos = mainMenuPos };
+                    if (Config.current.SayAvailableInputs)
+                        listItems[itemIndex-1].text += "\r\nInputs: Confirm to select, Deny to close, Up and Down to scroll list.";
+                }
                 else
+                {
                     listItems[itemIndex++] = new ListItem() { text = "Main Menu", relativePos = mainMenuPos };
+                    if (Config.current.SayAvailableInputs)
+                        listItems[itemIndex-1].text += "\r\nInputs: Confirm to select, Deny to close, Up and Down to scroll list.";
+                }
             }
 
             listItems[itemIndex++] = new ListItem() { text = "Accessibility Settings", relativePos = Vector2.Zero };
+            if (Config.current.SayAvailableInputs)
+                listItems[itemIndex-1].text += "\r\nInputs: Confirm to select, Deny to close, Up and Down to scroll list.";
 
             listItems[itemIndex] = new ListItem() { text = continueString, relativePos = continuePos };
+            if (Config.current.SayAvailableInputs)
+                listItems[itemIndex].text += "\r\nInputs: Confirm or Deny to close, Up and Down to scroll list.";
 
             return listItems;
 
@@ -178,8 +210,17 @@ namespace PvZA11y.Widgets
             bool accelChecked = memIO.mem.ReadByte(pointerChain + memIO.ptr.optionsMenu3DAccelOffset + ",a8") == 1;
             bool fullscreenChecked = memIO.mem.ReadByte(pointerChain + memIO.ptr.optionsMenuFullscreenOffset + ",a8") == 1;
 
-            string accelText = (accelChecked ? "Checked: " : "Unchecked: ") + "3D Acceleration";
-            string fullscreenText = (fullscreenChecked ? "Checked: " : "Unchecked: ") + "Full Screen";
+            //Cleanup previous text to remove "Checked: " / "Unchecked: " portion, before we re-insert that in the string (yucky, I know)
+            int colonIndex = listItems[2].text.IndexOf("d: ");
+            if(colonIndex != -1)
+                listItems[2].text = listItems[2].text.Substring(colonIndex+3, listItems[2].text.Length - (colonIndex+3));
+
+            colonIndex = listItems[3].text.IndexOf("d: ");
+            if (colonIndex != -1)
+                listItems[3].text = listItems[3].text.Substring(colonIndex+3, listItems[3].text.Length - (colonIndex+3));
+
+            string accelText = (accelChecked ? "Checked: " : "Unchecked: ") + listItems[2].text;
+            string fullscreenText = (fullscreenChecked ? "Checked: " : "Unchecked: ") + listItems[3].text;
 
             listItems[2].text = accelText;
             listItems[3].text = fullscreenText;
@@ -195,7 +236,7 @@ namespace PvZA11y.Widgets
             else
                 titleString = memIO.mem.ReadString(pointerChain + memIO.ptr.dialogTitleStrOffset + ",0");
 
-            return titleString;
+            return titleString + "\r\n" + listItems[0].text;
         }
 
         protected override string? GetContentUpdate()

@@ -68,16 +68,21 @@ namespace PvZA11y.Widgets
                 titleString = memIO.mem.ReadString(pointerChain + memIO.ptr.dialogTitleStrOffset);
             else
                 titleString = memIO.mem.ReadString(pointerChain + memIO.ptr.dialogTitleStrOffset + ",0", "", titleLen);
-            Console.WriteLine("BodyLen: {0}", bodyLen);
+            
             string bodyString = "";
             if (bodyLen > 0)
             {
                 
                 bodyString = memIO.mem.ReadString(pointerChain + memIO.ptr.dialogBodyStrOffset + ",0", "", bodyLen);
             }
-
+            bodyString = bodyString.ReplaceLineEndings(" ");
 
             string completeString =  titleString + "\r\n" + bodyString;
+
+            if(Config.current.SayAvailableInputs)
+            {
+                completeString += "\r\nInputs: Confirm to select, Deny to reject, Info1 to repeat, Up and Down to scroll options.";
+            }
 
             if(shouldSay)
             {
@@ -120,12 +125,12 @@ namespace PvZA11y.Widgets
 
                 float freq = 1250.0f - ((((float)listIndex/(float)listItems.Length) * 5000.0f) / 5.0f);
                 Program.PlayTone(1.0f, 1.0f, freq, freq, 100, SignalGeneratorType.Sin);
+
+                Console.WriteLine(listItems[listIndex].text);
+                Program.Say(listItems[listIndex].text, true);
             }
             else if (intent is (InputIntent.Up or InputIntent.Down))
                 Program.PlayTone(1, 1, 70, 70, 50, SignalGeneratorType.Square);
-
-            Console.WriteLine(listItems[listIndex].text);
-            Program.Say(listItems[listIndex].text, true);
         }
 
         private void ConfineInteractionIndex()

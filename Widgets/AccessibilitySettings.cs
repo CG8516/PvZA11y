@@ -227,12 +227,10 @@ namespace PvZA11y.Widgets
             }
             catch
             {
-                //Console.WriteLine("JAWS is not installed, and Freedom Scientific is a terrible company, so I literally can not support their software properly, without it crashing for non-JAWS users.");
-                //Console.WriteLine("They won't release a public API. They want to charge develoeprs money to make Freedom Scientific's own product work better with more software. Which is fucking ridiculous.");
-                //Console.WriteLine("I refuse to pay them any money, out of principle. But even if I wanted to, the cheapest version costs over $1000, as I have to purchase it through a reseller, because they refuse to sell directly outside of the US.");
-                //Console.WriteLine("What a pathetic excuse of a company. I hope they go bankrupt, they honestly deserve to.");
-                //Console.WriteLine("All the money that was wasted in JAWS subscriptions, could be donated to a more worthwhile project like NVDA.");
-                //Console.WriteLine("The world will quite literally be a better place without them");
+                //AccessibleOutput throws an exception while trying to load JAWS on a system without it installed, as it requires COM interop with their propriatry library.
+                //Would be nice if we could bundle a dll, but Freedom Scientific are a terrible company, and refuse to make their API public.
+                //Instead, they want to charge us money to make 'their' software more useful for their users.
+                //I hope their greed burns them one day.
             }
 
             AccessibleOutput.NvdaOutput nvda = new AccessibleOutput.NvdaOutput();
@@ -243,7 +241,6 @@ namespace PvZA11y.Widgets
             if (Config.current.screenReaderSelection is Config.ScreenReaderSelection.Auto)
                 selectedScreenreader = 0;
 
-            //Fuck Freedom Scientific
             if (jaws is not null && jaws.IsAvailable())
                 availableScreenreaders.Add(new ScreenReader() { name = "JAWS (NOT RECOMMENDED)", output = jaws, selection = Config.ScreenReaderSelection.Jaws });
             if (Config.current.screenReaderSelection is Config.ScreenReaderSelection.Jaws)
@@ -264,458 +261,17 @@ namespace PvZA11y.Widgets
                 selectedScreenreader = availableScreenreaders.Count - 1;
             
         }
-        
-        bool WaitForConfirmation()
-        {
-            InputIntent intent = InputIntent.None;
-            while (intent is not (InputIntent.Confirm or InputIntent.Deny))
-                intent = Program.input.GetCurrentIntent();
-            if (intent is InputIntent.Confirm)
-                return true;
-            return false;
-        }
-
-        void GetInputForAction(InputIntent intent, string description, ref uint pressedKey, ref GamepadButtons pressedButton)
-        {
-            bool buttonBound = false;
-            bool keyBound = false;
-            while (true)
-            {
-
-                if (buttonBound && keyBound)
-                    return;
-
-                string instruction = "";
-
-
-                if(buttonBound)
-                {
-                    instruction = "Controller button was bound! If you would like to remap a key, press one now. Otherwise, press the same controller button again to continue.";
-                    Console.WriteLine(instruction);
-                    Program.Say(instruction);
-                    GamepadButtons newButton = GamepadButtons.None;
-                    Program.input.GetKeyOrButton(ref pressedKey, ref newButton);
-                    if(newButton == pressedButton)
-                    {
-                        Program.PlayTone(1, 1, 300, 300, 50, SignalGeneratorType.Sin, 0);
-                        Program.PlayTone(1, 1, 350, 350, 50, SignalGeneratorType.Sin, 50);
-                        return;
-                    }
-                    else
-                    {
-                        instruction = "Press a key for the " + intent.ToString() + " action, or press any controller button to skip.";
-                        Console.WriteLine(instruction);
-                        Program.Say(instruction);
-                        Program.input.GetKeyOrButton(ref pressedKey, ref newButton);
-                        
-                        if(newButton != GamepadButtons.None)
-                        {
-                            //Skip grabbing key
-                            Program.PlayTone(1, 1, 70, 70, 50, SignalGeneratorType.Square);
-                            return;
-                        }
-
-                        string result = "Press the same key again to confirm your selection, or press something else to change it.";
-                        Console.WriteLine(result);
-                        Program.Say(result);
-                        uint keyToUse = pressedKey;
-                        Program.input.GetKeyOrButton(ref pressedKey, ref newButton);
-                        if (pressedKey == keyToUse)
-                        {
-                            Program.PlayTone(1, 1, 300, 300, 50, SignalGeneratorType.Sin, 0);
-                            Program.PlayTone(1, 1, 350, 350, 50, SignalGeneratorType.Sin, 50);
-                            keyBound = true;
-                        }
-                        else
-                        {
-                            Program.PlayTone(1, 1, 300, 300, 50, SignalGeneratorType.Sin, 0);
-                            Program.PlayTone(1, 1, 250, 250, 50, SignalGeneratorType.Sin, 50);
-                            continue;
-                        }
-
-                    }
-
-                    Console.WriteLine("Code should never reach here, right?");
-                    continue; //This shouldn't ever get hit, right?
-                }
-
-                if (keyBound)
-                {
-                    instruction = "Keyboard key was bound! If you would like to map a controller button, press one now. Otherwise, press the same keyboard key again to continue.";
-                    Console.WriteLine(instruction);
-                    Program.Say(instruction);
-                    uint newKey = 0;
-                    Program.input.GetKeyOrButton(ref newKey, ref pressedButton);
-                    if (newKey == pressedKey)
-                    {
-                        Program.PlayTone(1, 1, 300, 300, 50, SignalGeneratorType.Sin, 0);
-                        Program.PlayTone(1, 1, 350, 350, 50, SignalGeneratorType.Sin, 50);
-                        return;
-                    }
-                    else
-                    {
-                        instruction = "Press a button for the " + intent.ToString() + " action, or press any keyboard key to skip.";
-                        Console.WriteLine(instruction);
-                        Program.Say(instruction);
-                        Program.input.GetKeyOrButton(ref newKey, ref pressedButton);
-
-                        //If user pressed any key, skip grabbing gamepad button
-                        if (newKey != 0)
-                        {
-                            Program.PlayTone(1, 1, 70, 70, 50, SignalGeneratorType.Square);
-                            return;
-                        }
-
-                        string result = "Press the same button again to confirm your selection, or press something else to change it.";
-                        Console.WriteLine(result);
-                        Program.Say(result);
-                        GamepadButtons buttonToUse = pressedButton;
-                        Program.input.GetKeyOrButton(ref newKey, ref pressedButton);
-                        if (pressedButton == buttonToUse)
-                        {
-                            Program.PlayTone(1, 1, 300, 300, 50, SignalGeneratorType.Sin, 0);
-                            Program.PlayTone(1, 1, 350, 350, 50, SignalGeneratorType.Sin, 50);
-                            buttonBound = true;
-                        }
-                        else
-                        {
-                            Program.PlayTone(1, 1, 300, 300, 50, SignalGeneratorType.Sin, 0);
-                            Program.PlayTone(1, 1, 250, 250, 50, SignalGeneratorType.Sin, 50);
-                            continue;
-                        }
-
-                    }
-
-                    Console.WriteLine("Code should never reach here, right?");
-                    continue; //This shouldn't ever get hit, right?
-                }
-
-
-                instruction = intent.ToString();
-                instruction += "\r\n" + description;
-                Console.WriteLine(instruction);
-                Program.Say(instruction);
-                Program.input.GetKeyOrButton(ref pressedKey, ref pressedButton);
-
-                if (pressedButton != GamepadButtons.None)
-                {
-                    string result = "Press the same controller button again to confirm your selection, or press something else to change it";
-                    Console.WriteLine(result);
-                    Program.Say(result);
-                    GamepadButtons buttonToUse = pressedButton;
-                    Program.input.GetKeyOrButton(ref pressedKey, ref pressedButton);
-                    if (pressedButton == buttonToUse)
-                    {
-                        Program.PlayTone(1, 1, 300, 300, 50, SignalGeneratorType.Sin, 0);
-                        Program.PlayTone(1, 1, 350, 350, 50, SignalGeneratorType.Sin, 50);
-                        buttonBound = true;
-                    }
-                    else
-                    {
-                        Program.PlayTone(1, 1, 300, 300, 50, SignalGeneratorType.Sin, 0);
-                        Program.PlayTone(1, 1, 250, 250, 50, SignalGeneratorType.Sin, 50);
-                        continue;
-                    }
-                }
-
-                if(pressedKey != 0)
-                {
-                    string result = "Press the same keyboard key again to confirm your selection, or press something else to change it";
-                    Console.WriteLine(result);
-                    Program.Say(result);
-                    uint keyToUse = pressedKey;
-                    Program.input.GetKeyOrButton(ref pressedKey, ref pressedButton);
-                    if (keyToUse == pressedKey)
-                    {
-                        Program.PlayTone(1, 1, 300, 300, 50, SignalGeneratorType.Sin, 0);
-                        Program.PlayTone(1, 1, 350, 350, 50, SignalGeneratorType.Sin, 50);
-                        keyBound = true;
-                    }
-                    else
-                    {
-                        Program.PlayTone(1, 1, 300, 300, 50, SignalGeneratorType.Sin, 0);
-                        Program.PlayTone(1, 1, 250, 250, 50, SignalGeneratorType.Sin, 50);
-                        continue;
-                    }
-                }
-
-            }
-        }
-
-        GamepadButtons GetControllerInputForAction(RequiredInput reqInput)
-        {
-            while (true)
-            {
-                string instruction = reqInput.intent.ToString();
-                instruction += "\r\n" + reqInput.description;
-                Console.WriteLine(instruction);
-                Program.Say(instruction);
-                GamepadButtons pressedButton = Program.input.GetButton();
-
-                //If user pressed escape while grabbing controller button, cancel this
-                if (pressedButton == GamepadButtons.None)
-                    return GamepadButtons.None;
-
-                string result = "Press the same controller button again to confirm your selection, or press something else to change it";
-                Console.WriteLine(result);
-                Program.Say(result);
-                if (pressedButton == Program.input.GetButton())
-                {
-                    Program.PlayTone(1, 1, 300, 300, 50, SignalGeneratorType.Sin, 0);
-                    Program.PlayTone(1, 1, 350, 350, 50, SignalGeneratorType.Sin, 50);
-                    return pressedButton;
-                }
-                else
-                {
-                    Program.PlayTone(1, 1, 300, 300, 50, SignalGeneratorType.Sin, 0);
-                    Program.PlayTone(1, 1, 250, 250, 50, SignalGeneratorType.Sin, 50);
-                    continue;
-                }
-            }
-        }
-
-        void SetControllerInputForAction(RequiredInput reqInput)
-        {
-            while (true)
-            {
-                string instruction = reqInput.intent.ToString();
-                instruction += "\r\n" + reqInput.description;
-                Console.WriteLine(instruction);
-                Program.Say(instruction);
-                GamepadButtons pressedButton = Program.input.GetButton();
-
-                //If user pressed escape while grabbing controller button, cancel this
-                if (pressedButton == GamepadButtons.None)
-                    return;
-
-                string result = "Press the same controller button again to confirm your selection, or press something else to change it";
-                Console.WriteLine(result);
-                Program.Say(result);
-                if (pressedButton == Program.input.GetButton())
-                {
-                    Program.PlayTone(1, 1, 300, 300, 50, SignalGeneratorType.Sin, 0);
-                    Program.PlayTone(1, 1, 350, 350, 50, SignalGeneratorType.Sin, 50);
-                    if(Config.current.controllerBinds.ContainsValue(reqInput.intent))
-                    {
-                        Console.WriteLine("Input already added");
-                        GamepadButtons origButton = Config.current.controllerBinds.FirstOrDefault(x => x.Value == reqInput.intent).Key;
-                        Console.WriteLine("Original button: " + origButton.ToString());
-                        Config.current.controllerBinds.Remove(origButton);
-                    }
-                    if(Config.current.controllerBinds.ContainsKey(pressedButton))
-                    {
-                        string warningStr = "Specified input is already bound to: " + Config.current.controllerBinds[pressedButton].ToString();
-                        warningStr += "\r\n" + Config.current.controllerBinds[pressedButton].ToString() + " action Is now unbound!";
-                        Config.current.controllerBinds.Remove(pressedButton);
-                        Console.WriteLine(warningStr);
-                        Program.Say(warningStr);
-                    }
-                    Config.current.controllerBinds.Add(pressedButton, reqInput.intent);
-                    Program.input.UpdateControllerBinds(Config.current.controllerBinds);
-                    return;
-                }
-                else
-                {
-                    Program.PlayTone(1, 1, 300, 300, 50, SignalGeneratorType.Sin, 0);
-                    Program.PlayTone(1, 1, 250, 250, 50, SignalGeneratorType.Sin, 50);
-                    continue;
-                }
-            }
-        }
-
-        uint GetKyboardInputForAction(RequiredInput reqInput)
-        {
-            while (true)
-            {
-                string instruction = reqInput.intent.ToString();
-                instruction += "\r\n" + reqInput.description;
-                Console.WriteLine(instruction);
-                Program.Say(instruction);
-                uint pressedKey = Program.input.GetKey();
-
-                string result = "Press the same keyboard key again to confirm your selection, or press something else to change it";
-                Console.WriteLine(result);
-                Program.Say(result);
-                if (pressedKey == Program.input.GetKey())
-                {
-                    Program.PlayTone(1, 1, 300, 300, 50, SignalGeneratorType.Sin, 0);
-                    Program.PlayTone(1, 1, 350, 350, 50, SignalGeneratorType.Sin, 50);
-                    return pressedKey;
-                }
-                else
-                {
-                    Program.PlayTone(1, 1, 300, 300, 50, SignalGeneratorType.Sin, 0);
-                    Program.PlayTone(1, 1, 250, 250, 50, SignalGeneratorType.Sin, 50);
-                    continue;
-                }
-            }
-        }
-
-        struct RequiredInput
-        {
-            public InputIntent intent;
-            public string description;
-        }
-
-        RequiredInput[] requiredInputs = new RequiredInput[]
-        {
-            new RequiredInput(){intent = InputIntent.Up, description = "Up directional input"},
-            new RequiredInput(){intent = InputIntent.Down, description = "Down directional input"},
-            new RequiredInput(){intent = InputIntent.Left, description = "Left directional input"},
-            new RequiredInput(){intent = InputIntent.Right, description = "Right directional input"},
-            new RequiredInput(){intent = InputIntent.Confirm, description = "Plant placement and confirming menu choices."},
-            new RequiredInput(){intent = InputIntent.Deny, description = "Shovelling plants, and for denying menu choices."},
-            new RequiredInput(){intent = InputIntent.Start, description = "Opens the pause menu, also starts the game when on the plant selector."},
-            new RequiredInput(){intent = InputIntent.Option, description = "Freeze/Unfreezes all plants/zombies. Also opens the store when in the Zen Garden."},
-            new RequiredInput(){intent = InputIntent.CycleLeft, description = "Cycles left between plants, zen garden tools, and store pages."},
-            new RequiredInput(){intent = InputIntent.CycleRight, description = "Cycles right between plants, zen garden tools, and store pages."},
-            new RequiredInput(){intent = InputIntent.ZombieMinus, description = "Cycle backwards through zombies on the lawn."},
-            new RequiredInput(){intent = InputIntent.ZombiePlus, description = "Cycle forwards through zombies on the lawn."},
-            new RequiredInput(){intent = InputIntent.Info1, description = "1 of 4. Provides additional information."},
-            new RequiredInput(){intent = InputIntent.Info2, description = "2 of 4. Provides additional information."},
-            new RequiredInput(){intent = InputIntent.Info3, description = "3 of 4. Provides additional information."},
-            new RequiredInput(){intent = InputIntent.Info4, description = "4 of 4. Provides additional information."},
-            new RequiredInput(){intent = InputIntent.Slot1, description = "1 of 10. Hotkey to instantly select plant slot 1."},
-            new RequiredInput(){intent = InputIntent.Slot2, description = "2 of 10. Hotkey to instantly select plant slot 2."},
-            new RequiredInput(){intent = InputIntent.Slot3, description = "3 of 10. Hotkey to instantly select plant slot 3."},
-            new RequiredInput(){intent = InputIntent.Slot4, description = "4 of 10. Hotkey to instantly select plant slot 4."},
-            new RequiredInput(){intent = InputIntent.Slot5, description = "5 of 10. Hotkey to instantly select plant slot 5."},
-            new RequiredInput(){intent = InputIntent.Slot6, description = "6 of 10. Hotkey to instantly select plant slot 6."},
-            new RequiredInput(){intent = InputIntent.Slot7, description = "7 of 10. Hotkey to instantly select plant slot 7."},
-            new RequiredInput(){intent = InputIntent.Slot8, description = "8 of 10. Hotkey to instantly select plant slot 8."},
-            new RequiredInput(){intent = InputIntent.Slot9, description = "9 of 10. Hotkey to instantly select plant slot 9."},
-            new RequiredInput(){intent = InputIntent.Slot10, description = "10 of 10. Hotkey to instantly select plant slot 10."},
-        };
-
-        //TODO: Create sub-menu for rebinds, so users can rebind individual keys, instead of needing to rebind everything at once
-        void RebindInputs()
-        {
-            string warningText = "Warning. This will reset all keybinds. Press confirm if you would like to proceed, or deny to go back";
-            Console.WriteLine(warningText);
-            Program.Say(warningText);
-
-            InputIntent intent = InputIntent.None;
-            while (intent is not (InputIntent.Deny or InputIntent.Confirm))
-                intent = Program.input.GetCurrentIntent();
-
-            if(intent is InputIntent.Deny)
-                return;
-
-            string instructions = "You will be presented with a series of input types, and a brief description of what the input is used for.";
-            instructions += "\r\nYou will need to press the key or controller button that you would like to use to perform that action.";
-            instructions += "\r\nPress confirm to continue. Or Deny to go back.";
-            Console.WriteLine(instructions);
-            Program.Say(instructions);
-            if (!WaitForConfirmation())
-                return;
-
-            uint pressedKey = 0;
-            GamepadButtons pressedButton = GamepadButtons.None;
-
-            Dictionary<GamepadButtons, InputIntent> controllerBinds = new Dictionary<GamepadButtons, InputIntent>();
-            Dictionary<uint, InputIntent> keyBinds = new Dictionary<uint, InputIntent>();
-
-            foreach(var reqInput in requiredInputs)
-            {
-                GetInputForAction(reqInput.intent, reqInput.description, ref pressedKey, ref pressedButton);
-                if (pressedKey != 0)
-                    keyBinds.Add(pressedKey, reqInput.intent);
-                if (pressedButton != GamepadButtons.None)
-                    controllerBinds.Add(pressedButton, reqInput.intent);
-            }
-           
-            Program.input.UpdateInputBinds(keyBinds, controllerBinds);
-
-        }
-
-        bool KeybindWarning(bool isKeyboard)
-        {
-            string warningText = "Warning. This will reset all " + (isKeyboard ? "keyboard" : "controller") + " input binds. Press confirm if you would like to proceed, or deny to go back";
-            Console.WriteLine(warningText);
-            Program.Say(warningText);
-
-            InputIntent intent = InputIntent.None;
-            while (intent is not (InputIntent.Deny or InputIntent.Confirm))
-                intent = Program.input.GetCurrentIntent();
-
-            if (intent is InputIntent.Confirm)
-                return true;
-            return false;
-
-        }
-
-        bool KeybindIntro(bool isKeyboard)
-        {
-            string instructions = "You will be presented with a series of input types, and a brief description of what the input is used for.";
-            instructions += "\r\nYou will need to press the " + (isKeyboard? "keyboard key" : "controller button") + " that you would like to use to perform that action.";
-            instructions += "\r\nPress confirm to continue. Or Deny to go back";
-            Console.WriteLine(instructions);
-            Program.Say(instructions);
-            if (!WaitForConfirmation())
-                return false;
-            return true;
-        }
-
-        void RebindKeyboard()
-        {
-            if (!KeybindWarning(true))
-                return;
-            if (!KeybindIntro(true))
-                return;
-
-            Dictionary<uint, InputIntent> keyBinds = new Dictionary<uint, InputIntent>();
-
-            foreach (var reqInput in requiredInputs)
-            {
-                uint pressedKey = GetKyboardInputForAction(reqInput);
-                keyBinds.Add(pressedKey, reqInput.intent);
-            }
-
-            Program.input.UpdateKeyboardBinds(keyBinds);
-
-        }
-
-        void RebindController()
-        {
-            if (!KeybindWarning(false))
-                return;
-            if (!KeybindIntro(false))
-                return;
-
-            Dictionary<GamepadButtons, InputIntent> controllerBinds = new Dictionary<GamepadButtons, InputIntent>();
-            foreach (var reqInput in requiredInputs)
-            {
-                if ((reqInput.intent >= InputIntent.Slot1 && reqInput.intent <= InputIntent.Slot10) || reqInput.intent is InputIntent.ZombieMinus or InputIntent.ZombiePlus)
-                    continue;
-                GamepadButtons pressedButton = GetControllerInputForAction(reqInput);
-                if (pressedButton != GamepadButtons.None)
-                    controllerBinds.Add(pressedButton, reqInput.intent);
-                else
-                    return; //If user pressed escape, cancel rebinding controller input
-            }
-
-            Program.input.UpdateControllerBinds(controllerBinds);
-        }
 
         //Really gross that we need this
         //TODO: Remove this
         void DummyLeftRightAction(InputIntent intent){}
 
-        void InputRebindMenu(bool isController = false)
+        void InputRebindMenu()
         {
-            options.Clear();
-            optionIndex = 0;
-            hasReadContent = false;
+            InputRebind rebindMenu = new InputRebind();
+            while (rebindMenu.HandleInput()) ;
 
-            foreach(var reqInput in requiredInputs)
-            {
-                if (isController)
-                    options.Add(new Option() { name = reqInput.intent.ToString(), description = reqInput.description, confirmAction = () => SetControllerInputForAction(reqInput), leftRightAction = DummyLeftRightAction });
-                else
-                    options.Add(new Option() { name = reqInput.intent.ToString(), description = reqInput.description, confirmAction = () => GetKyboardInputForAction(reqInput), leftRightAction = DummyLeftRightAction });
-            }
-
-            //options.Add(new Option() { name = "Up Direction", description = "Button used to move up in menus and on grids"})
+            return;
         }
 
         void MainAccessibilityMenu()
@@ -730,9 +286,8 @@ namespace PvZA11y.Widgets
             options.Add(new Option() { name = "Grid cursor wrapping", description = "Jump to the opposite side of grids when passing the bounds", confirmAction = () => ToggleBool(ref Config.current.WrapCursorOnGrids), valueGrabber = () => GetBoolOptionValue(Config.current.WrapCursorOnGrids) });
             options.Add(new Option() { name = "Plant selection wrapping", description = "Loop selection when cycling plants and Zen Garden tools", confirmAction = () => ToggleBool(ref Config.current.WrapPlantSelection), valueGrabber = () => GetBoolOptionValue(Config.current.WrapPlantSelection) });
             options.Add(new Option() { name = "Key repetition", description = "Repeat directional inputs when held", confirmAction = () => ToggleBool(ref Config.current.KeyRepetition), valueGrabber = () => GetBoolOptionValue(Config.current.KeyRepetition) });
-            options.Add(new Option() { name = "Rebind all keyboard inputs", description = "Allows you to rebind all keyboard controls.", confirmAction = RebindKeyboard });
-            options.Add(new Option() { name = "Rebind all controller buttons", description = "Allows you to rebind all controller buttons.", confirmAction = RebindController });
-            //options.Add(new Option() { name = "Rebind all controller buttons", description = "Allows you to rebind all controller buttons.", confirmAction = () => InputRebindMenu(true) });
+            options.Add(new Option() { name = "Rebind inputs", description = "Allows you to rebind all controls.", confirmAction = InputRebindMenu, leftRightAction = DummyLeftRightAction });
+            options.Add(new Option() { name = "Say available inputs", description = "Say available key/button inputs in menus.", confirmAction = () => ToggleBool(ref Config.current.SayAvailableInputs), valueGrabber = () => GetBoolOptionValue(Config.current.SayAvailableInputs) });
 
             //Gameplay
             options.Add(new Option() { name = "Shovel Confirmation", description = "Require the shovel button to be pressed twice, to avoid accidental shoveling", confirmAction = () => ToggleBool(ref Config.current.RequireShovelConfirmation), valueGrabber = () => GetBoolOptionValue(Config.current.RequireShovelConfirmation) });
@@ -788,6 +343,11 @@ namespace PvZA11y.Widgets
                 optionText += " : " + options[optionIndex].name;
             else
                 optionText = options[optionIndex].name + " : " + optionText;
+
+            if(Config.current.SayAvailableInputs)
+            {
+                optionText += "\r\nInputs: Confirm to toggle/apply value, Deny to close, Info1 for more information, Left and Right to change value, Up and Down to scroll list.";
+            }
 
             Console.WriteLine(optionText);
             Program.Say(optionText, true);

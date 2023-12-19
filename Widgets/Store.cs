@@ -13,6 +13,7 @@ namespace PvZA11y.Widgets
     class Store : Widget
     {
 
+        string inputDescription = "\r\nInputs: Confirm to buy, Deny to close, Info1 to say owned coins, Horizontal directions and Cycle buttons to switch categories, Vertical directions to scroll items";
         public Store (MemoryIO memIO, string pointerChain) : base(memIO, pointerChain)
         {
             ReloadStore();
@@ -45,11 +46,6 @@ namespace PvZA11y.Widgets
 
         public void ReloadStore(bool resetPosition = false)
         {
-            //byte[] purchasedBytes = mem.ReadBytes(lawnAppPtr + ",94c,1e8", 320);
-            //int[] playerPurchases = new int[80];
-            //for (int i = 0; i < 79; i++)
-            //    playerPurchases[i] = BitConverter.ToInt32(purchasedBytes, i * 4);
-
             var playerPurchases = memIO.GetPlayerPurchases();
 
             inBuyConfirmationDialogue = false; //Just to make sure
@@ -345,26 +341,6 @@ namespace PvZA11y.Widgets
                     itemType = StoreItem.ZenTreeFood
                 });
 
-
-
-            //Phonograph
-            //Gardening Glove
-            //Mushroom garden
-            //Aquarium garden
-            //WheelBarrow
-            //Stinky?
-            //TreeOfWisdom
-            //TreeFood
-
-            //Back Button
-            //Switch between pages with Dpad Left/Right Lb/Rb
-            //Move between items with up/down
-            //Purchase with A, Back/Exit with B
-            //Purchase confirmation with A/B after dialogue
-            //Check Money with X/Y
-
-
-
             //Numbers added to the end of marigolds, to make it clear that they're moving between them
             if (finishedAdventure)
                 zenGarden.Add(new StoreEntry()
@@ -396,10 +372,6 @@ namespace PvZA11y.Widgets
                     itemType = StoreItem.ZenMarigold3
                 });
 
-
-            //int gameUpgradeCount = 
-            //StoreEntry[] gameUpgrades = new StoreEntry[10];
-
             storePages[0].entries = gameUpgrades;
             storePages[1].entries = plantUpgrades;
             storePages[2].entries = zenGarden;
@@ -409,19 +381,10 @@ namespace PvZA11y.Widgets
         public override void Interact(InputIntent intent)
         {
             string text = "";
-            //byte mPaused = (byte)mem.ReadByte(lawnAppPtr + ",868,17c");
-            bool isPaused = memIO.GetBoardPaused();
-
-
-
 
             //We don't use the real store. It's completely redesigned for blind-accessibility
-            //int playerCoinCount = mem.ReadInt(lawnAppPtr + ",94c,50") * 10;
             int playerCoinCount = memIO.GetPlayerCoinCount() * 10;
             bool nvdaOverwrite = true;
-
-           
-
 
             if (inBuyConfirmationDialogue)
             {
@@ -608,7 +571,6 @@ namespace PvZA11y.Widgets
                     if (storePages[storePage].entries[storeItemIndex].outOfStock)
                     {
                         text = "Item out of stock!";
-                        //PlayTone(0.8f, 0.8f, 400, 400, 100, SignalGeneratorType.Square);
                         Program.PlayTone(0.6f, 0.6f, 333, 333, 100, SignalGeneratorType.Sin);
                     }
                     else if (playerCoinCount < storePages[storePage].entries[storeItemIndex].price)
@@ -628,11 +590,16 @@ namespace PvZA11y.Widgets
 
             if (intent == InputIntent.Info1)
             {
-                text = "You have: " + Program.FormatNumber(playerCoinCount) + " coins.";
+                text = "You have " + Program.FormatNumber(playerCoinCount) + " coins.";
             }
 
-            Console.WriteLine(text);
-            Program.Say(text, nvdaOverwrite);
+            if (text.Length > 0)
+            {
+                if (Config.current.SayAvailableInputs)
+                    text += inputDescription;
+                Console.WriteLine(text);
+                Program.Say(text, nvdaOverwrite);
+            }
         }
 
         protected override string? GetContentUpdate()
@@ -655,9 +622,14 @@ namespace PvZA11y.Widgets
             else if (finishedAdventure && storeItemIndex == -1)
                 text += "All plant upgrades have been obtained!";
 
+            if (Config.current.SayAvailableInputs)
+                text += inputDescription;
             return text;
-            //Console.WriteLine(text);
-            //Say(text, true);
+        }
+
+        protected override string? GetContent()
+        {
+            return "Store\r\n" + GetContentUpdate();
         }
 
     }

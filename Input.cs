@@ -80,7 +80,7 @@ namespace PvZA11y
             {
                 foreach (InputIntent intent in Enum.GetValues(typeof(InputIntent)))
                 {
-                    if (intent is InputIntent.None)
+                    if (intent is InputIntent.None or (>= InputIntent.Up and <= InputIntent.Right) or InputIntent.ZombieMinus or InputIntent.ZombiePlus or (>= InputIntent.Slot1 and <= InputIntent.Slot10))
                         continue;
                     if (!Config.current.controllerBinds.ContainsValue(intent))
                     {
@@ -147,39 +147,39 @@ namespace PvZA11y
             {
                 keyBinds = new Dictionary<uint, InputIntent>();
 
-                keyBinds.Add(VIRTUALKEY.VK_UP, InputIntent.Up);
-                keyBinds.Add(VIRTUALKEY.VK_DOWN, InputIntent.Down);
-                keyBinds.Add(VIRTUALKEY.VK_LEFT, InputIntent.Left);
-                keyBinds.Add(VIRTUALKEY.VK_RIGHT, InputIntent.Right);
+                keyBinds.Add(Key.Up, InputIntent.Up);
+                keyBinds.Add(Key.Down, InputIntent.Down);
+                keyBinds.Add(Key.Left, InputIntent.Left);
+                keyBinds.Add(Key.Right, InputIntent.Right);
 
-                keyBinds.Add(VIRTUALKEY.VK_RETURN, InputIntent.Confirm);
-                keyBinds.Add(VIRTUALKEY.VK_BACK, InputIntent.Deny);
+                keyBinds.Add(Key.Return, InputIntent.Confirm);
+                keyBinds.Add(Key.Back, InputIntent.Deny);
 
-                keyBinds.Add(VIRTUALKEY.VK_ESCAPE, InputIntent.Start);
-                keyBinds.Add(VIRTUALKEY.VK_TAB, InputIntent.Option);
+                keyBinds.Add(Key.Escape, InputIntent.Start);
+                keyBinds.Add(Key.Tab, InputIntent.Option);
 
-                keyBinds.Add(VIRTUALKEY.VK_OEM_MINUS, InputIntent.CycleLeft);
-                keyBinds.Add(VIRTUALKEY.VK_OEM_PLUS, InputIntent.CycleRight);
+                keyBinds.Add(Key.Minus, InputIntent.CycleLeft);
+                keyBinds.Add(Key.Plus, InputIntent.CycleRight);
 
-                keyBinds.Add(VIRTUALKEY.VK_F1, InputIntent.Info1);
-                keyBinds.Add(VIRTUALKEY.VK_F2, InputIntent.Info2);
-                keyBinds.Add(VIRTUALKEY.VK_F3, InputIntent.Info3);
-                keyBinds.Add(VIRTUALKEY.VK_F4, InputIntent.Info4);
+                keyBinds.Add(Key.F1, InputIntent.Info1);
+                keyBinds.Add(Key.F2, InputIntent.Info2);
+                keyBinds.Add(Key.F3, InputIntent.Info3);
+                keyBinds.Add(Key.F4, InputIntent.Info4);
 
                 //Really need to improve input rebinding menu
-                keyBinds.Add((uint)VIRTUALKEY.VK_1, InputIntent.Slot1);
-                keyBinds.Add((uint)VIRTUALKEY.VK_2, InputIntent.Slot2);
-                keyBinds.Add((uint)VIRTUALKEY.VK_3, InputIntent.Slot3);
-                keyBinds.Add((uint)VIRTUALKEY.VK_4, InputIntent.Slot4);
-                keyBinds.Add((uint)VIRTUALKEY.VK_5, InputIntent.Slot5);
-                keyBinds.Add((uint)VIRTUALKEY.VK_6, InputIntent.Slot6);
-                keyBinds.Add((uint)VIRTUALKEY.VK_7, InputIntent.Slot7);
-                keyBinds.Add((uint)VIRTUALKEY.VK_8, InputIntent.Slot8);
-                keyBinds.Add((uint)VIRTUALKEY.VK_9, InputIntent.Slot9);
-                keyBinds.Add((uint)VIRTUALKEY.VK_0, InputIntent.Slot10);
+                keyBinds.Add((uint)Key.One, InputIntent.Slot1);
+                keyBinds.Add((uint)Key.Two, InputIntent.Slot2);
+                keyBinds.Add((uint)Key.Three, InputIntent.Slot3);
+                keyBinds.Add((uint)Key.Four, InputIntent.Slot4);
+                keyBinds.Add((uint)Key.Five, InputIntent.Slot5);
+                keyBinds.Add((uint)Key.Six, InputIntent.Slot6);
+                keyBinds.Add((uint)Key.Seven, InputIntent.Slot7);
+                keyBinds.Add((uint)Key.Eight, InputIntent.Slot8);
+                keyBinds.Add((uint)Key.Nine, InputIntent.Slot9);
+                keyBinds.Add((uint)Key.Zero, InputIntent.Slot10);
 
-                keyBinds.Add((uint)VIRTUALKEY.VK_OEM_COMMA, InputIntent.ZombieMinus);
-                keyBinds.Add((uint)VIRTUALKEY.VK_OEM_PERIOD, InputIntent.ZombiePlus);
+                keyBinds.Add((uint)Key.Comma, InputIntent.ZombieMinus);
+                keyBinds.Add((uint)Key.Period, InputIntent.ZombiePlus);
 
                 Config.current.keyBinds = keyBinds;
                 Config.SaveConfig();
@@ -262,7 +262,7 @@ namespace PvZA11y
                             return button;
                     }
 
-                    if (NativeKeyboard.IsKeyDown(VIRTUALKEY.VK_ESCAPE))
+                    if (NativeKeyboard.IsKeyDown(Key.Escape))
                         return GamepadButtons.None;
 
                 }
@@ -282,6 +282,19 @@ namespace PvZA11y
                 {
                     if (NativeKeyboard.IsKeyDown(i))
                         buttonPressed = true;
+                }
+                if (XInput.GetState(0, out State state))
+                {
+                    foreach (GamepadButtons button in Enum.GetValues(typeof(GamepadButtons)))
+                    {
+                        if (button is GamepadButtons.None)
+                            continue;
+                        if (state.Gamepad.Buttons.HasFlag(button))
+                        {
+                            buttonPressed = true;
+                            break;
+                        }
+                    }
                 }
             }
             ClearIntents();
@@ -318,45 +331,18 @@ namespace PvZA11y
 
         public void GetKeyOrButton(ref uint pressedKey, ref GamepadButtons pressedButton)
         {
-            pressedKey = 1;
-            pressedButton = GamepadButtons.Start;
+            pressedKey = 0;
+            pressedButton = GamepadButtons.None;
 
             string startWarning = "Please release all keyboard keys and controller buttons.";
 
-            while (pressedKey != 0 || pressedButton != GamepadButtons.None)
-            {
-                pressedButton = GamepadButtons.None;
-                pressedKey = 0;
-
-                if (XInput.GetState(0, out State state))
-                {
-                    foreach (GamepadButtons button in Enum.GetValues(typeof(GamepadButtons)))
-                    {
-                        if (button is GamepadButtons.None)
-                            continue;
-                        if (state.Gamepad.Buttons.HasFlag(button))
-                        {
-                            pressedButton = button;
-                            break;
-                        }
-                    }
-                }
-                
-                for (uint i = 1; i < 0xff; i++)
-                {
-                    if (NativeKeyboard.IsKeyDown(i))
-                    {
-                        pressedKey = i;
-                        break;
-                    }
-
-                }
-
-            }
-
+            WaitForNoInput();
 
             while (pressedKey == 0 && pressedButton == GamepadButtons.None)
             {
+                if (CheckEscapeHeld())
+                    return;
+                
                 if (XInput.GetState(0, out State state))
                 {
                     foreach(GamepadButtons button in Enum.GetValues(typeof(GamepadButtons)))
@@ -391,6 +377,7 @@ namespace PvZA11y
 
             Config.current.controllerBinds = controllerBinds;
             Config.SaveConfig();
+            ClearIntents();
         }
 
         public void UpdateKeyboardBinds(Dictionary<uint, InputIntent> keyBinds)
@@ -400,6 +387,25 @@ namespace PvZA11y
 
             Config.current.keyBinds = keyBinds;
             Config.SaveConfig();
+            ClearIntents();
+        }
+
+        public bool CheckEscapeHeld(int holdTimeMs = 3000)
+        {
+
+            bool escapeDown = NativeKeyboard.IsKeyDown(Key.Escape);
+
+            long milliseconds = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            while (escapeDown)
+            {
+                escapeDown = NativeKeyboard.IsKeyDown(Key.Escape);
+                if (DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - milliseconds >= holdTimeMs)
+                    return true;
+
+                Task.Delay(30).Wait();  //Avoid excess cpu usage
+            }
+
+            return false;
         }
 
         public void UpdateInputBinds(Dictionary<uint,InputIntent> keyBinds, Dictionary<GamepadButtons,InputIntent> controllerBinds)

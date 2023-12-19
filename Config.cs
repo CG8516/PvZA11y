@@ -36,6 +36,7 @@ namespace PvZA11y
             public bool KeyRepetition = true;
             public Dictionary<uint, InputIntent> keyBinds = new Dictionary<uint, InputIntent>();
             public Dictionary<GamepadButtons, InputIntent> controllerBinds = new Dictionary<GamepadButtons, InputIntent>();
+            public bool SayAvailableInputs = true;
 
             //Gameplay
             public bool RequireShovelConfirmation = false;
@@ -118,18 +119,6 @@ namespace PvZA11y
 
         public static void SaveConfig(ScreenReaderSelection? screenReader = null)
         {
-            //Todo: Clean this up a bit (I feel like I can write this line almost anywhere in the project)
-            //if (current.ScreenReader is NvdaOutput)
-            //    current.screenReaderSelection = ScreenReaderSelection.Nvda;
-            //else if (current.ScreenReader is JawsOutput)
-            //    current.screenReaderSelection = ScreenReaderSelection.Jaws;
-            //else if (current.ScreenReader is SapiOutput)
-            //    current.screenReaderSelection = ScreenReaderSelection.Sapi;
-            //else if (current.ScreenReader is AutoOutput)
-            //    current.screenReaderSelection = ScreenReaderSelection.Auto;
-            //else if (current.ScreenReader is null)
-            //    current.screenReaderSelection = ScreenReaderSelection.Disabled;
-
             if(screenReader != null)
                 current.screenReaderSelection = screenReader.Value;
 

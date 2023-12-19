@@ -29,6 +29,8 @@ namespace PvZA11y.Widgets
             button1Pos.X += 0.1f;
             button1Pos.Y += 0.1f;
             string button1Str = memIO.GetWidgetButton1String(pointerChain);
+            if (Config.current.SayAvailableInputs)
+                button1Str += "\r\nInputs: Confirm to select, Deny to reject, Info1 to repeat, Up and Down to scroll options.";
             listItems[0] = new ListItem() { relativePos = button1Pos, text = button1Str };
 
             if(buttonCount == 2)
@@ -39,6 +41,8 @@ namespace PvZA11y.Widgets
                 button2Pos.X += 0.1f;
                 button2Pos.Y += 0.1f;
                 string button2Str = memIO.GetWidgetButton2String(pointerChain);
+                if (Config.current.SayAvailableInputs)
+                    button2Str += "\r\nInputs: Confirm to select, Deny to reject, Info1 to repeat, Up and Down to scroll options.";
                 listItems[1] = new ListItem() { relativePos = button2Pos, text = button2Str };
             }
 
@@ -65,6 +69,7 @@ namespace PvZA11y.Widgets
             if (startContent is null)
                 return null;
 
+            startContent = startContent.ReplaceLineEndings(" ");
             return startContent + "\r\n" + listItems[0].text;
         }
     }

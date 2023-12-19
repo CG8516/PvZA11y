@@ -41,11 +41,11 @@ namespace PvZA11y.Widgets
             Program.Say(menuStr);
 
             
-            while (keyInput != VIRTUALKEY.VK_RETURN && keyInput != VIRTUALKEY.VK_ESCAPE)
+            while (keyInput != Key.Return && keyInput != Key.Escape)
             {
                 keyInput = Program.input.GetKey(false);
 
-                if(keyInput == VIRTUALKEY.VK_UP || keyInput == VIRTUALKEY.VK_DOWN || keyInput == VIRTUALKEY.VK_F1)
+                if(keyInput == Key.Up || keyInput == Key.Down || keyInput == Key.F1)
                 {
                     Console.WriteLine(menuStr);
                     Program.Say(menuStr);
@@ -81,7 +81,7 @@ namespace PvZA11y.Widgets
 
             }
             */
-            if (keyInput == VIRTUALKEY.VK_ESCAPE)
+            if (keyInput == Key.Escape)
             {
                 Vector2 cancelButtonPos = memIO.GetWidgetButton2Pos(pointerChain);
                 cancelButtonPos.X += 0.1f;

@@ -18,7 +18,11 @@ namespace PvZA11y.Widgets
             ListItem[] listItems = new ListItem[userNames.Length];
 
             for (int i = 0; i < userNames.Length; i++)
+            {
                 listItems[i] = new ListItem() { text = userNames[i], relativePos = new Vector2(0.2f, 0.3f + (0.05f * i)) };
+                if(Config.current.SayAvailableInputs)
+                    listItems[i].text += "\r\nInputs: Confirm to select, Deny to close, Info1 to rename, Info2 to delete, Directions to scroll.";
+            }
 
             return listItems;
         }
@@ -49,6 +53,13 @@ namespace PvZA11y.Widgets
             Program.Click(clickPos);
         }
 
+        protected override string? GetContent()
+        {
+            string? baseContent = base.GetContent();
+            if (baseContent != null && Config.current.SayAvailableInputs)
+                baseContent += "Inputs: Confirm to select, Deny to close, Info1 to rename, Info2 to delete, Directions to scroll.";
+            return baseContent;
+        }
         public override void Interact(InputIntent intent)
         {
             base.Interact(intent);

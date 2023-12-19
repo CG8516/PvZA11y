@@ -14,6 +14,8 @@ namespace PvZA11y.Widgets
 {
     class ZenGarden : Widget
     {
+        string inputDescription = "\r\nInputs: Directions to move around garden, Confirm to use tool, Deny or Start to leave, Info1 to say plant on current tile, Info2 to say plant need on current tile, Info3 to say number of needy plants, CycleLeft/CycleRight to change tools, Option to visit the store";
+
         struct ZenTool
         {
             public float posX;
@@ -39,6 +41,7 @@ namespace PvZA11y.Widgets
             public int index;  //Index of plant within zengarden plant array
 
             public bool mushroomInMain; //Whether this plant is a nocturnal plant in the main garden
+            public bool aquaticInMain; //Whether this plant is a water plant in the main garden
         }
 
         //Plot positions for plants in zen mushroom garden
@@ -310,6 +313,9 @@ namespace PvZA11y.Widgets
                     if(gardenType == 0 && Program.IsNocturnal((SeedType)plant.id))
                         plant.mushroomInMain = true;
 
+                    if (gardenType == 0 && Program.IsAquatic((SeedType)plant.id))
+                        plant.aquaticInMain = true;
+
                     plants.Add(plant);
                 }
             }
@@ -343,7 +349,7 @@ namespace PvZA11y.Widgets
             int needyPlantCount = 0;
             foreach(ZenPlant plant in plants)
             {
-                if (plant.need != ZenPlantNeed.None || plant.mushroomInMain)
+                if (plant.need != ZenPlantNeed.None || plant.mushroomInMain || plant.aquaticInMain)
                     needyPlantCount++;
             }
 
@@ -484,6 +490,9 @@ namespace PvZA11y.Widgets
                         if (currentPlant.Value.mushroomInMain)
                             needInfo = "Nocturnal. Needs to be moved to mushroom garden";
 
+                        if (currentPlant.Value.aquaticInMain)
+                            needInfo = "Aquatic. Needs to be moved to aquarium garden";
+
                     }
                     Console.WriteLine(needInfo);
                     Program.Say(needInfo, true);
@@ -557,20 +566,25 @@ namespace PvZA11y.Widgets
         protected override string? GetContentUpdate()
         {
             RefreshState();
-
+            string addonText = Config.current.SayAvailableInputs ? inputDescription : "";
             switch (currentPage)
             {
                 case 0:
-                    return "Main garden";
+                    return "Main garden" + addonText;
                 case 1:
-                    return "Mushroom garden";
+                    return "Mushroom garden" + addonText;
                 case 3:
-                    return "Aquarium";
+                    return "Aquarium" + addonText;
                 case 4:
-                    return "Tree Of Wisdom";
+                    return "Tree Of Wisdom" + addonText;
                 default:
                     return null;
             }
+        }
+
+        protected override string? GetContent()
+        {
+            return "Zen Garden\r\n" + GetContentUpdate();
         }
     }
 }

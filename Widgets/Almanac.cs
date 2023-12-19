@@ -28,76 +28,32 @@ namespace PvZA11y.Widgets
 
         }
 
-        /*
-        void UpdatePageInteractions()
-        {
-            pageID = memIO.GetAlmanacPage(pointerChain);
-
-            //We reuse the seedpicker for plant page (AlmanacPage==1), as they're in the same layout and unlock state.
-            if (pageID == 0)
-            {
-                
-                widget.interactables = new WidgetInteractable[]
-                {
-                        new WidgetInteractable(){text = "Plants", relativePos = new Vector2(0.26f,0.6f)},
-                        new WidgetInteractable(){text = "Zombies", relativePos = new Vector2(0.74f,0.6f)},
-                        new WidgetInteractable(){text = "Close", relativePos = new Vector2(0.9f,0.95f)}
-                };
-            }
-            else if (AlmanacPage == 2)
-            {
-                //Use a sequential list for zombies, as dr.zomboss is in an inaccessible location (hard to find without vision)
-                //Could use a grid-based navigation, and jump all movement in the bottom row to dr.zomboss. But variable-width grids generally aren't nice for blind players.
-
-
-                //TODO: Add full zombie name, stats, description
-                //TODO MAYBE: Play identifiable sfx for each zombie (eg metal hit for bucket-head, pole-vault sfx, bungee sound)
-
-                //First levels you see each zombie type
-                int[] zombieLevels = new int[] { 1, 3, 6, 8, 11, 13, 16, 18, 18, 21, 23, 26, 26, 28, 31, 33, 36, 38, 40, 41, 43, 46, 48, 48, 50, 99, 99, 99, 99, 99, 99, 48, 99, 99, 99, 99 };
-
-                int playerLevel = memIO.GetPlayerLevel();
-                int adventureCompletions = mem.ReadInt(lawnAppPtr + ",94c,54");
-
-                List<WidgetInteractable> interactables = new List<WidgetInteractable>();
-                for (int i = 0; i <= (int)ZombieType.DrZomBoss; i++)
-                {
-                    string zombieDesc = ".\r\n" + zombieFullDescriptions[i];
-                    if (i == (int)ZombieType.Yeti)
-                    {
-                        if (adventureCompletions > 1 || (adventureCompletions > 0 && playerLevel >= zombieLevels[i]))
-                            interactables.Add(new WidgetInteractable() { text = ((ZombieType)i).ToString() + zombieDesc });
-                        else
-                            interactables.Add(new WidgetInteractable() { text = "Mystery Zombie. Not encountered yet." });
-                    }
-                    else if (adventureCompletions > 0 || playerLevel >= zombieLevels[i])
-                        interactables.Add(new WidgetInteractable() { text = ((ZombieType)i).ToString() + zombieDesc });
-                }
-
-                widget.interactables = interactables.ToArray();
-            }
-        }
-        */
-
         protected override string? GetContentUpdate()
         {
-            switch(pageID)
+            string inputText = "";
+            if (Config.current.SayAvailableInputs)
+                inputText = "\r\nInputs: Confirm to select, Deny to close, Directions to scroll options.";
+
+            switch (pageID)
             {
                 case 0:
-                    return "Almanac Index.";
+                    return "Almanac Index." + inputText;
                 case 1:
-                    return "Plants.";
+                    return "Plants." + inputText;
                 case 2:
-                    return "Zombies.";
+                    return "Zombies." + inputText;
             }
             return null;
         }
 
+        protected override string? GetContent()
+        {
+            return GetContentUpdate();
+        }
 
         public override void Interact(InputIntent intent)
         {
             int newPageID = memIO.GetAlmanacPage(pointerChain);
-            Console.WriteLine("Page id: " + newPageID);
             if(newPageID != pageID)
             {
                 pageID = newPageID;
@@ -117,8 +73,6 @@ namespace PvZA11y.Widgets
                     float clickY = (indexPosY + indexHeight / 2) / 600.0f;
 
                     string fullChain = indexChain + memIO.ptr.inlineButtonPosXOffset;
-                    Console.WriteLine("FullChain: {0}", fullChain);
-                    Console.WriteLine("x/y: {0},{1}", clickX, clickY);
 
                     Program.Click(clickX, clickY, false, false,100,true);
 
@@ -145,15 +99,6 @@ namespace PvZA11y.Widgets
                 hasUpdatedContents = true;
                 return;
             }
-
-
-            if (pageID == 1 && PlantPage.cursorX == 0 && PlantPage.cursorY == 0 && intent == InputIntent.Up)
-            {
-                //Shhhh! It's a secret! (Tree of Life tells you about it)
-                //If imitater unlocked, move to super secret cell.
-                if(memIO.GetPlayerPurchase(StoreItem.GameUpgradeImitater) == 1)
-                    PlantPage.cursorY = -1;
-            }
             
 
             switch(pageID)
@@ -162,7 +107,11 @@ namespace PvZA11y.Widgets
                     if(intent is InputIntent.Up or InputIntent.Down or InputIntent.Left or InputIntent.Right)
                     {
                         plantsSelected = !plantsSelected;
+                        string inputText = "";
+                        if (Config.current.SayAvailableInputs)
+                            inputText = "\r\nInputs: Confirm to select, Deny to close, Directions to scroll options.";
                         string text = plantsSelected ? "Plants" : "Zombies";
+                        text += inputText;
                         Console.WriteLine(text);
                         Program.Say(text, true);
 
@@ -186,13 +135,18 @@ namespace PvZA11y.Widgets
                             Program.Click(0.25f, 0.62f);
                         else
                             Program.Click(0.75f, 0.62f);
+                        hasUpdatedContents = true;
                     }
                     break;
                 case 1:
                     {
                         int prevX = PlantPage.cursorX;
                         int prevY = PlantPage.cursorY;
-                        PlantPage.Interact(intent);
+                        bool onImitater = false;
+                        if (prevY == 0 && prevX == 0 && intent is InputIntent.Up && Program.CheckOwnedPlant((int)SeedType.SEED_IMITATER))
+                            onImitater = true;
+                        else
+                            PlantPage.Interact(intent);
 
                         if(PlantPage.cursorX != prevX || PlantPage.cursorY != prevY)
                         {
@@ -220,7 +174,9 @@ namespace PvZA11y.Widgets
                             }
                             else
                             {
-                                //Click on plant in almanac, for visual update
+                                //Shhhh! It's a secret! (Tree of Life tells you about it)
+                                //If imitater unlocked, move to super secret cell.
+
                                 Program.MoveMouse(clickX, clickY);
                                 Program.Click(clickX, clickY);
 
@@ -231,6 +187,17 @@ namespace PvZA11y.Widgets
                                 plantInfo = Consts.plantNames[pickerIndex] + ": " + sunCost + " sun.\r\nRecharge time: " + rechargeText + Consts.plantFullDescriptions[pickerIndex];
                             }
 
+                            Console.WriteLine(plantInfo);
+                            Program.Say(plantInfo, true);
+                        }
+
+                        if(onImitater)
+                        {
+                            float clickX = 0.06f;
+                            float clickY = 0.1f;
+                            Program.MoveMouse(clickX, clickY);
+                            Program.Click(clickX, clickY);
+                            string plantInfo = Consts.plantNames[(int)SeedType.SEED_IMITATER] + ": " + Consts.plantFullDescriptions[(int)SeedType.SEED_IMITATER];
                             Console.WriteLine(plantInfo);
                             Program.Say(plantInfo, true);
                         }
