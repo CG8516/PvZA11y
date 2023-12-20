@@ -118,13 +118,14 @@ namespace PvZA11y.Widgets
 
             if (listIndex != lastIndex)
             {
-                //TODO: Play sound for index
+                if(listIndex < 0 || listIndex >= listItems.Length)
+                    Program.Vibrate(0.1f, 0.1f, 50);
                 ConfineInteractionIndex();
                 Vector2 mousePos = GetItemPos();
                 Program.MoveMouse(mousePos.X, mousePos.Y);
 
                 float freq = 1250.0f - ((((float)listIndex/(float)listItems.Length) * 5000.0f) / 5.0f);
-                Program.PlayTone(1.0f, 1.0f, freq, freq, 100, SignalGeneratorType.Sin);
+                Program.PlayTone(0.2f, 0.2f, freq, freq, 100, SignalGeneratorType.Sin);
 
                 Console.WriteLine(listItems[listIndex].text);
                 Program.Say(listItems[listIndex].text, true);

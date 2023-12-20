@@ -238,6 +238,8 @@ namespace PvZA11y
 
         static int drawStartX;
 
+        static long vibrationEnd;
+
         [DllImport("user32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         static extern bool GetWindowRect(IntPtr hWnd, ref RECT lpRect);
@@ -1405,6 +1407,13 @@ namespace PvZA11y
             return;
         }
 
+        public static void Vibrate(float leftStrength, float rightStrength, int length)
+        {
+            Console.WriteLine("Vibrating...");
+            XInput.SetVibration(0, leftStrength, rightStrength);
+            vibrationEnd = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() + length;
+        }
+
         public static bool CheckOwnedPlant(int plantID)
         {
             //All seeds <= 39 are unlocked if adventure mode has been completed
@@ -1756,6 +1765,8 @@ namespace PvZA11y
                     gameWHnd = gameProc.MainWindowHandle;
                 }
 
+                if (vibrationEnd <= DateTimeOffset.UtcNow.ToUnixTimeMilliseconds())
+                    XInput.SetVibration(0, 0, 0);
 
                 GameScene gameScene = (GameScene)memIO.GetGameScene();
                 /*
@@ -1942,8 +1953,17 @@ namespace PvZA11y
 
                 if (plantPacketReady && !packetWasReady && Config.current.BeepOnPacketReady)
                 {
-                    PlayTone(0.5f, 0.5f, 700, 700, 100, SignalGeneratorType.Square, 0);
-                    PlayTone(0.5f, 0.5f, 800, 800, 100, SignalGeneratorType.Square, 100);
+                    List<ToneProperties> tones = new List<ToneProperties>();
+                    tones.Add(new ToneProperties() { leftVolume = 0.4f, rightVolume = 0.4f, startFrequency = 698.46f, endFrequency = 698.46f, duration = 190, signalType = SignalGeneratorType.Sin, startDelay = 0 });
+                    tones.Add(new ToneProperties() { leftVolume = 0.4f, rightVolume = 0.4f, startFrequency = 880, endFrequency = 880, duration = 170, signalType = SignalGeneratorType.Sin, startDelay = 20 });
+                    tones.Add(new ToneProperties() { leftVolume = 0.4f, rightVolume = 0.4f, startFrequency = 1046.5f, endFrequency = 1046.5f, duration = 150, signalType = SignalGeneratorType.Sin, startDelay = 40 });
+                    //tones.Add(new ToneProperties() { leftVolume = 0.3f, rightVolume = 0.3f, startFrequency = 750, endFrequency = 750, duration = 200, signalType = SignalGeneratorType.Square, startDelay = 100 });
+                    //tones.Add(new ToneProperties() { leftVolume = 0.3f, rightVolume = 0.3f, startFrequency = 800, endFrequency = 800, duration = 200, signalType = SignalGeneratorType.Square, startDelay = 200 });
+                    //tones.Add(new ToneProperties() { leftVolume = 0.3f, rightVolume = 0.3f, startFrequency = 800, endFrequency = 800, duration = 200, signalType = SignalGeneratorType.Square, startDelay = 200 });
+                    //tones.Add(new ToneProperties() { leftVolume = 0.3f, rightVolume = 0.3f, startFrequency = 850, endFrequency = 850, duration = 200, signalType = SignalGeneratorType.Square, startDelay = 200 });
+                    PlayTones(tones);
+                    //PlayTone(0.5f, 0.5f, 700, 700, 100, SignalGeneratorType.Square, 0);
+                    //PlayTone(0.5f, 0.5f, 800, 800, 100, SignalGeneratorType.Square, 100);
                 }
 
                 packetWasReady = plantPacketReady;

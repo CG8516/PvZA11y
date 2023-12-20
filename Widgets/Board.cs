@@ -920,6 +920,9 @@ namespace PvZA11y.Widgets
                 starfruitTemplate = false;
 
             float rightVol = (float)gridInput.cursorX / (float)gridInput.width;
+            float leftVol = 1.0f - rightVol;
+            rightVol *= 0.4f;
+            leftVol *= 0.4f;
             float freq = 1000.0f - ((gridInput.cursorY * 500.0f) / (float)gridInput.height);
 
             var plant = Program.GetPlantAtCell(gridInput.cursorX, gridInput.cursorY);
@@ -947,7 +950,7 @@ namespace PvZA11y.Widgets
                 else if (hasGravestone)
                     plantInfoString = "Gravestone";
                 else if (vaseType != -1)
-                    plantInfoString = vaseType == 3 ? "Mystery vase" : vaseType == 4 ? "Plant vase" : "Zombie vase";
+                    plantInfoString = vaseType == 3 ? "Vase" : vaseType == 4 ? "Plant vase" : "Zombie vase";
                 else if (hasIce)
                     plantInfoString = "Ice";
                 else if (starfruitTemplate)
@@ -965,10 +968,10 @@ namespace PvZA11y.Widgets
                 }
 
                 if ((hasCrater || hasGravestone || vaseType != -1 || hasIce || starfruitTemplate || hasCirclePortal || hasSquarePortal) && beepOnFound)
-                    Program.PlayTone(1.0f- rightVol, rightVol, freq, freq, 100, SignalGeneratorType.SawTooth);
+                    Program.PlayTone(leftVol, rightVol, freq, freq, 100, SignalGeneratorType.SawTooth);
                 else if(beepOnEmpty)
                 {
-                    Program.PlayTone(1.0f- rightVol, rightVol, freq, freq, 50, SignalGeneratorType.Square);
+                    Program.PlayTone(leftVol, rightVol, freq, freq, 50, SignalGeneratorType.Square);
                     //Program.PlayTone(1.0f- rightVol, rightVol, freq-100, freq, 50, SignalGeneratorType.Square, 55);
                 }
             }
@@ -1099,7 +1102,10 @@ namespace PvZA11y.Widgets
                     plantInfoString += " and Square portal";
 
                 if (beepOnFound)
-                    Program.PlayTone(1.0f- rightVol, rightVol, freq, freq, 100, SignalGeneratorType.SawTooth);
+                {
+                    Program.PlayTone(leftVol, rightVol, freq, freq, 100, SignalGeneratorType.SawTooth);
+                    Program.Vibrate(0.3f, 0.3f, 50);
+                }
             }
 
             return plantInfoString;
@@ -1674,7 +1680,7 @@ namespace PvZA11y.Widgets
                 inBowling |= memIO.GetPlayerLevel() == 5 && ConveyorBeltCounter() > 0; //converyorBeltCounter >0, means we're passed the peashooter-shovelling part.
                 if (inBowling)
                 {
-                    if(!doneBowlingTutorial && Config.current.GameplayTutorial && gameMode != GameMode.WallnutBowling2)
+                    if (!doneBowlingTutorial && Config.current.GameplayTutorial && gameMode != GameMode.WallnutBowling2)
                     {
                         Program.GameplayTutorial(new string[] { "This is wall-nut bowling.", "Your deck at the top has been replaced with a conveyor belt.", "As you play, plants will arrive and build up on the conveyor belt.", "When you place a plant, it will be removed from the belt." });
                         Program.GameplayTutorial(new string[] { "You will be confined to the left three columns, and you will start receiving wall-nuts on the conveyor belt.", "When you place a wall-nut, it will roll from where you place it, to the right of the screen.", "Zombies will arrive as normal, and you must bowl them over to defend your house." });
@@ -1686,7 +1692,7 @@ namespace PvZA11y.Widgets
 
                 //bool inIZombie = gameMode >= (int)GameMode.PUZZLE_I_ZOMBIE_1 && gameMode <= (int)GameMode.PUZZLE_I_ZOMBIE_ENDLESS;
                 //if (inIZombie)
-                  //  minX = 4;
+                //  minX = 4;
 
                 bool inZomboss = gameMode == GameMode.DrZombossRevenge || (gameMode == GameMode.Adventure && memIO.GetPlayerLevel() == 50);
                 if (inZomboss)
@@ -1700,8 +1706,11 @@ namespace PvZA11y.Widgets
 
                 string totalTileInfoStr = "";
 
-                if(prevX == gridInput.cursorX && prevY == gridInput.cursorY)
-                    Program.PlayTone(1, 1, 70, 70, 50, SignalGeneratorType.Square);
+                if (prevX == gridInput.cursorX && prevY == gridInput.cursorY)
+                {
+                    Program.PlayTone(0.4f, 0.4f, 70, 70, 50, SignalGeneratorType.Square);
+                    Program.Vibrate(0.2f, 0.2f, 50);
+                }
                 else
                 {
                     float rightVol = (float)gridInput.cursorX / (float)gridInput.width;
@@ -1717,23 +1726,24 @@ namespace PvZA11y.Widgets
                             totalTileInfoStr += tileObjectInfo;
                     }
 
-                    if(inBeghouled && Config.current.BeghouledMatchAssist != 0)
+                    if (inBeghouled && Config.current.BeghouledMatchAssist != 0)
                     {
                         //OOOOHHH boy, this will be crazy
                         bool matchable = BeghouledMatchablePlant();
-                        if(matchable)
+                        if (matchable)
                         {
                             List<Program.ToneProperties> tones = new List<Program.ToneProperties>();
                             tones.Add(new Program.ToneProperties() { leftVolume = 1, rightVolume = 1, startFrequency = 700, endFrequency = 700, duration = 100, signalType = SignalGeneratorType.Sin, startDelay = 0 });
                             tones.Add(new Program.ToneProperties() { leftVolume = 1, rightVolume = 1, startFrequency = 800, endFrequency = 800, duration = 200, signalType = SignalGeneratorType.Sin, startDelay = 100 });
                             Program.PlayTones(tones);
+                            Program.Vibrate(1, 1, 100);
                         }
                     }
 
                     bool zombieFound = false;
-                    if(Config.current.SayZombieOnTileMove || Config.current.BeepWhenZombieFound)
+                    if (Config.current.SayZombieOnTileMove || Config.current.BeepWhenZombieFound)
                     {
-                        string? zombiesThisTile = GetZombieInfo(true,false,false,false);
+                        string? zombiesThisTile = GetZombieInfo(true, false, false, false);
                         if (zombiesThisTile != null)
                         {
                             zombieFound = true;
@@ -1757,18 +1767,18 @@ namespace PvZA11y.Widgets
                         }
                     }
 
-                    if(Config.current.ZombieSonarOnRowChange > 0 && prevY != gridInput.cursorY)
+                    if (Config.current.ZombieSonarOnRowChange > 0 && prevY != gridInput.cursorY)
                     {
                         string? zombiesThisRow = GetZombieInfo(false, (Config.current.ZombieSonarOnRowChange == 1 || Config.current.ZombieSonarOnRowChange == 2), Config.current.ZombieSonarOnRowChange == 1 || Config.current.ZombieSonarOnRowChange == 2, Config.current.ZombieSonarOnRowChange == 1, Config.current.ZombieSonarOnRowChange == 3);
                         if (zombiesThisRow == null)
                             zombiesThisRow = "No Zombies";
 
-                        if(Config.current.ZombieSonarOnRowChange == 1 || Config.current.ZombieSonarOnRowChange == 3)
+                        if (Config.current.ZombieSonarOnRowChange == 1 || Config.current.ZombieSonarOnRowChange == 3)
                             totalTileInfoStr += " " + zombiesThisRow;
                     }
 
 
-                    
+
                     if ((!plantFound || !Config.current.BeepWhenPlantFound) && !zombieFound)
                         Program.PlayTone(1.0f - rightVol, rightVol, freq, freq, 100, SignalGeneratorType.Sin);
                 }
@@ -1800,8 +1810,11 @@ namespace PvZA11y.Widgets
                 */
 
             }
-            else if(intent is InputIntent.Up or InputIntent.Down or InputIntent.Left or InputIntent.Right)
+            else if (intent is InputIntent.Up or InputIntent.Down or InputIntent.Left or InputIntent.Right)
+            {
                 Program.PlayTone(1, 1, 70, 70, 50, SignalGeneratorType.Square);
+                Program.Vibrate(0.2f, 0.2f, 50);
+            }
 
             bool inZombiquarium = gameMode == GameMode.Zombiquarium;
             //Dirty hack to allow scrolling to empty seedbank slot in zombiequarium (so placing brains can be a seedbank option)
@@ -1875,7 +1888,7 @@ namespace PvZA11y.Widgets
                     int zombieColumn = GetZombieColumn(cycleZombie.posX);
                     string tileName = ((char)('A' + zombieColumn)).ToString();
                     if (zombieColumn > 8)
-                        tileName = "Right";
+                        tileName = "Off-Board";
 
                     tileName += " " + (cycleZombie.row + 1) + ", ";
 
@@ -1918,7 +1931,10 @@ namespace PvZA11y.Widgets
                 PlacePlant(seedbankSlot, seedbankSize, plants[seedbankSlot].offsetX, false, true, true); //Move mouse cursor to aid sighted players in knowing which seed packet is selected
                 float frequency = 100.0f + (100.0f * seedbankSlot);
                 float rVolume = (float)seedbankSlot / (float)seedbankSize;
-                Program.PlayTone(1.0f - rVolume, rVolume, frequency, frequency, 100, SignalGeneratorType.Square);
+                float lVolume = 1.0f - rVolume;
+                rVolume *= 0.4f;
+                lVolume *= 0.4f;
+                Program.PlayTone(lVolume, rVolume, frequency, frequency, 100, SignalGeneratorType.Square);
 
                 if (inZombiquarium)
                 {

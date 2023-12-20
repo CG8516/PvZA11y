@@ -54,10 +54,16 @@ namespace PvZA11y.Widgets
                 {
                     float rightVol = (float)cursorX / (float)width;
                     float freq = 1000.0f - ((cursorY * 500.0f) / (float)height);
+                    float leftVol = 1.0f - rightVol;
+                    rightVol *= 0.4f;
+                    leftVol *= 0.4f;
                     if (prevX != cursorX || prevY != cursorY)
-                        Program.PlayTone(1.0f - rightVol, rightVol, freq, freq, 100, SignalGeneratorType.Sin);
+                        Program.PlayTone(leftVol, rightVol, freq, freq, 100, SignalGeneratorType.Sin);
                     else
-                        Program.PlayTone(1, 1, 70, 70, 50, SignalGeneratorType.Square);
+                    {
+                        Program.PlayTone(0.4f, 0.4f, 70, 70, 50, SignalGeneratorType.Square);
+                        Program.Vibrate(0.1f, 0.1f, 50);
+                    }
                 }
 
                 return true;

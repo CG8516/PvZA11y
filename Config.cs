@@ -36,7 +36,7 @@ namespace PvZA11y
             public bool KeyRepetition = true;
             public Dictionary<uint, InputIntent> keyBinds = new Dictionary<uint, InputIntent>();
             public Dictionary<GamepadButtons, InputIntent> controllerBinds = new Dictionary<GamepadButtons, InputIntent>();
-            public bool SayAvailableInputs = true;
+            public bool SayAvailableInputs = false; //Useful, but quickly gets annoying (doesn't stfu)
 
             //Gameplay
             public bool RequireShovelConfirmation = false;

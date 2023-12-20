@@ -122,7 +122,10 @@ namespace PvZA11y.Widgets
 
             //Accessibility settings hack
             if (listIndex == listItems.Length - 2)
+            {
                 accessibilitySettings = new Widgets.AccessibilitySettings(memIO);
+                accessibilitySettings.GetCurrentWidgetText();
+            }
         }
 
         public override void Interact(InputIntent intent)
