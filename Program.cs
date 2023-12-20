@@ -76,12 +76,6 @@ namespace PvZA11y
     internal class Program
     {
 
-
-
-        [DllImport("User32.dll")]
-        public static extern Int32 SetForegroundWindow(int hWnd);
-
-
         [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
         private static extern IntPtr GetForegroundWindow();
 
@@ -365,9 +359,6 @@ namespace PvZA11y
             int clickUpX = (int)(((upX * drawWidth)/ windowScale) + drawStartX);
             int clickUpY = (int)((upY * drawHeight)/ windowScale);
 
-            //if(Config.current.FocusOnInteract)
-                //SetForegroundWindow(gameWHnd.ToInt32()); //Bring window to front
-
             PostMessage(gameWHnd, WM_LBUTTONDOWN, 1, MakeLParam(clickX, clickY));
             Task.Delay(50).Wait();
             PostMessage(gameWHnd, WM_LBUTTONUP, 0, MakeLParam(clickUpX, clickUpY));
@@ -386,9 +377,6 @@ namespace PvZA11y
 
             uint clickDown = rightClick ? WM_RBUTTONDOWN : WM_LBUTTONDOWN;
             uint clickUp = rightClick ? WM_RBUTTONUP : WM_LBUTTONUP;
-
-            if (Config.current.FocusOnInteract)
-                SetForegroundWindow(gameWHnd.ToInt32());    //Bring window to front
 
             //Overwrite mouse position in widgetManager
             //mem.WriteMemory(lawnAppPtr + ",320,108", "int", clickX.ToString());

@@ -970,8 +970,11 @@ namespace PvZA11y.Widgets
                 }
 
                 if ((hasCrater || hasGravestone || vaseType != -1 || hasIce || starfruitTemplate || hasCirclePortal || hasSquarePortal) && beepOnFound)
+                {
                     Program.PlayTone(leftVol, rightVol, freq, freq, 100, SignalGeneratorType.SawTooth);
-                else if(beepOnEmpty)
+                    Program.Vibrate(0.3f, 0.3f, 50);
+                }
+                else if (beepOnEmpty)
                     Program.PlayTone(leftVol, rightVol, freq, freq, 50, SignalGeneratorType.Square);
             }
             else
@@ -1733,7 +1736,7 @@ namespace PvZA11y.Widgets
                             tones.Add(new Program.ToneProperties() { leftVolume = Config.current.BeghouledAssistVolume, rightVolume = Config.current.BeghouledAssistVolume, startFrequency = 700, endFrequency = 700, duration = 100, signalType = SignalGeneratorType.Sin, startDelay = 0 });
                             tones.Add(new Program.ToneProperties() { leftVolume = Config.current.BeghouledAssistVolume, rightVolume = Config.current.BeghouledAssistVolume, startFrequency = 800, endFrequency = 800, duration = 200, signalType = SignalGeneratorType.Sin, startDelay = 100 });
                             Program.PlayTones(tones);
-                            Program.Vibrate(1, 1, 100);
+                            Program.Vibrate(1, 1, 150);
                         }
                     }
 

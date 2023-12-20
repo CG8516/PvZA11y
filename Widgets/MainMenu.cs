@@ -72,7 +72,8 @@ namespace PvZA11y.Widgets
         {
             string titleString = "Main Menu";
             string bodyString = "\r\nWelcome back, " + memIO.mem.ReadString(memIO.ptr.lawnAppPtr + ",94c,04");  //TODO: Move this to memIO. //lawnapp,playerInfo,name
-            return titleString + bodyString;
+            string inputStr = "\r\nInputs: Up and down to scroll, Confirm button to select";
+            return titleString + bodyString + inputStr;
         }
 
         public override void Interact(InputIntent intent)

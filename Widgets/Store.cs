@@ -13,7 +13,7 @@ namespace PvZA11y.Widgets
     class Store : Widget
     {
 
-        string inputDescription = "\r\nInputs: Confirm to buy, Deny to close, Info1 to say owned coins, Horizontal directions and Cycle buttons to switch categories, Vertical directions to scroll items";
+        string inputDescription = "Inputs: Confirm to buy, Deny to close, Info1 to say coin balance, Horizontal directions and Cycle buttons to switch categories, Vertical directions to scroll items\r\n";
         public Store (MemoryIO memIO, string pointerChain) : base(memIO, pointerChain)
         {
             ReloadStore();
@@ -536,6 +536,8 @@ namespace PvZA11y.Widgets
                 storeItemIndex = storeItemIndex < 0 ? 0 : storeItemIndex;
                 storeItemIndex = storeItemIndex > lastItemIndex ? lastItemIndex : storeItemIndex;
             }
+            if (lastItemIndex == -1)
+                storeItemIndex = -1;
 
             bool finishedAdventure = memIO.GetAdventureCompletions() > 0;
             int level = memIO.GetPlayerLevel();
@@ -605,8 +607,6 @@ namespace PvZA11y.Widgets
 
             if (text.Length > 0)
             {
-                if (Config.current.SayAvailableInputs)
-                    text += inputDescription;
                 Console.WriteLine(text);
                 Program.Say(text, nvdaOverwrite);
             }
@@ -632,14 +632,12 @@ namespace PvZA11y.Widgets
             else if (finishedAdventure && storeItemIndex == -1)
                 text += "All plant upgrades have been obtained!";
 
-            if (Config.current.SayAvailableInputs)
-                text += inputDescription;
             return text;
         }
 
         protected override string? GetContent()
         {
-            return "Store\r\n" + GetContentUpdate();
+            return "Store\r\n" + inputDescription + GetContentUpdate();
         }
 
     }

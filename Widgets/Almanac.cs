@@ -31,8 +31,6 @@ namespace PvZA11y.Widgets
         protected override string? GetContentUpdate()
         {
             string inputText = "";
-            if (Config.current.SayAvailableInputs)
-                inputText = "\r\nInputs: Confirm to select, Deny to close, Directions to scroll options.";
 
             switch (pageID)
             {
@@ -48,7 +46,7 @@ namespace PvZA11y.Widgets
 
         protected override string? GetContent()
         {
-            return GetContentUpdate();
+            return GetContentUpdate() + "\r\nInputs: Confirm to select, Deny to close, Directions to scroll options.";
         }
 
         public override void Interact(InputIntent intent)
@@ -108,8 +106,6 @@ namespace PvZA11y.Widgets
                     {
                         plantsSelected = !plantsSelected;
                         string inputText = "";
-                        if (Config.current.SayAvailableInputs)
-                            inputText = "\r\nInputs: Confirm to select, Deny to close, Directions to scroll options.";
                         string text = plantsSelected ? "Plants" : "Zombies";
                         text += inputText;
                         Console.WriteLine(text);

@@ -45,27 +45,34 @@ namespace PvZA11y.Widgets
 
         static ListItem[] defaultList = new ListItem[]
         {
-            new ListItem(){relativePos = new Vector2(0.5f,0.5f), text = "Next"}
+            new ListItem(){text = "Repeat"},
+            new ListItem(){relativePos = new Vector2(0.5f,0.5f), text = "Next"},
         };
 
         public CrazyDave(MemoryIO memIO, string ptrChain, Widget? prevWidget = null) : base(memIO, ptrChain, defaultList)
         {
             this.prevWidget = prevWidget;
+            listIndex = 1;
             //currentMessageID = memIO.GetDaveMessageID();
         }
 
+        public override void ConfirmInteraction()
+        {
+            if(listIndex != 0)
+                base.ConfirmInteraction();
+        }
         public override void Interact(InputIntent intent)
         {
-            if (IsDaveReady())
+            if (IsDaveReady() && intent != InputIntent.Info1)
             {
                 UpdateInteractions();   //Bugfix, the yes/no buttons when buying seed slots gets messed up
                 base.Interact(intent);
             }
 
-            if (intent is InputIntent.Confirm or InputIntent.Deny)
+            if (intent is InputIntent.Confirm or InputIntent.Deny && listIndex != 0)
                 hasUpdatedContents = true;
 
-            if(intent is InputIntent.Info1)
+            if(intent is InputIntent.Info1 || (intent is InputIntent.Confirm && listIndex == 0))
             {
                 string? daveText = memIO.GetDaveMessageText();
                 if (daveText is null)
@@ -104,6 +111,7 @@ namespace PvZA11y.Widgets
 
                 listItems = new ListItem[]
                 {
+                    new ListItem(){text = "Repeat"},
                     new ListItem(){text = "Yes", relativePos = (memIO.GetWidgetButton1Pos(pointerChain) / memIO.GetWidgetSize(pointerChain)) + new Vector2(0.1f,0.1f)},
                     new ListItem(){text = "No", relativePos = (memIO.GetWidgetButton2Pos(pointerChain) / memIO.GetWidgetSize(pointerChain)) + new Vector2(0.1f,0.1f)}
                 };
@@ -112,6 +120,7 @@ namespace PvZA11y.Widgets
             {
                 listItems = new ListItem[]
                 {
+                    new ListItem(){text = "Repeat"},
                     new ListItem(){text = "Next", relativePos = new Vector2(0.5f,0.5f)}
                 };
             }

@@ -568,17 +568,16 @@ namespace PvZA11y.Widgets
         protected override string? GetContentUpdate()
         {
             RefreshState();
-            string addonText = Config.current.SayAvailableInputs ? inputDescription : "";
             switch (currentPage)
             {
                 case 0:
-                    return "Main garden" + addonText;
+                    return "Main garden";
                 case 1:
-                    return "Mushroom garden" + addonText;
+                    return "Mushroom garden";
                 case 3:
-                    return "Aquarium" + addonText;
+                    return "Aquarium";
                 case 4:
-                    return "Tree Of Wisdom" + addonText;
+                    return "Tree Of Wisdom";
                 default:
                     return null;
             }
@@ -586,7 +585,7 @@ namespace PvZA11y.Widgets
 
         protected override string? GetContent()
         {
-            return "Zen Garden\r\n" + GetContentUpdate();
+            return "Zen Garden\r\n" + GetContentUpdate() + inputDescription;
         }
     }
 }

@@ -36,54 +36,46 @@ namespace PvZA11y
             public bool KeyRepetition = true;
             public Dictionary<uint, InputIntent> keyBinds = new Dictionary<uint, InputIntent>();
             public Dictionary<GamepadButtons, InputIntent> controllerBinds = new Dictionary<GamepadButtons, InputIntent>();
-            public bool SayAvailableInputs = false; //Useful, but quickly gets annoying (doesn't stfu)
             public bool ControllerVibration = true;
 
             //Gameplay
             public bool RequireShovelConfirmation = false;
             public bool AutoCollectItems = true;
-            public bool SayTilePosOnMove = false;
             public bool GameplayTutorial = true;
-            public bool SayPlantOnTileMove = true;
-            //public bool BeepWhenPlantFound = true;
-            //public bool BeepWhenZombieFound = true;
-            public bool SayZombieOnTileMove = false;
-            public bool SayLawnmowerType = false;
-            //public bool FastZombieAlert = true;
-            //public bool BeepOnPacketReady = true;
+            public int ZombieSonarInterval = 3;
             public int ZombieSonarOnRowChange = 0;
-            //public bool ZombieEnterAlert = true;
-            public int BeghouledMatchAssist = 1;
-            public int ZombieSonarInterval = 0;
-            //public bool ZombieKilledIndicator = false;
-            public int ZombieCycleMode = 0;
+            public int ZombieCycleMode = 1;
             public bool MoveOnZombieCycle = true;
-            
+            public int BeghouledMatchAssist = 1;
+
+            //Narration
+            public bool SayTilePosOnMove = false;
+            public bool SayPlantOnTileMove = true;
+            public bool SayZombieOnTileMove = true;
+            public bool SayLawnmowerType = false;
+            public ScreenReaderSelection screenReaderSelection = ScreenReaderSelection.Auto;
 
             //Core functionality
             public bool RestartOnCrash = true;
             public bool MoveMouseCursor = true;
-            public bool FocusOnInteract = true;
 
             //Volumes
             public float MenuPositionCueVolume = 0.3f;
-            public float HitBoundaryVolume = 0.2f;
-            public float GridPositionCueVolume = 0.4f;
-            public float PlantSlotChangeVolume = 0.3f;
-            public float AutomaticZombieSonarVolume = 0.8f;
+            public float HitBoundaryVolume = 0.6f;
+            public float GridPositionCueVolume = 0.6f;
+            public float PlantSlotChangeVolume = 0.5f;
+            public float AutomaticZombieSonarVolume = 0.6f;
             public float ManualZombieSonarVolume = 1.0f;
             public float PlantReadyCueVolume = 0.3f;
-            public float FoundObjectCueVolume = 0.4f;
+            public float FoundObjectCueVolume = 0.6f;
             public float FastZombieCueVolume = 1.0f;
             public float DeadZombieCueVolume = 0.0f;
             public float ZombieOnTileVolume = 1.0f;
-            public float ZombieEntryVolume = 0.0f;
+            public float ZombieEntryVolume = 1.0f;
             public float BeghouledAssistVolume = 1.0f;
             public float MiscAlertCueVolume = 1.0f; //Not enough sun, refreshing, press start to begin, lawnmowers, etc..
             public float AudioCueMasterVolume = 1.0f;
 
-            public ScreenReaderSelection screenReaderSelection = ScreenReaderSelection.Auto;
-            
 
             [JsonIgnore]
             public IAccessibleOutput? ScreenReader = null;  //TODO: This really shouldn't be here

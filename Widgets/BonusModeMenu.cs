@@ -112,7 +112,8 @@ namespace PvZA11y.Widgets
 
         protected override string? GetContent()
         {
-            return listItems[listIndex].text;
+            string inputDesc = "Inputs: Up and down to scroll, Confirm to select, Deny to close\r\n";
+            return inputDesc + listItems[listIndex].text;
         }
 
         public override void Interact(InputIntent intent)

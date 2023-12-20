@@ -65,24 +65,16 @@ namespace PvZA11y.Widgets
             int bodyLen = memIO.mem.ReadInt(pointerChain + memIO.ptr.dialogBodyLenOffset);
             string titleString = "";
             if (titleLen <= 15)
-                titleString = memIO.mem.ReadString(pointerChain + memIO.ptr.dialogTitleStrOffset);
+                titleString = memIO.mem.ReadString(pointerChain + memIO.ptr.dialogTitleStrOffset,"", titleLen);
             else
                 titleString = memIO.mem.ReadString(pointerChain + memIO.ptr.dialogTitleStrOffset + ",0", "", titleLen);
             
             string bodyString = "";
             if (bodyLen > 0)
-            {
-                
                 bodyString = memIO.mem.ReadString(pointerChain + memIO.ptr.dialogBodyStrOffset + ",0", "", bodyLen);
-            }
             bodyString = bodyString.ReplaceLineEndings(" ");
 
             string completeString =  titleString + "\r\n" + bodyString;
-
-            if(Config.current.SayAvailableInputs)
-            {
-                completeString += "\r\nInputs: Confirm to select, Deny to reject, Info1 to repeat, Up and Down to scroll options.";
-            }
 
             if(shouldSay)
             {
@@ -150,7 +142,7 @@ namespace PvZA11y.Widgets
 
         protected override string? GetContent()
         {
-            return SayTitle(false);
+            return SayTitle(false) + "\r\nInputs: Confirm to select, Deny to reject, Info1 to repeat, Up and Down to scroll options.";
         }
 
     }

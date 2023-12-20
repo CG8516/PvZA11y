@@ -18,11 +18,7 @@ namespace PvZA11y.Widgets
             ListItem[] listItems = new ListItem[userNames.Length];
 
             for (int i = 0; i < userNames.Length; i++)
-            {
                 listItems[i] = new ListItem() { text = userNames[i], relativePos = new Vector2(0.2f, 0.3f + (0.05f * i)) };
-                if(Config.current.SayAvailableInputs)
-                    listItems[i].text += "\r\nInputs: Confirm to select, Deny to close, Info1 to rename, Info2 to delete, Directions to scroll.";
-            }
 
             return listItems;
         }
@@ -56,10 +52,18 @@ namespace PvZA11y.Widgets
         protected override string? GetContent()
         {
             string? baseContent = base.GetContent();
-            if (baseContent != null && Config.current.SayAvailableInputs)
-                baseContent += "Inputs: Confirm to select, Deny to close, Info1 to rename, Info2 to delete, Directions to scroll.";
+            if (baseContent != null)
+                baseContent += "Inputs: Up and Down to scroll, Confirm to select, Deny to close, Info1 to rename, Info2 to delete";
             return baseContent;
         }
+
+        public override string? SayTitle(bool shouldSay)
+        {
+            if(!shouldSay)
+                return base.SayTitle(shouldSay);
+            return null;
+        }
+
         public override void Interact(InputIntent intent)
         {
             base.Interact(intent);
@@ -84,13 +88,12 @@ namespace PvZA11y.Widgets
                     Vector2 clickPos = relativePos + new Vector2(0.5f, 0.7f);
                     Program.Click(clickPos);
                 }
-                else if (intent == InputIntent.Deny)
-                {
-                    //Click cancel button
-                    Vector2 clickPos = relativePos + new Vector2(0.4f, 0.78f);
-                    Program.Click(clickPos);
-                }
-
+            }
+            if (intent == InputIntent.Deny)
+            {
+                //Click cancel button
+                Vector2 clickPos = relativePos + new Vector2(0.4f, 0.78f);
+                Program.Click(clickPos);
             }
 
         }

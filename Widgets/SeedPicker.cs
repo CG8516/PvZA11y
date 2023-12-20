@@ -11,7 +11,7 @@ namespace PvZA11y.Widgets
 {
     class SeedPicker : Widget
     {
-        string inputDescription = "\r\nInputs: Directional input to Navigate grid, Confirm to select/deselect plant, Back to pause, Start to start level, Info1 to list zombies in level, CycleLeft/CycleRight to list selected plants.";
+        string inputDescription = "\r\nInputs: Directional input to Navigate grid, Confirm to select/deselect plant, Deny to pause, Start to start level, Info1 to list zombies in level, CycleLeft/CycleRight to list selected plants.\r\n";
 
         GridInput gridInput;
         int pickedPlantIndex;   //Currently selected slot of the picked plants row (at the top of the screen)
@@ -352,8 +352,6 @@ namespace PvZA11y.Widgets
 
                 Program.PlayTone(Config.current.MiscAlertCueVolume, Config.current.MiscAlertCueVolume, 300, 300, 100, SignalGeneratorType.Triangle);
                 string errorString = "Please select " + (seedBankSize - pickedCount) + " more plant" + (seedBankSize - pickedCount > 1 ? "s" : "") + " to begin";
-                if (Config.current.SayAvailableInputs)
-                    errorString += inputDescription;
                 Console.WriteLine(errorString);
                 Program.Say(errorString, true);
             }
@@ -378,8 +376,6 @@ namespace PvZA11y.Widgets
                 foreach(int zombieType in zombieTypes)
                     totalZombieTypeString += Consts.zombieNames[zombieType] + ", ";
 
-                if (Config.current.SayAvailableInputs)
-                    totalZombieTypeString += inputDescription;
                 Console.WriteLine(totalZombieTypeString);
                 Program.Say(totalZombieTypeString);
 
@@ -435,10 +431,7 @@ namespace PvZA11y.Widgets
             int sunCost = Consts.plantCosts[0];
             string plantInfo = Consts.plantNames[0] + ": " + sunCost + ": " + Consts.plantDescriptions[0];
 
-            info += "\r\n" + plantInfo;
-            if (Config.current.SayAvailableInputs)
-                info += inputDescription;
-            return info;
+            return info += inputDescription + plantInfo;
         }
     }
 }

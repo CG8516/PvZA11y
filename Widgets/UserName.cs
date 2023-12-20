@@ -58,10 +58,13 @@ namespace PvZA11y.Widgets
                     Program.Say(nameText);
                     prevName = nameText;
                 }
-                
+
                 //If we're no longer in the username dialogue, break out of this (prevent hanging if we don't catch the dialogue close)
                 if (memIO.mem.ReadUInt(pointerChain + ",0") != memIO.ptr.widgetType.UserName)
+                {
+                    Program.input.ClearIntents();
                     return;
+                }
             }
 
             //Game already handles enter key input, oops didn't need this (left just in case we need to overwrite that keyboard-checking function in the future)
@@ -93,7 +96,7 @@ namespace PvZA11y.Widgets
                 cancelButtonPos += parentPos;
                 Program.Click(cancelButtonPos);
             }
-            
+
             Program.input.WaitForNoInput(); //Wait until the user isn't pressing any keys/buttons, and clear any potential input intents which were added
         }
 
