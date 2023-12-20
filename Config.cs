@@ -37,6 +37,7 @@ namespace PvZA11y
             public Dictionary<uint, InputIntent> keyBinds = new Dictionary<uint, InputIntent>();
             public Dictionary<GamepadButtons, InputIntent> controllerBinds = new Dictionary<GamepadButtons, InputIntent>();
             public bool SayAvailableInputs = false; //Useful, but quickly gets annoying (doesn't stfu)
+            public bool ControllerVibration = true;
 
             //Gameplay
             public bool RequireShovelConfirmation = false;
@@ -44,17 +45,17 @@ namespace PvZA11y
             public bool SayTilePosOnMove = false;
             public bool GameplayTutorial = true;
             public bool SayPlantOnTileMove = true;
-            public bool BeepWhenPlantFound = true;
-            public bool BeepWhenZombieFound = true;
+            //public bool BeepWhenPlantFound = true;
+            //public bool BeepWhenZombieFound = true;
             public bool SayZombieOnTileMove = false;
             public bool SayLawnmowerType = false;
-            public bool FastZombieAlert = true;
-            public bool BeepOnPacketReady = true;
+            //public bool FastZombieAlert = true;
+            //public bool BeepOnPacketReady = true;
             public int ZombieSonarOnRowChange = 0;
-            public bool ZombieEnterAlert = true;
+            //public bool ZombieEnterAlert = true;
             public int BeghouledMatchAssist = 1;
             public int ZombieSonarInterval = 0;
-            public bool ZombieKilledIndicator = false;
+            //public bool ZombieKilledIndicator = false;
             public int ZombieCycleMode = 0;
             public bool MoveOnZombieCycle = true;
             
@@ -63,7 +64,24 @@ namespace PvZA11y
             public bool RestartOnCrash = true;
             public bool MoveMouseCursor = true;
             public bool FocusOnInteract = true;
-            public float AudioCueVolume = 1.0f;
+
+            //Volumes
+            public float MenuPositionCueVolume = 0.3f;
+            public float HitBoundaryVolume = 0.2f;
+            public float GridPositionCueVolume = 0.4f;
+            public float PlantSlotChangeVolume = 0.3f;
+            public float AutomaticZombieSonarVolume = 0.8f;
+            public float ManualZombieSonarVolume = 1.0f;
+            public float PlantReadyCueVolume = 0.3f;
+            public float FoundObjectCueVolume = 0.4f;
+            public float FastZombieCueVolume = 1.0f;
+            public float DeadZombieCueVolume = 0.0f;
+            public float ZombieOnTileVolume = 1.0f;
+            public float ZombieEntryVolume = 0.0f;
+            public float BeghouledAssistVolume = 1.0f;
+            public float MiscAlertCueVolume = 1.0f; //Not enough sun, refreshing, press start to begin, lawnmowers, etc..
+            public float AudioCueMasterVolume = 1.0f;
+
             public ScreenReaderSelection screenReaderSelection = ScreenReaderSelection.Auto;
             
 

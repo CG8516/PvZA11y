@@ -422,7 +422,10 @@ namespace PvZA11y.Widgets
             {
                 float frequency = 100.0f + (100.0f * toolIndex);
                 float rVolume = (float)toolIndex / (float)ZenTools.Count;
-                Program.PlayTone(1.0f - rVolume, rVolume, frequency, frequency, 100, SignalGeneratorType.Square);
+                float lVolume = 1.0f - rVolume;
+                lVolume *= Config.current.PlantSlotChangeVolume;
+                rVolume *= Config.current.PlantSlotChangeVolume;
+                Program.PlayTone(lVolume, rVolume, frequency, frequency, 100, SignalGeneratorType.Square);
 
                 Console.WriteLine(ZenTools[toolIndex].name);
                 Program.Say(ZenTools[toolIndex].name, true);
@@ -444,26 +447,25 @@ namespace PvZA11y.Widgets
 
                 if (prevX != gridInput.cursorX || prevY != gridInput.cursorY)
                 {
-                    
 
-                    float rightVol = gridInput.cursorX / (float)gridInput.width;
-                    float leftVol = 1.0f - rightVol;
 
+                    float rVolume = gridInput.cursorX / (float)gridInput.width;
+                    float lVolume = 1.0f - rVolume;
+                    lVolume *= Config.current.GridPositionCueVolume;
+                    rVolume *= Config.current.GridPositionCueVolume;
                     float freq = 1000.0f - ((gridInput.cursorY * 500.0f) / 5.0f);
                     if (currentPlant is null || currentPlant?.need == ZenPlantNeed.None)
-                        Program.PlayTone(leftVol, rightVol, freq, freq, 100, SignalGeneratorType.Sin);
+                        Program.PlayTone(lVolume, rVolume, freq, freq, 100, SignalGeneratorType.Sin);
                     else
-                        Program.PlayTone(leftVol, rightVol, freq, freq, 100, SignalGeneratorType.Square);
+                        Program.PlayTone(lVolume, rVolume, freq, freq, 100, SignalGeneratorType.Square);
 
                     //Move cursor to plant grid for sighted players
-                    Vector2 cellPos = GetGardenCellPosition() + new Vector2(0.02f,0.02f);
+                    Vector2 cellPos = GetGardenCellPosition() + new Vector2(0.02f, 0.02f);
                     Program.MoveMouse(cellPos.X, cellPos.Y);
 
                 }
-                else if(intent is InputIntent.Up or InputIntent.Down or InputIntent.Left or InputIntent.Right)
-                {
-                    Program.PlayTone(1, 1, 70, 70, 50, SignalGeneratorType.Square);
-                }
+                else if (intent is InputIntent.Up or InputIntent.Down or InputIntent.Left or InputIntent.Right)
+                    Program.PlayBoundaryTone();
             }
 
             if (currentPage <= 3)

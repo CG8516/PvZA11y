@@ -466,7 +466,7 @@ namespace PvZA11y.Widgets
                     text = "Purchase complete!";
                     Console.WriteLine(text);
                     Program.Say(text, true);
-                    Program.PlayTone(0.8f, 0.8f, 800, 800, 200, SignalGeneratorType.Sin);
+                    Program.PlayTone(Config.current.MiscAlertCueVolume, Config.current.MiscAlertCueVolume, 800, 800, 200, SignalGeneratorType.Sin);
 
                     ReloadStore();
                     hasUpdatedContents = true;
@@ -478,7 +478,7 @@ namespace PvZA11y.Widgets
                     text = "Cancelled.";
                     Console.WriteLine(text);
                     Program.Say(text, true);
-                    Program.PlayTone(0.6f, 0.6f, 333, 333, 100, SignalGeneratorType.Sin);
+                    Program.PlayTone(Config.current.MiscAlertCueVolume, Config.current.MiscAlertCueVolume, 333, 333, 100, SignalGeneratorType.Sin);
                     hasUpdatedContents = true;
                     return;
                 }
@@ -526,8 +526,16 @@ namespace PvZA11y.Widgets
 
             int lastItemIndex = storePages[storePage].entries.Count - 1;
 
-            storeItemIndex = storeItemIndex < 0 ? 0 : storeItemIndex;
-            storeItemIndex = storeItemIndex > lastItemIndex ? lastItemIndex : storeItemIndex;
+            if(Config.current.WrapCursorInMenus)
+            {
+                storeItemIndex = storeItemIndex < 0 ? lastItemIndex : storeItemIndex;
+                storeItemIndex = storeItemIndex > lastItemIndex ? 0 : storeItemIndex;
+            }
+            else
+            {
+                storeItemIndex = storeItemIndex < 0 ? 0 : storeItemIndex;
+                storeItemIndex = storeItemIndex > lastItemIndex ? lastItemIndex : storeItemIndex;
+            }
 
             bool finishedAdventure = memIO.GetAdventureCompletions() > 0;
             int level = memIO.GetPlayerLevel();
@@ -535,10 +543,12 @@ namespace PvZA11y.Widgets
 
             bool nullInteraction = intent == InputIntent.Confirm && storeItemIndex == -1;
 
+            float freq = 1250.0f - ((((float)storeItemIndex / (float)lastItemIndex) * 5000.0f) / 5.0f);
+
             if (shouldReadItem && storeItemIndex == prevItemIndex && prevStorePage == storePage)
-                Program.PlayTone(0.8f, 0.8f, 200, 200, 50, SignalGeneratorType.Sin);
+                Program.PlayBoundaryTone();
             else if (shouldReadItem)
-                Program.PlayTone(0.8f, 0.8f, 400, 400, 100, SignalGeneratorType.Sin);
+                Program.PlayTone(Config.current.MenuPositionCueVolume, Config.current.MenuPositionCueVolume, freq, freq, 100, SignalGeneratorType.Sin);
 
             if (shouldReadItem && storeItemIndex != -1)
             {
@@ -550,19 +560,19 @@ namespace PvZA11y.Widgets
             {
                 text += "Keep playing adventure mode to unlock this section.";
                 if (intent == InputIntent.Confirm)
-                    Program.PlayTone(0.8f, 0.8f, 400, 400, 100, SignalGeneratorType.Square);
+                    Program.PlayBoundaryTone();
             }
             else if ((shouldReadItem || nullInteraction) && !finishedAdventure)
             {
                 text += "Keep playing adventure mode to unlock more upgrades.";
                 if (intent == InputIntent.Confirm)
-                    Program.PlayTone(0.8f, 0.8f, 400, 400, 100, SignalGeneratorType.Square);
+                    Program.PlayBoundaryTone();
             }
             else if ((shouldReadItem || nullInteraction) && finishedAdventure && storeItemIndex == -1)
             {
                 text += "All plant upgrades have been obtained!";
                 if (intent == InputIntent.Confirm)
-                    Program.PlayTone(0.8f, 0.8f, 400, 400, 100, SignalGeneratorType.Square);
+                    Program.PlayBoundaryTone();
             }
             else if (storeItemIndex != -1)
             {
@@ -571,7 +581,7 @@ namespace PvZA11y.Widgets
                     if (storePages[storePage].entries[storeItemIndex].outOfStock)
                     {
                         text = "Item out of stock!";
-                        Program.PlayTone(0.6f, 0.6f, 333, 333, 100, SignalGeneratorType.Sin);
+                        Program.PlayTone(Config.current.MiscAlertCueVolume, Config.current.MiscAlertCueVolume, 333, 333, 100, SignalGeneratorType.Sin);
                     }
                     else if (playerCoinCount < storePages[storePage].entries[storeItemIndex].price)
                     {

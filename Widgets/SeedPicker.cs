@@ -187,6 +187,8 @@ namespace PvZA11y.Widgets
             {
                 float rightVol = gridInput.cursorX / 7.0f;
                 float leftVol = 1.0f - rightVol;
+                leftVol *= Config.current.GridPositionCueVolume;
+                rightVol *= Config.current.GridPositionCueVolume;
 
                 float startFrequency = 400 + (((7 - gridInput.cursorY) + 1) * 100);
                 float endFrequency = startFrequency;
@@ -213,7 +215,7 @@ namespace PvZA11y.Widgets
                 PlantIssue issue = FindPlantIssues((SeedType)pickerIndex);
                 string plantInfo = "";
 
-                switch(issue)
+                switch (issue)
                 {
                     case PlantIssue.Aquatic:
                         plantInfo = "Aquatic. Not recommended. ";
@@ -259,7 +261,7 @@ namespace PvZA11y.Widgets
 
             }
             else if (intent is InputIntent.Up or InputIntent.Down or InputIntent.Left or InputIntent.Right)
-                Program.PlayTone(1, 1, 70, 70, 50, SignalGeneratorType.Square);
+                Program.PlayBoundaryTone();
 
 
             if (intent == InputIntent.CycleRight)
@@ -287,7 +289,10 @@ namespace PvZA11y.Widgets
 
                 float frequency = 100.0f + (100.0f * pickedPlantIndex);
                 float rVolume = (float)pickedPlantIndex / (float)seedBankSize;
-                Program.PlayTone(1.0f - rVolume, rVolume, frequency, frequency, 100, SignalGeneratorType.Square);
+                float lVolume = 1.0f - rVolume;
+                lVolume *= Config.current.PlantSlotChangeVolume;
+                rVolume *= Config.current.PlantSlotChangeVolume;
+                Program.PlayTone(lVolume, rVolume, frequency, frequency, 100, SignalGeneratorType.Square);
 
                 int friendlySlotNumber = pickedPlantIndex + 1;
 
@@ -312,7 +317,7 @@ namespace PvZA11y.Widgets
                 PlantIssue issue = FindPlantIssues((SeedType)pickerIndex);
                 if(issue is PlantIssue.NotAllowed)
                 {
-                    Program.PlayTone(1, 1, 300, 300, 100, SignalGeneratorType.Triangle);
+                    Program.PlayTone(Config.current.MiscAlertCueVolume, Config.current.MiscAlertCueVolume, 300, 300, 100, SignalGeneratorType.Triangle);
                     string alertStr = "That plant is not allowed on this level.";
                     Console.WriteLine(alertStr);
                     Program.Say(alertStr);
@@ -326,7 +331,7 @@ namespace PvZA11y.Widgets
                 {
                     //If player tries to add seed to an alread-full seedbank, play a tone
                     if (seedState == ChosenSeedState.InChooser && startPickCount == seedBankSize)
-                        Program.PlayTone(1, 1, 300, 300, 100, SignalGeneratorType.Triangle);
+                        Program.PlayTone(Config.current.MiscAlertCueVolume, Config.current.MiscAlertCueVolume, 300, 300, 100, SignalGeneratorType.Triangle);
                     else
                         Program.Click(clickX, clickY);
                 }
@@ -345,7 +350,7 @@ namespace PvZA11y.Widgets
                     return;
                 }
 
-                Program.PlayTone(1, 1, 300, 300, 100, SignalGeneratorType.Triangle);
+                Program.PlayTone(Config.current.MiscAlertCueVolume, Config.current.MiscAlertCueVolume, 300, 300, 100, SignalGeneratorType.Triangle);
                 string errorString = "Please select " + (seedBankSize - pickedCount) + " more plant" + (seedBankSize - pickedCount > 1 ? "s" : "") + " to begin";
                 if (Config.current.SayAvailableInputs)
                     errorString += inputDescription;

@@ -118,20 +118,20 @@ namespace PvZA11y.Widgets
 
             if (listIndex != lastIndex)
             {
-                if(listIndex < 0 || listIndex >= listItems.Length)
+                if (listIndex < 0 || listIndex >= listItems.Length)
                     Program.Vibrate(0.1f, 0.1f, 50);
                 ConfineInteractionIndex();
                 Vector2 mousePos = GetItemPos();
                 Program.MoveMouse(mousePos.X, mousePos.Y);
 
-                float freq = 1250.0f - ((((float)listIndex/(float)listItems.Length) * 5000.0f) / 5.0f);
-                Program.PlayTone(0.2f, 0.2f, freq, freq, 100, SignalGeneratorType.Sin);
+                float freq = 1250.0f - ((((float)listIndex / (float)listItems.Length) * 5000.0f) / 5.0f);
+                Program.PlayTone(Config.current.MenuPositionCueVolume, Config.current.MenuPositionCueVolume, freq, freq, 100, SignalGeneratorType.Sin);
 
                 Console.WriteLine(listItems[listIndex].text);
                 Program.Say(listItems[listIndex].text, true);
             }
             else if (intent is (InputIntent.Up or InputIntent.Down))
-                Program.PlayTone(1, 1, 70, 70, 50, SignalGeneratorType.Square);
+                Program.PlayBoundaryTone();
         }
 
         private void ConfineInteractionIndex()

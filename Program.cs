@@ -1362,10 +1362,15 @@ namespace PvZA11y
             waveOutEvents.Add(waveOutEvent);
         }
 
+        public static void PlayBoundaryTone()
+        {
+            PlayTone(Config.current.HitBoundaryVolume, Config.current.HitBoundaryVolume, 70, 70, 50, SignalGeneratorType.Square);
+            Vibrate(0.1f, 0.1f, 50);
+        }
         public static void PlayTone(float leftVolume, float rightVolume, float startFrequency, float endFrequency, float duration, SignalGeneratorType signalType = SignalGeneratorType.Sweep, int startDelay = 0)
         {            
-            leftVolume *= Config.current.AudioCueVolume;
-            rightVolume *= Config.current.AudioCueVolume;
+            leftVolume *= Config.current.AudioCueMasterVolume;
+            rightVolume *= Config.current.AudioCueMasterVolume;
 
             if (leftVolume == 0 && rightVolume == 0)
                 return;
@@ -1409,7 +1414,8 @@ namespace PvZA11y
 
         public static void Vibrate(float leftStrength, float rightStrength, int length)
         {
-            Console.WriteLine("Vibrating...");
+            if (!Config.current.ControllerVibration)
+                return;
             XInput.SetVibration(0, leftStrength, rightStrength);
             vibrationEnd = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() + length;
         }
@@ -1858,12 +1864,12 @@ namespace PvZA11y
                         packetWasReady = false;
 
                     prevSeedbankSlot = ((Board)currentWidget).seedbankSlot;
-                    if(Config.current.ZombieKilledIndicator)
+                    if(Config.current.DeadZombieCueVolume > 0)
                     {
                         List<ToneProperties> tones = ((Board)currentWidget).FindDeadZombies();
                         PlayTones(tones);
                     }
-                    if (Config.current.ZombieEnterAlert)
+                    if (Config.current.ZombieEntryVolume > 0)
                     {
                         var enteredZombies = ((Board)currentWidget).GetZombies(false, true);
                         List<ToneProperties> zombieTones = new List<ToneProperties>();
@@ -1873,7 +1879,7 @@ namespace PvZA11y
                             if (enteredZombies.Any(zom => zom.row == z))
                             {
                                 float freq = 1000.0f - ((z * 500.0f) / boardHeight);
-                                zombieTones.Add(new ToneProperties() { leftVolume = 0, rightVolume = 1, startFrequency = freq, endFrequency = freq, duration = 100, signalType = SignalGeneratorType.Sin, startDelay = z * 200 });
+                                zombieTones.Add(new ToneProperties() { leftVolume = 0, rightVolume = Config.current.ZombieEntryVolume, startFrequency = freq, endFrequency = freq, duration = 100, signalType = SignalGeneratorType.Sin, startDelay = z * 200 });
                             }
                         }
                         PlayTones(zombieTones);
@@ -1901,6 +1907,8 @@ namespace PvZA11y
                             {
                                 float rVolume = zombie.posX / 900.0f;
                                 float lVolume = 1.0f - rVolume;
+                                rVolume *= Config.current.AutomaticZombieSonarVolume;
+                                lVolume *= Config.current.AutomaticZombieSonarVolume;
                                 int startDelay = (int)(zombie.posX / 2.0f);
                                 float freq = 1000.0f - ((zombie.row * 500.0f) / (float)((Board)currentWidget).gridInput.height);
                                 if (startDelay > 1000 || startDelay < 0)
@@ -1938,32 +1946,25 @@ namespace PvZA11y
                     }
                 }
 
-                if(thisFastZombieCount > prevFastZombieCount && Config.current.FastZombieAlert)
+                if(thisFastZombieCount > prevFastZombieCount && Config.current.FastZombieCueVolume > 0)
                 {
-                    //play warning
                     List<ToneProperties> tones = new List<ToneProperties>();
-                    tones.Add(new ToneProperties() { leftVolume = 1, rightVolume = 1, startFrequency = 500, endFrequency = 1000, duration = 200, signalType = SignalGeneratorType.Sweep, startDelay = 0 });
-                    tones.Add(new ToneProperties() { leftVolume = 1, rightVolume = 1, startFrequency = 1000, endFrequency = 500, duration = 200, signalType = SignalGeneratorType.Sweep, startDelay = 0 });
-                    tones.Add(new ToneProperties() { leftVolume = 1, rightVolume = 1, startFrequency = 500, endFrequency = 1000, duration = 200, signalType = SignalGeneratorType.Sweep, startDelay = 200 });
-                    tones.Add(new ToneProperties() { leftVolume = 1, rightVolume = 1, startFrequency = 1000, endFrequency = 500, duration = 200, signalType = SignalGeneratorType.Sweep, startDelay = 200 });
+                    tones.Add(new ToneProperties() { leftVolume = Config.current.FastZombieCueVolume, rightVolume = Config.current.FastZombieCueVolume, startFrequency = 500, endFrequency = 1000, duration = 200, signalType = SignalGeneratorType.Sweep, startDelay = 0 });
+                    tones.Add(new ToneProperties() { leftVolume = Config.current.FastZombieCueVolume, rightVolume = Config.current.FastZombieCueVolume, startFrequency = 1000, endFrequency = 500, duration = 200, signalType = SignalGeneratorType.Sweep, startDelay = 0 });
+                    tones.Add(new ToneProperties() { leftVolume = Config.current.FastZombieCueVolume, rightVolume = Config.current.FastZombieCueVolume, startFrequency = 500, endFrequency = 1000, duration = 200, signalType = SignalGeneratorType.Sweep, startDelay = 200 });
+                    tones.Add(new ToneProperties() { leftVolume = Config.current.FastZombieCueVolume, rightVolume = Config.current.FastZombieCueVolume, startFrequency = 1000, endFrequency = 500, duration = 200, signalType = SignalGeneratorType.Sweep, startDelay = 200 });
                     PlayTones(tones);
                 }
 
                 prevFastZombieCount = thisFastZombieCount;
 
-                if (plantPacketReady && !packetWasReady && Config.current.BeepOnPacketReady)
+                if (plantPacketReady && !packetWasReady && Config.current.PlantReadyCueVolume > 0)
                 {
                     List<ToneProperties> tones = new List<ToneProperties>();
-                    tones.Add(new ToneProperties() { leftVolume = 0.4f, rightVolume = 0.4f, startFrequency = 698.46f, endFrequency = 698.46f, duration = 190, signalType = SignalGeneratorType.Sin, startDelay = 0 });
-                    tones.Add(new ToneProperties() { leftVolume = 0.4f, rightVolume = 0.4f, startFrequency = 880, endFrequency = 880, duration = 170, signalType = SignalGeneratorType.Sin, startDelay = 20 });
-                    tones.Add(new ToneProperties() { leftVolume = 0.4f, rightVolume = 0.4f, startFrequency = 1046.5f, endFrequency = 1046.5f, duration = 150, signalType = SignalGeneratorType.Sin, startDelay = 40 });
-                    //tones.Add(new ToneProperties() { leftVolume = 0.3f, rightVolume = 0.3f, startFrequency = 750, endFrequency = 750, duration = 200, signalType = SignalGeneratorType.Square, startDelay = 100 });
-                    //tones.Add(new ToneProperties() { leftVolume = 0.3f, rightVolume = 0.3f, startFrequency = 800, endFrequency = 800, duration = 200, signalType = SignalGeneratorType.Square, startDelay = 200 });
-                    //tones.Add(new ToneProperties() { leftVolume = 0.3f, rightVolume = 0.3f, startFrequency = 800, endFrequency = 800, duration = 200, signalType = SignalGeneratorType.Square, startDelay = 200 });
-                    //tones.Add(new ToneProperties() { leftVolume = 0.3f, rightVolume = 0.3f, startFrequency = 850, endFrequency = 850, duration = 200, signalType = SignalGeneratorType.Square, startDelay = 200 });
+                    tones.Add(new ToneProperties() { leftVolume = Config.current.PlantReadyCueVolume, rightVolume = Config.current.PlantReadyCueVolume, startFrequency = 698.46f, endFrequency = 698.46f, duration = 190, signalType = SignalGeneratorType.Sin, startDelay = 0 });
+                    tones.Add(new ToneProperties() { leftVolume = Config.current.PlantReadyCueVolume, rightVolume = Config.current.PlantReadyCueVolume, startFrequency = 880, endFrequency = 880, duration = 170, signalType = SignalGeneratorType.Sin, startDelay = 20 });
+                    tones.Add(new ToneProperties() { leftVolume = Config.current.PlantReadyCueVolume, rightVolume = Config.current.PlantReadyCueVolume, startFrequency = 1046.5f, endFrequency = 1046.5f, duration = 150, signalType = SignalGeneratorType.Sin, startDelay = 40 });
                     PlayTones(tones);
-                    //PlayTone(0.5f, 0.5f, 700, 700, 100, SignalGeneratorType.Square, 0);
-                    //PlayTone(0.5f, 0.5f, 800, 800, 100, SignalGeneratorType.Square, 100);
                 }
 
                 packetWasReady = plantPacketReady;
@@ -1975,10 +1976,7 @@ namespace PvZA11y
                 {
                     Console.WriteLine(currentWidgetText);
                     Say(currentWidgetText);
-                    //screenreader output
                 }
-                //ReadCurrentWidgetText(ref currentWidget);
-                //WidgetInteraction(ref currentWidget);
 
                 if (currentWidget is SeedPicker)
                 {
@@ -2002,29 +2000,8 @@ namespace PvZA11y
                     else
                         playedPlantFullIndicator = false;
                 }
-
-
-                //Debug setting. Won't be accurate in fullscreen, or if cursor is outside of window.
-                //Just used to grab positions of clickable items during development
-                //Kept here, in case somebody wants to add support for other clickable items.
-                /*
-                bool qDown = NativeKeyboard.IsKeyDown(VIRTUALKEY.VK_Q);
-                if (qDown && !qHeld)
-                    printCursorPos = !printCursorPos;
-                qHeld = qDown;
-                if(printCursorPos)
-                {
-                    float mouseX = (float)mem.ReadInt(dirtyBoardPtr + ",A4,3A0,D20");
-                    float mouseY = (float)mem.ReadInt(dirtyBoardPtr + ",A4,3A0,D24");
-                    //float mouseX = (float)mem.ReadInt(boardPtr + ",A4,3A0,D20");
-                    //float mouseY = (float)mem.ReadInt(boardPtr + ",A4,3A0,D24");
-                    Console.WriteLine("{0},{1}", mouseX / 800.0f, mouseY / 600.0f);
-                }
-                */
                 
-                Task.Delay(10).Wait();
-                
-                
+                Task.Delay(10).Wait();  //Avoid excess cpu usage
             }
         }
     }

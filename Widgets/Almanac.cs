@@ -118,7 +118,8 @@ namespace PvZA11y.Widgets
                         float rightVol = plantsSelected ? 0.2f : 0.8f;
                         float leftVol = 1.0f - rightVol;
                         float freq = 400 + (plantsSelected ? 100 : 0);
-
+                        leftVol *= Config.current.MenuPositionCueVolume;
+                        rightVol *= Config.current.MenuPositionCueVolume;
                         Program.PlayTone(leftVol, rightVol, freq, freq, 100, SignalGeneratorType.Sin);
 
 
