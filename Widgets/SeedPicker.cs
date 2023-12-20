@@ -385,6 +385,39 @@ namespace PvZA11y.Widgets
 
             }
 
+            if(intent is InputIntent.Info2)
+            {
+                LevelType lvlType = memIO.GetLevelType();
+                string typeName = "";
+                switch(lvlType)
+                {
+                    case LevelType.Normal:
+                        typeName = "Front yard, day";
+                        break;
+                    case LevelType.Night:
+                        typeName = "Front yard, day";
+                        break;
+                    case LevelType.Pool:
+                        typeName = "Back yard, day";
+                        break;
+                    case LevelType.PoolNight:
+                        typeName = "Back yard, night";
+                        break;
+                    case LevelType.Roof:
+                        typeName = "Rooftop, day";
+                        break;
+                    case LevelType.Boss:
+                        typeName = "Rooftop, night";
+                        break;
+                    default:
+                        typeName = "Unknown";
+                        break;
+                }
+                    
+                Console.WriteLine(typeName);
+                Program.Say(typeName);
+            }
+
         }
 
         protected override string? GetContent()
