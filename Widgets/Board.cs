@@ -24,6 +24,7 @@ namespace PvZA11y.Widgets
         int animatingSunAmount;
         int currentZombieID;
 
+        int lastConveyorCount;
         bool doneBowlingTutorial = false;
 
         public struct Zombie
@@ -804,6 +805,22 @@ namespace PvZA11y.Widgets
             bool inSlotMachine = gameMode is GameMode.SlotMachine;
             bool inZombiquarium = gameMode is GameMode.Zombiquarium;
             bool inBeghouled = gameMode is GameMode.Beghouled;
+            bool conveyorLevel = ConveyorBeltCounter() > 0;
+
+            if(conveyorLevel)
+            {
+                var bankPlants = GetPlantsInBoardBank();
+                int conveyorCount = 0;
+                foreach(var plant in bankPlants)
+                {
+                    if (plant.packetType != -1)
+                        conveyorCount++;
+                }
+                int prevCount = lastConveyorCount;
+                lastConveyorCount = conveyorCount;
+                return prevCount < conveyorCount;
+            }
+
             if (inSlotMachine)
             {
                 bool slotReady = memIO.mem.ReadInt(memIO.ptr.boardChain + ",178,54") == 0;
@@ -1986,8 +2003,25 @@ namespace PvZA11y.Widgets
                         int packetType = plants[seedbankSlot].packetType;
                         if (packetType >= 0 && packetType < (int)SeedType.NUM_SEED_TYPES)
                         {
-                            Console.WriteLine(Consts.plantNames[plants[seedbankSlot].packetType]);
-                            Program.Say(Consts.plantNames[plants[seedbankSlot].packetType], true);
+                            string plantInfo = Consts.plantNames[plants[seedbankSlot].packetType];
+                            bool isConveyor = ConveyorBeltCounter() > 0;
+                            bool ready = PlantPacketReady();
+                            if (ready && !isConveyor)
+                                plantInfo += ", Ready,";
+                            else if (!isConveyor)
+                            {
+                                bool refreshing = plants[seedbankSlot].isRefreshing;
+                                int sunAmount = memIO.mem.ReadInt(memIO.ptr.boardChain + ",5578");
+                                sunAmount += animatingSunAmount;
+                                if (refreshing)
+                                    plantInfo += ", Refreshing,";
+                                else
+                                    plantInfo += ", " + sunAmount + " out of";
+                            }
+                            if(!isConveyor)
+                                plantInfo += " " + Consts.plantCosts[plants[seedbankSlot].packetType] + " sun";
+                            Console.WriteLine(plantInfo);
+                            Program.Say(plantInfo);
                         }
                         else if (packetType >= 60 && packetType <= 74)
                         {

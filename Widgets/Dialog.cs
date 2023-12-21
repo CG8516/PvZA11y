@@ -142,7 +142,7 @@ namespace PvZA11y.Widgets
 
         protected override string? GetContent()
         {
-            return SayTitle(false) + "\r\nInputs: Confirm to select, Deny to reject, Info1 to repeat, Up and Down to scroll options.";
+            return SayTitle(false);
         }
 
     }
