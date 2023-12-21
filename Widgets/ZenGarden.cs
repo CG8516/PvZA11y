@@ -451,13 +451,19 @@ namespace PvZA11y.Widgets
 
                     float rVolume = gridInput.cursorX / (float)gridInput.width;
                     float lVolume = 1.0f - rVolume;
-                    lVolume *= Config.current.GridPositionCueVolume;
-                    rVolume *= Config.current.GridPositionCueVolume;
                     float freq = 1000.0f - ((gridInput.cursorY * 500.0f) / 5.0f);
                     if (currentPlant is null || currentPlant?.need == ZenPlantNeed.None)
+                    {
+                        lVolume *= Config.current.GridPositionCueVolume;
+                        rVolume *= Config.current.GridPositionCueVolume;
                         Program.PlayTone(lVolume, rVolume, freq, freq, 100, SignalGeneratorType.Sin);
+                    }
                     else
+                    {
+                        lVolume *= Config.current.FoundObjectCueVolume;
+                        rVolume *= Config.current.FoundObjectCueVolume;
                         Program.PlayTone(lVolume, rVolume, freq, freq, 100, SignalGeneratorType.Square);
+                    }
 
                     //Move cursor to plant grid for sighted players
                     Vector2 cellPos = GetGardenCellPosition() + new Vector2(0.02f, 0.02f);
@@ -577,7 +583,7 @@ namespace PvZA11y.Widgets
                 case 3:
                     return "Aquarium";
                 case 4:
-                    return "Tree Of Wisdom";
+                    return "Tree Of Wisdom. Press Info1 to say tree height.";
                 default:
                     return null;
             }
