@@ -17,46 +17,118 @@ namespace PvZA11y.Widgets
     {
         GridInput PlantPage;
         GridInput ZombiePage;
-        int pageID; //0: main, 1: plants, 2: zombies
+        int pageID = -1; //0: main, 1: plants, 2: zombies
         bool plantsSelected;    //whether plants is the current selection on the index page (toggle state with any directional input on index) 
 
         public Almanac(MemoryIO memIO, string pointerChain) : base(memIO, pointerChain)
         {
-            pageID = memIO.GetAlmanacPage(pointerChain);
             PlantPage = new GridInput(8, 6);    //Imitater is in secret cell above peashooter, only if unlocked
             ZombiePage = new GridInput(5, 6);   //5 + 1 for zomboss
-
         }
 
         protected override string? GetContentUpdate()
         {
-            string inputText = "";
-
-            switch (pageID)
+            hasReadContent = false;
+            hasUpdatedContents = true;
+            int newPageID = memIO.GetAlmanacPage(pointerChain);
+            if (newPageID != pageID)
             {
-                case 0:
-                    return "Almanac Index." + inputText;
-                case 1:
-                    return "Plants." + inputText;
-                case 2:
-                    return "Zombies." + inputText;
+                pageID = newPageID;
+                switch (pageID)
+                {
+                    case 0:
+                        return "Almanac Index.";
+                    case 1:
+                        return "Plants.";
+                    case 2:
+                        return "Zombies.";
+                }
             }
             return null;
         }
 
         protected override string? GetContent()
         {
-            return GetContentUpdate() + "\r\nInputs: Confirm to select, Deny to close, Directions to scroll options.";
+            string? contents = GetContentUpdate();
+            if(contents != null)
+            {
+                if(pageID == 1)
+                    return contents + "\r\nInputs: Directions to navigate grid, Deny to return to index.\r\n" + GetPlantInfo();
+                else if(pageID == 2)
+                    return contents + "\r\nInputs: Directions to navigate grid, Deny to return to index.\r\n" + GetZombieInfo();
+                return contents + "\r\nInputs: Directions to change option, Confirm to select, Deny to close.";
+            }
+            return null;
+        }
+
+        string GetPlantInfo()
+        {
+            int pickerIndex = (PlantPage.cursorY * 8) + PlantPage.cursorX;
+            int sunCost = Consts.plantCosts[pickerIndex];
+
+            string plantInfo = "";
+
+            bool plantUnlocked = Program.CheckOwnedPlant(pickerIndex);
+
+            float clickX = 0.06f + (0.065f * PlantPage.cursorX);
+            float clickY = 0.2f + (0.13f * PlantPage.cursorY);
+
+            if (!plantUnlocked)
+            {
+                int finishedAdventure = memIO.GetAdventureCompletions();
+                bool storeUnlocked = finishedAdventure > 0 || memIO.GetPlayerLevel() > 24;
+
+                if (PlantPage.cursorY == 5)
+                    plantInfo = "Unavailable." + (storeUnlocked ? " Buy it from the store." : "");
+                else
+                    plantInfo = "Locked. Keep playing adventure mode to unlock more plants.";
+
+                Program.MoveMouse(clickX, clickY);  //Move cursor for sighted players
+            }
+            else
+            {
+                //Shhhh! It's a secret! (Tree of Life tells you about it)
+                //If imitater unlocked, move to super secret cell.
+
+                Program.MoveMouse(clickX, clickY);
+                Program.Click(clickX, clickY);
+
+                int rechargeTime = Consts.plantCooldowns[pickerIndex];
+
+                string rechargeText = rechargeTime == 750 ? "Fast.\r\n" : rechargeTime == 3000 ? "Slow.\r\n" : "Very Slow.\r\n";
+
+                plantInfo = Consts.plantNames[pickerIndex] + ": " + sunCost + " sun.\r\nRecharge time: " + rechargeText + Consts.plantFullDescriptions[pickerIndex];
+            }
+
+            return plantInfo;
+        }
+
+        string GetZombieInfo()
+        {
+            int zombieIndex = ZombiePage.cursorY * 5 + ZombiePage.cursorX;
+            if (ZombiePage.cursorY == 5 && ZombiePage.cursorX == 2)
+                zombieIndex = 25;
+
+            string zombieString = Consts.zombieNames[zombieIndex] + ".\r\n" + Consts.zombieFullDescriptions[zombieIndex];
+
+            int[] zombieLevels = new int[] { 1, 3, 6, 8, 11, 13, 16, 18, 18, 21, 23, 26, 26, 28, 31, 33, 36, 38, 40, 41, 43, 46, 48, 48, 50, 99, 99, 99, 99, 99, 99, 48, 99, 99, 99, 99 };
+
+            int playerLevel = memIO.GetPlayerLevel();
+            int adventureCompletions = memIO.GetAdventureCompletions();
+            if (zombieIndex == (int)ZombieType.Yeti)
+            {
+                if (adventureCompletions == 0 || playerLevel < zombieLevels[zombieIndex])
+                    zombieString = "Mystery Zombie. Not encountered yet.";
+            }
+            if (adventureCompletions == 0 && playerLevel < zombieLevels[zombieIndex])
+                zombieString = "Mystery Zombie. Not encountered yet.";
+
+            return zombieString;
         }
 
         public override void Interact(InputIntent intent)
         {
-            int newPageID = memIO.GetAlmanacPage(pointerChain);
-            if(newPageID != pageID)
-            {
-                pageID = newPageID;
-                hasUpdatedContents = true;
-            }
+            hasUpdatedContents = true;
 
             if (intent is InputIntent.Deny or InputIntent.Start)
             {
@@ -147,43 +219,7 @@ namespace PvZA11y.Widgets
 
                         if(PlantPage.cursorX != prevX || PlantPage.cursorY != prevY)
                         {
-                            int pickerIndex = (PlantPage.cursorY * 8) + PlantPage.cursorX;
-                            int sunCost = Consts.plantCosts[pickerIndex];
-
-                            string plantInfo;// = Program.plantNames[pickerIndex] + ": " + sunCost + ": " + Program.plantDescriptions[pickerIndex];
-
-                            bool plantUnlocked = Program.CheckOwnedPlant(pickerIndex);
-
-                            float clickX = 0.06f + (0.065f * PlantPage.cursorX);
-                            float clickY = 0.2f + (0.13f * PlantPage.cursorY);
-
-                            if (!plantUnlocked)
-                            {
-                                int finishedAdventure = memIO.GetAdventureCompletions();
-                                bool storeUnlocked = finishedAdventure > 0 || memIO.GetPlayerLevel() > 24;
-
-                                if (PlantPage.cursorY == 5)
-                                    plantInfo = "Unavailable." + (storeUnlocked ? " Buy it from the store." : "");
-                                else
-                                    plantInfo = "Locked. Keep playing adventure mode to unlock more plants.";
-
-                                Program.MoveMouse(clickX, clickY);  //Move cursor for sighted players
-                            }
-                            else
-                            {
-                                //Shhhh! It's a secret! (Tree of Life tells you about it)
-                                //If imitater unlocked, move to super secret cell.
-
-                                Program.MoveMouse(clickX, clickY);
-                                Program.Click(clickX, clickY);
-
-                                int rechargeTime = Consts.plantCooldowns[pickerIndex];
-
-                                string rechargeText = rechargeTime == 750 ? "Fast.\r\n" : rechargeTime == 3000 ? "Slow.\r\n" : "Very Slow.\r\n";
-
-                                plantInfo = Consts.plantNames[pickerIndex] + ": " + sunCost + " sun.\r\nRecharge time: " + rechargeText + Consts.plantFullDescriptions[pickerIndex];
-                            }
-
+                            string plantInfo = GetPlantInfo();
                             Console.WriteLine(plantInfo);
                             Program.Say(plantInfo, true);
                         }
@@ -214,22 +250,7 @@ namespace PvZA11y.Widgets
                         Program.MoveMouse(clickX, clickY);
                         Program.Click(clickX, clickY);
 
-                        int zombieIndex = ZombiePage.cursorY * 5 + ZombiePage.cursorX;
-                        if (ZombiePage.cursorY == 5 && ZombiePage.cursorX == 2)
-                            zombieIndex = 25;
-                        string zombieString = Consts.zombieNames[zombieIndex] + ".\r\n" + Consts.zombieFullDescriptions[zombieIndex];
-
-                        int[] zombieLevels = new int[] { 1, 3, 6, 8, 11, 13, 16, 18, 18, 21, 23, 26, 26, 28, 31, 33, 36, 38, 40, 41, 43, 46, 48, 48, 50, 99, 99, 99, 99, 99, 99, 48, 99, 99, 99, 99 };
-
-                        int playerLevel = memIO.GetPlayerLevel();
-                        int adventureCompletions = memIO.GetAdventureCompletions();
-                        if(zombieIndex == (int)ZombieType.Yeti)
-                        {
-                            if (adventureCompletions == 0 || playerLevel < zombieLevels[zombieIndex])
-                                zombieString = "Mystery Zombie. Not encountered yet.";
-                        }
-                        if (adventureCompletions == 0 && playerLevel < zombieLevels[zombieIndex])
-                            zombieString = "Mystery Zombie. Not encountered yet.";
+                        string zombieString = GetZombieInfo();
 
 
                         Console.WriteLine(zombieString);
