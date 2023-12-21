@@ -1653,17 +1653,20 @@ namespace PvZA11y
         public static Input input = null;
 
         static long nextTripwireAlarmMs;
-        static void PlayTripwireAlarm()
+        static void PlayTripwireAlarm(bool intense)
         {
             if(nextTripwireAlarmMs <= DateTimeOffset.UtcNow.ToUnixTimeMilliseconds())
             {
                 List<ToneProperties> musicTones = new List<ToneProperties>();
-                musicTones.Add(new ToneProperties() { leftVolume = Config.current.ZombieTripwireVolume, rightVolume = Config.current.ZombieTripwireVolume, duration = 500, startFrequency = 200, endFrequency = 200, signalType = SignalGeneratorType.Triangle, startDelay = 0 });
-                musicTones.Add(new ToneProperties() { leftVolume = Config.current.ZombieTripwireVolume, rightVolume = Config.current.ZombieTripwireVolume, duration = 500, startFrequency = 275, endFrequency = 275, signalType = SignalGeneratorType.Triangle, startDelay = 20 });
-                musicTones.Add(new ToneProperties() { leftVolume = Config.current.ZombieTripwireVolume, rightVolume = Config.current.ZombieTripwireVolume, duration = 500, startFrequency = 350, endFrequency = 350, signalType = SignalGeneratorType.Triangle, startDelay = 20 });
-                musicTones.Add(new ToneProperties() { leftVolume = Config.current.ZombieTripwireVolume, rightVolume = Config.current.ZombieTripwireVolume, duration = 100, startFrequency = 100, endFrequency = 100, signalType = SignalGeneratorType.Triangle, startDelay = 0 });
-                musicTones.Add(new ToneProperties() { leftVolume = Config.current.ZombieTripwireVolume, rightVolume = Config.current.ZombieTripwireVolume, duration = 100, startFrequency = 100, endFrequency = 100, signalType = SignalGeneratorType.Triangle, startDelay = 200 });
-                musicTones.Add(new ToneProperties() { leftVolume = Config.current.ZombieTripwireVolume, rightVolume = Config.current.ZombieTripwireVolume, duration = 100, startFrequency = 100, endFrequency = 100, signalType = SignalGeneratorType.Triangle, startDelay = 400 });
+                if (intense)
+                {
+                    musicTones.Add(new ToneProperties() { leftVolume = Config.current.ZombieTripwireVolume, rightVolume = Config.current.ZombieTripwireVolume, duration = 500, startFrequency = 200, endFrequency = 200, signalType = SignalGeneratorType.Triangle, startDelay = 0 });
+                    musicTones.Add(new ToneProperties() { leftVolume = Config.current.ZombieTripwireVolume, rightVolume = Config.current.ZombieTripwireVolume, duration = 500, startFrequency = 275, endFrequency = 275, signalType = SignalGeneratorType.Triangle, startDelay = 20 });
+                    musicTones.Add(new ToneProperties() { leftVolume = Config.current.ZombieTripwireVolume, rightVolume = Config.current.ZombieTripwireVolume, duration = 500, startFrequency = 350, endFrequency = 350, signalType = SignalGeneratorType.Triangle, startDelay = 20 });
+                }
+                musicTones.Add(new ToneProperties() { leftVolume = Config.current.ZombieTripwireVolume * 0.5f, rightVolume = Config.current.ZombieTripwireVolume * 0.5f, duration = 100, startFrequency = 100, endFrequency = 100, signalType = SignalGeneratorType.Square, startDelay = 0 });
+                musicTones.Add(new ToneProperties() { leftVolume = Config.current.ZombieTripwireVolume * 0.5f, rightVolume = Config.current.ZombieTripwireVolume * 0.5f, duration = 100, startFrequency = 100, endFrequency = 100, signalType = SignalGeneratorType.Square, startDelay = 200 });
+                musicTones.Add(new ToneProperties() { leftVolume = Config.current.ZombieTripwireVolume * 0.5f, rightVolume = Config.current.ZombieTripwireVolume * 0.5f, duration = 100, startFrequency = 100, endFrequency = 100, signalType = SignalGeneratorType.Square, startDelay = 400 });
                 PlayTones(musicTones);
                 nextTripwireAlarmMs = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() + 1500;
             }
@@ -1929,18 +1932,15 @@ namespace PvZA11y
                     {
                         var board = ((Board)currentWidget);
                         var zombies = board.GetZombies();
-                        bool playAlarm = false;
+                        int alarmCount = 0;
                         foreach(var zombie in zombies)
                         {
                             if(board.GetZombieColumn(zombie.posX) < Config.current.ZombieTripwireRow)
-                            {
-                                playAlarm = true;
-                                break;
-                            }
+                                alarmCount++;
 
                         }
-                        if (playAlarm)
-                            PlayTripwireAlarm();
+                        if (alarmCount > 0)
+                            PlayTripwireAlarm(alarmCount > 1);
                     }
                 }
                 else

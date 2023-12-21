@@ -73,7 +73,7 @@ namespace PvZA11y
             public float DeadZombieCueVolume = 0.0f;
             public float ZombieOnTileVolume = 1.0f;
             public float ZombieEntryVolume = 1.0f;
-            public float ZombieTripwireVolume = 0.2f;
+            public float ZombieTripwireVolume = 0.5f;
             public float BeghouledAssistVolume = 1.0f;
             public float MiscAlertCueVolume = 1.0f; //Not enough sun, refreshing, press start to begin, lawnmowers, etc..
             public float AudioCueMasterVolume = 1.0f;

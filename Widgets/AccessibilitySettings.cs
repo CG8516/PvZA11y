@@ -422,9 +422,9 @@ namespace PvZA11y.Widgets
                 new ToneProperties() { leftVolume = 1.0f, rightVolume = 1.0f, duration = 500, startFrequency = 200, endFrequency = 200, signalType = SignalGeneratorType.Triangle, startDelay = 0 },
                 new ToneProperties() { leftVolume = 1.0f, rightVolume = 1.0f, duration = 500, startFrequency = 275, endFrequency = 275, signalType = SignalGeneratorType.Triangle, startDelay = 20 },
                 new ToneProperties() { leftVolume = 1.0f, rightVolume = 1.0f, duration = 500, startFrequency = 350, endFrequency = 350, signalType = SignalGeneratorType.Triangle, startDelay = 20 },
-                new ToneProperties() { leftVolume = 1.0f, rightVolume = 1.0f, duration = 100, startFrequency = 100, endFrequency = 100, signalType = SignalGeneratorType.Triangle, startDelay = 0 },
-                new ToneProperties() { leftVolume = 1.0f, rightVolume = 1.0f, duration = 100, startFrequency = 100, endFrequency = 100, signalType = SignalGeneratorType.Triangle, startDelay = 200 },
-                new ToneProperties() { leftVolume = 1.0f, rightVolume = 1.0f, duration = 100, startFrequency = 100, endFrequency = 100, signalType = SignalGeneratorType.Triangle, startDelay = 400 },
+                new ToneProperties() { leftVolume = 0.5f, rightVolume = 0.5f, duration = 100, startFrequency = 100, endFrequency = 100, signalType = SignalGeneratorType.Square, startDelay = 0 },
+                new ToneProperties() { leftVolume = 0.5f, rightVolume = 0.5f, duration = 100, startFrequency = 100, endFrequency = 100, signalType = SignalGeneratorType.Square, startDelay = 200 },
+                new ToneProperties() { leftVolume = 0.5f, rightVolume = 0.5f, duration = 100, startFrequency = 100, endFrequency = 100, signalType = SignalGeneratorType.Square, startDelay = 400 },
             ];
 
 
