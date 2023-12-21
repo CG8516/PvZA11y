@@ -1653,9 +1653,30 @@ namespace PvZA11y
         public static Input input = null;
 
         static long nextTripwireAlarmMs;
+        static int tripwireAlarmState;
         static void PlayTripwireAlarm(bool intense)
         {
-            if(nextTripwireAlarmMs <= DateTimeOffset.UtcNow.ToUnixTimeMilliseconds())
+            if(tripwireAlarmState == 0 && !intense)
+            {
+                tripwireAlarmState = 1;
+                if (Config.current.SayWhenTripwireCrossed)
+                {
+                    Console.WriteLine("Tripwire triggered!");
+                    Say("Tripwire triggered!");
+                }
+            }
+            if (tripwireAlarmState <= 1 && intense)
+            {
+                tripwireAlarmState = 2;
+                if (Config.current.SayWhenTripwireCrossed)
+                {
+                    Console.WriteLine("ALERT! Multiple tripwires triggered!");
+                    Say("ALERT! Multiple tripwires triggered!");
+                }
+            }
+
+
+            if (nextTripwireAlarmMs <= DateTimeOffset.UtcNow.ToUnixTimeMilliseconds())
             {
                 List<ToneProperties> musicTones = new List<ToneProperties>();
                 if (intense)
@@ -1928,7 +1949,7 @@ namespace PvZA11y
                             PlayTones(tones);
                         }
                     }
-                    if(Config.current.ZombieTripwireRow != 0 && Config.current.ZombieTripwireVolume > 0)
+                    if(Config.current.ZombieTripwireRow != 0 && (Config.current.ZombieTripwireVolume > 0 || Config.current.SayWhenTripwireCrossed))
                     {
                         var board = ((Board)currentWidget);
                         var zombies = board.GetZombies();
@@ -1941,6 +1962,8 @@ namespace PvZA11y
                         }
                         if (alarmCount > 0)
                             PlayTripwireAlarm(alarmCount > 1);
+                        else
+                            tripwireAlarmState = 0;
                     }
                 }
                 else

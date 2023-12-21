@@ -54,6 +54,7 @@ namespace PvZA11y
             public bool SayPlantOnTileMove = true;
             public bool SayZombieOnTileMove = true;
             public bool SayLawnmowerType = false;
+            public bool SayWhenTripwireCrossed = true;
             public ScreenReaderSelection screenReaderSelection = ScreenReaderSelection.Auto;
 
             //Core functionality
