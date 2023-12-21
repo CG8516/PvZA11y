@@ -1616,6 +1616,11 @@ namespace PvZA11y
             }
             catch (Exception ex)
             {
+                bool gameClosed = false;
+                try {gameClosed = memIO.mem.mProc.Process.HasExited;} catch { }
+                if (gameClosed)
+                    Environment.Exit(0);
+
                 Console.WriteLine("PvZ A11y encountered an error.");
                 Console.WriteLine(ex.Message);
                 Console.WriteLine(ex.StackTrace);
@@ -1697,6 +1702,19 @@ namespace PvZA11y
             }
         }
 
+        static void UpdateWindowHandle(Process gameProc)
+        {
+            try
+            {
+                gameWHnd = Process.GetProcessById(gameProc.Id).MainWindowHandle; //Ensure we have the main handle (changes when entering/exiting fullscreen)
+            }
+            catch
+            {
+                //Game must be closed
+                Environment.Exit(0);
+            }
+        }
+
         static void SafeMain(string[] args)
         {
             Config.LoadConfig();
@@ -1728,16 +1746,7 @@ namespace PvZA11y
 
             drawStartX = (windowWidth - drawWidth) / 2; //After first black bar, if there are any.
 
-            try
-            {
-                gameWHnd = Process.GetProcessById(gameProc.Id).MainWindowHandle; //Ensure we have the main handle (changes when entering/exiting fullscreen)
-            }
-            catch
-            {
-                gameProc = HookProcess();
-                gameWHnd = gameProc.MainWindowHandle;
-            }
-
+            UpdateWindowHandle(gameProc);
 
             Widget? tempWidget = GetActiveWidget(null);
             while (prevScene == GameScene.Loading)
@@ -1790,36 +1799,16 @@ namespace PvZA11y
                 drawWidth = memIO.GetDrawWidth();
                 drawHeight = memIO.GetDrawHeight();
                 drawStartX = (windowWidth - drawWidth) / 2; //After first black bar, if there are any.
-                
-                
-                
-                try
-                {
-                    gameWHnd = Process.GetProcessById(gameProc.Id).MainWindowHandle; //Ensure we have the main handle (changes when entering/exiting fullscreen)
-                }
-                catch
-                {
-                    gameProc = HookProcess();
-                    gameWHnd = gameProc.MainWindowHandle;
-                }
+
+                UpdateWindowHandle(gameProc);
 
                 if (vibrationEnd <= DateTimeOffset.UtcNow.ToUnixTimeMilliseconds())
                     XInput.SetVibration(0, 0, 0);
 
                 GameScene gameScene = (GameScene)memIO.GetGameScene();
-                /*
-                if(gameScene != prevScene)
-                    Console.WriteLine("Scene: " + gameScene);
-                */
                 prevScene = gameScene;
 
-                Type oldType = currentWidget.GetType();
                 currentWidget = GetActiveWidget(currentWidget);
-                
-                /*
-                if (oldType != currentWidget.GetType())
-                    Console.WriteLine("New widget type: " + currentWidget.GetType());
-                */
 
                 bool inVaseBreaker = VaseBreakerCheck(); //GetPlayerLevel() == 35 || (gameMode >= (int)GameMode.SCARY_POTTER_1 && gameMode <= (int)GameMode.SCARY_POTTER_ENDLESS);
 
