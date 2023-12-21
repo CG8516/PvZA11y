@@ -23,13 +23,9 @@ namespace PvZA11y.Widgets
             continueX += continueWidth / 2;
             continueY += continueHeight / 2;
 
-            Console.WriteLine("Continue pos: {0},{1}", continueX, continueY);
-            Console.WriteLine("Continue pos relative: {0},{1}", continueX / 800.0f, continueY / 600.0f);
-            Console.WriteLine("Continue Chain: '{0}'", continueChain);
-
             var listItems = new ListItem[]
             {
-                //new ListItem(){text = "Continue", relativePos = new Vector2(0.5f,0.87f)}
+                new ListItem(){text = "Repeat"},
                 new ListItem(){text = "Continue", relativePos = new Vector2(continueX/800.0f, continueY/600.0f)}
             };
 
@@ -39,6 +35,7 @@ namespace PvZA11y.Widgets
 
         public AwardScreen(MemoryIO memIO, string pointerChain) : base(memIO, pointerChain, GetListItems(pointerChain,memIO))
         {
+            listIndex = 1;
         }
 
         public override void DenyInteraction()
@@ -51,9 +48,10 @@ namespace PvZA11y.Widgets
         {
             //Ensure continue button position is updated
             listItems = GetListItems(pointerChain, memIO);
-            base.Interact(intent);
-            if (intent is InputIntent.Info1)
+            if((listIndex == 0 && intent is InputIntent.Confirm) || intent is InputIntent.Info1)
                 hasReadContent = false;
+            else
+                base.Interact(intent);
         }
 
         protected override string? GetContentUpdate()
@@ -83,7 +81,7 @@ namespace PvZA11y.Widgets
             if (awardType == 1 && playerLevel == 1)
             {
                 playerLevel = 60;
-                listItems[0].relativePos = new Vector2(0.5f, 0.95f);
+                listItems[1].relativePos = new Vector2(0.5f, 0.95f);
             }
             if (adventureMode)
             {
