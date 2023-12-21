@@ -1242,14 +1242,16 @@ namespace PvZA11y.Widgets
             {
                 if (zombies[i].row == y)
                 {
-                    Console.Write("{0} ", zombies[i].posX);
+                    if(!currentTileOnly)
+                        Console.Write("{0} ", zombies[i].posX);
                     if(currentTileOnly && GetZombieColumn(zombies[i].posX) == gridInput.cursorX)
                         zombiesThisRow.Add(zombies[i]);
                     else if(!currentTileOnly)
                         zombiesThisRow.Add(zombies[i]);
                 }
             }
-            Console.WriteLine("");
+            if(!currentTileOnly)
+                Console.WriteLine("");
 
             string verboseZombieInfo = "";
 

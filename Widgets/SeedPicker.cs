@@ -11,7 +11,7 @@ namespace PvZA11y.Widgets
 {
     class SeedPicker : Widget
     {
-        string inputDescription = "\r\nInputs: Directional input to Navigate grid, Confirm to select/deselect plant, Deny to pause, Start to start level, Info1 to list zombies in level, CycleLeft/CycleRight to list selected plants.\r\n";
+        string inputDescription = "\r\nInputs: Directional input to Navigate grid, Confirm to select/deselect plant, Deny to pause, Start to start level, Info1 to list zombies in level, Info2 to say level type, CycleLeft/CycleRight to list selected plants.\r\n";
 
         GridInput gridInput;
         int pickedPlantIndex;   //Currently selected slot of the picked plants row (at the top of the screen)
