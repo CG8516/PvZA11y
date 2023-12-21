@@ -1113,7 +1113,7 @@ namespace PvZA11y.Widgets
             return plantInfoString;
         }
 
-        int GetZombieColumn(float posX)
+        public int GetZombieColumn(float posX)
         {
             int[] tileLimitsFront = new int[] { 70, 130, 217, 297, 367, 485, 535, 627, 720 };
             int[] tileLimitsPool = new int[] { 70, 145, 217, 305, 385, 470, 540, 627, 720 };

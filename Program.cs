@@ -1652,6 +1652,22 @@ namespace PvZA11y
 
         public static Input input = null;
 
+        static long nextTripwireAlarmMs;
+        static void PlayTripwireAlarm()
+        {
+            if(nextTripwireAlarmMs <= DateTimeOffset.UtcNow.ToUnixTimeMilliseconds())
+            {
+                List<ToneProperties> musicTones = new List<ToneProperties>();
+                musicTones.Add(new ToneProperties() { leftVolume = Config.current.ZombieTripwireVolume, rightVolume = Config.current.ZombieTripwireVolume, duration = 500, startFrequency = 200, endFrequency = 200, signalType = SignalGeneratorType.Triangle, startDelay = 0 });
+                musicTones.Add(new ToneProperties() { leftVolume = Config.current.ZombieTripwireVolume, rightVolume = Config.current.ZombieTripwireVolume, duration = 500, startFrequency = 275, endFrequency = 275, signalType = SignalGeneratorType.Triangle, startDelay = 20 });
+                musicTones.Add(new ToneProperties() { leftVolume = Config.current.ZombieTripwireVolume, rightVolume = Config.current.ZombieTripwireVolume, duration = 500, startFrequency = 350, endFrequency = 350, signalType = SignalGeneratorType.Triangle, startDelay = 20 });
+                musicTones.Add(new ToneProperties() { leftVolume = Config.current.ZombieTripwireVolume, rightVolume = Config.current.ZombieTripwireVolume, duration = 100, startFrequency = 100, endFrequency = 100, signalType = SignalGeneratorType.Triangle, startDelay = 0 });
+                musicTones.Add(new ToneProperties() { leftVolume = Config.current.ZombieTripwireVolume, rightVolume = Config.current.ZombieTripwireVolume, duration = 100, startFrequency = 100, endFrequency = 100, signalType = SignalGeneratorType.Triangle, startDelay = 200 });
+                musicTones.Add(new ToneProperties() { leftVolume = Config.current.ZombieTripwireVolume, rightVolume = Config.current.ZombieTripwireVolume, duration = 100, startFrequency = 100, endFrequency = 100, signalType = SignalGeneratorType.Triangle, startDelay = 400 });
+                PlayTones(musicTones);
+                nextTripwireAlarmMs = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() + 1500;
+            }
+        }
 
         static void SafeMain(string[] args)
         {
@@ -1908,6 +1924,23 @@ namespace PvZA11y
                             }
                             PlayTones(tones);
                         }
+                    }
+                    if(Config.current.ZombieTripwireRow != 0 && Config.current.ZombieTripwireVolume > 0)
+                    {
+                        var board = ((Board)currentWidget);
+                        var zombies = board.GetZombies();
+                        bool playAlarm = false;
+                        foreach(var zombie in zombies)
+                        {
+                            if(board.GetZombieColumn(zombie.posX) < Config.current.ZombieTripwireRow)
+                            {
+                                playAlarm = true;
+                                break;
+                            }
+
+                        }
+                        if (playAlarm)
+                            PlayTripwireAlarm();
                     }
                 }
                 else
