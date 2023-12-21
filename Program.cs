@@ -14,7 +14,7 @@ using PvZA11y.Widgets;
 using NAudio.Mixer;
 
 /*
-[PVZ-A11y Beta 1.12]
+[PVZ-A11y Beta 1.13]
 
 Blind and motor accessibility mod for Plants Vs Zombies.
 Allows input with rebindable keys and controller buttons, rather than requiring a mouse for input.
@@ -458,7 +458,7 @@ namespace PvZA11y
 
                         //If plantsVsZombies.exe starts more threads, it's not a launcher. So stop searching for popcapagame1
                         foundProcs = Process.GetProcessesByName("PlantsVsZombies");
-                        if (foundProcs[0].Threads.Count >= 10)
+                        if (foundProcs != null && foundProcs.Length > 0 && foundProcs[0].Threads.Count >= 10)
                         {
                             reqpopcapgame1 = false;
                             break;
@@ -1781,7 +1781,7 @@ namespace PvZA11y
             int prevSeedbankSlot = -1;
 
             long lastSweep = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-
+            long nextFloatingPacketUpdate = 0;  //When to scan for floating seed packets (need to delay, to avoid slowing the game)
             while (true)
             {
                 //Ensure window/draw specs, and hwnd are accurate
@@ -1889,6 +1889,12 @@ namespace PvZA11y
 
                 if (currentWidget is Board)
                 {
+                    if(nextFloatingPacketUpdate <= DateTimeOffset.UtcNow.ToUnixTimeMilliseconds())
+                    {
+                        ((Board)currentWidget).UpdateFloatingSeedPackets();
+                        nextFloatingPacketUpdate = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() + 200;   //Update once every 200ms, to avoid slowing the game too much (floating packet updates pause the board, to avoid memory relocations causing issues)
+                    }
+
                     ((Board)currentWidget).SetAnimatingSunAmount(animatingSun);
                     thisFastZombieCount = ((Board)currentWidget).GetFastZombieCount();
                     plantPacketReady = ((Board)currentWidget).PlantPacketReady();

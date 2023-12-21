@@ -829,6 +829,7 @@ namespace PvZA11y.Widgets
                     prevFloatingPacketCount = floatingCount;
                     return true;
                 }
+                prevFloatingPacketCount = floatingCount;
                 return false;
             }
             
@@ -1663,7 +1664,7 @@ namespace PvZA11y.Widgets
             return partOfMatch;
         }
 
-        void UpdateFloatingSeedPackets()
+        public void UpdateFloatingSeedPackets()
         {
             //Temporarily pause game, to avoid issued caused by memory shuffling while processing
             bool wasPaused = memIO.GetBoardPaused();
@@ -2046,12 +2047,14 @@ namespace PvZA11y.Widgets
                     lVolume *= Config.current.PlantSlotChangeVolume;
                     Program.PlayTone(lVolume, rVolume, frequency, frequency, 100, SignalGeneratorType.Square);
 
-                    Program.MoveMouse((floatingPackets[seedbankSlot].posX + 25) / 800.0f, (floatingPackets[seedbankSlot].posY + 50) /600.0f);
+                    Program.MoveMouse((floatingPackets[seedbankSlot].posX + 25) / 800.0f, (floatingPackets[seedbankSlot].posY + 50) / 600.0f);
                     int heldPlantID = floatingPackets[seedbankSlot].packetType;
                     string plantStr = Consts.plantNames[heldPlantID];
                     Console.WriteLine(plantStr);
                     Program.Say(plantStr, true);
                 }
+                else
+                    Program.PlayBoundaryTone();
             }
             else if(cycleInputIntent)
             {
@@ -2245,7 +2248,7 @@ namespace PvZA11y.Widgets
 
             if (intent == InputIntent.Deny)
             {
-                if(inBeghouled)
+                if (inBeghouled)
                 {
                     var newIntent = Program.input.GetCurrentIntent();
                     while (newIntent is InputIntent.None)
@@ -2253,8 +2256,10 @@ namespace PvZA11y.Widgets
                     if (newIntent is InputIntent.Up or InputIntent.Down or InputIntent.Left or InputIntent.Right)
                         DragPlant(newIntent);
                 }
-                else if(inWhackAZombie)
+                else if (inWhackAZombie)
                     PlacePlant(seedbankSlot, seedbankSize, plants[seedbankSlot].offsetX, false, false, false);
+                else if (inRainingSeeds || inVaseBreaker || inSlotMachine)
+                    ShovelPlant(5);
                 else if (Config.current.RequireShovelConfirmation)
                 {
                     if (shovelPressedLast)
