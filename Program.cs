@@ -874,6 +874,10 @@ namespace PvZA11y
                 if (mem.ReadByte(memIO.ptr.boardChain + ",fc," + (index + 0x38).ToString("X2")) == 1)
                     continue;
 
+                //Skip seed packets
+                if (coinType == (int)CoinType.UsableSeedPacket)
+                    continue;
+
                 //Skip collectables we've already clicked on
                 if (mem.ReadByte(memIO.ptr.boardChain + ",fc," + (index + 0x50).ToString("X2")) == 1)
                 {

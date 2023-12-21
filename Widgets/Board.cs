@@ -27,6 +27,9 @@ namespace PvZA11y.Widgets
         int lastConveyorCount;
         bool doneBowlingTutorial = false;
 
+        List<FloatingPacket> floatingPackets = new List<FloatingPacket>();
+        int prevFloatingPacketCount;
+
         public struct Zombie
         {
             public int zombieType;
@@ -59,6 +62,15 @@ namespace PvZA11y.Widgets
             public float y;
             public int row;
             public bool isIce;
+        }
+
+        struct FloatingPacket
+        {
+            public int packetType;
+            public float posX;
+            public float posY;
+            public int disappearTime;
+            public int arrayIndex;
         }
 
         struct plantInBoardBank
@@ -806,6 +818,20 @@ namespace PvZA11y.Widgets
             bool inZombiquarium = gameMode is GameMode.Zombiquarium;
             bool inBeghouled = gameMode is GameMode.Beghouled;
             bool conveyorLevel = ConveyorBeltCounter() > 0;
+            bool inVaseBreaker = VaseBreakerCheck();
+            bool inRainingSeeds = gameMode is GameMode.ItsRainingSeeds;
+
+            if (inVaseBreaker || inRainingSeeds)
+            {
+                int floatingCount = floatingPackets.Count;
+                if(floatingCount > prevFloatingPacketCount)
+                {
+                    prevFloatingPacketCount = floatingCount;
+                    return true;
+                }
+                return false;
+            }
+            
 
             if(conveyorLevel)
             {
@@ -896,6 +922,17 @@ namespace PvZA11y.Widgets
             if (iceDistanceThisRow <= iceLimits[gridInput.cursorX])
                 return true;
 
+            return false;
+        }
+
+        bool CheckVaseAtTile()
+        {
+            var gridItems = Program.GetGridItems();
+            foreach(var item in gridItems)
+            {
+                if (item.x == gridInput.cursorX && item.y == gridInput.cursorY && item.type == (int)GridItemType.Vase)
+                    return true;
+            }
             return false;
         }
 
@@ -1626,9 +1663,72 @@ namespace PvZA11y.Widgets
             return partOfMatch;
         }
 
+        void UpdateFloatingSeedPackets()
+        {
+            //Temporarily pause game, to avoid issued caused by memory shuffling while processing
+            bool wasPaused = memIO.GetBoardPaused();
+            memIO.SetBoardPaused(true);
+
+            //Grab all coins, sunflowers, awards
+            int maxCount = memIO.mem.ReadInt(memIO.ptr.boardChain + ",100");
+
+            byte[] coinBytes = memIO.mem.ReadBytes(memIO.ptr.boardChain + ",fc,0", maxCount * 216);           
+
+            floatingPackets = new List<FloatingPacket>();
+
+            for (int i = 0; i < maxCount; i++)
+            {
+                int index = i * 216;
+
+                int coinTypeNumber = BitConverter.ToInt32(coinBytes, index + 0x58);
+                int disappearTime = BitConverter.ToInt32(coinBytes, index + 0x54);
+
+                //Skip inactive clickables
+                if (coinBytes[index+0x38] == 1)
+                    continue;
+
+                CoinType coinType = (CoinType)coinTypeNumber;
+                if (coinType is CoinType.UsableSeedPacket)
+                {
+                    int newY = 550;
+                    string newYStr = newY.ToString();
+                    memIO.mem.WriteMemory(memIO.ptr.boardChain + ",fc," + (index + 0x2c).ToString("X2"), "float", "0"); //Xvelocity 0
+                    memIO.mem.WriteMemory(memIO.ptr.boardChain + ",fc," + (index + 0x30).ToString("X2"), "float", "0"); //yVelocity 0
+
+                    int packetType = memIO.mem.ReadInt(memIO.ptr.boardChain + ",fc," + (index + 0x68).ToString("X2"));
+                    floatingPackets.Add(new FloatingPacket() { packetType = packetType, arrayIndex = i, disappearTime = disappearTime });
+                }
+            }
+
+
+            //Sort by disappearTime, to ensure newest packets are to the right
+            floatingPackets.Sort((a, b) => b.disappearTime.CompareTo(a.disappearTime));
+
+            int posX = 0;
+            for(int i =0; i < floatingPackets.Count; i++)
+            {
+                if (i == 9)
+                    posX = 0;
+                floatingPackets[i] = floatingPackets[i] with { posX = posX, posY = i < 9 ? 0 : 550 };
+                string newXStr = posX.ToString();
+                string newYStr = floatingPackets[i].posY.ToString();
+                int index = floatingPackets[i].arrayIndex * 216;
+                memIO.mem.WriteMemory(memIO.ptr.boardChain + ",fc," + (index + 0x24).ToString("X2"), "float", newXStr);   //xPos
+                memIO.mem.WriteMemory(memIO.ptr.boardChain + ",fc," + (index + 0x40).ToString("X2"), "float", newXStr);   //collectionXpos
+
+                memIO.mem.WriteMemory(memIO.ptr.boardChain + ",fc," + (index + 0x44).ToString("X2"), "float", newYStr);   //collectionYpos
+                memIO.mem.WriteMemory(memIO.ptr.boardChain + ",fc," + (index + 0x48).ToString("X2"), "int", newYStr);     //groundPos
+                memIO.mem.WriteMemory(memIO.ptr.boardChain + ",fc," + (index + 0x28).ToString("X2"), "float", newYStr);   //yPos 
+                posX += 50;
+            }
+
+            memIO.SetBoardPaused(wasPaused);
+        }
 
         public override void Interact(InputIntent intent)
         {
+            UpdateFloatingSeedPackets();
+
             if(intent == InputIntent.Option)
             {
                 if(memIO.GetGameMode() == (int)GameMode.LastStand)
@@ -1663,9 +1763,19 @@ namespace PvZA11y.Widgets
             if(intent == InputIntent.Start)
                 Program.Click(0.95f, 0.05f);
 
+            GameMode gameMode = (GameMode)memIO.GetGameMode();
+            bool inBeghouled = gameMode == GameMode.Beghouled;
+            bool inVaseBreaker = VaseBreakerCheck();
+            bool inRainingSeeds = gameMode == GameMode.ItsRainingSeeds;
+            bool inWhackAZombie = gameMode == GameMode.WhackAZombie || memIO.GetPlayerLevel() == 15;
+            bool inIZombie = gameMode >= GameMode.IZombie1 && gameMode <= GameMode.IZombieEndless;
+            bool inSlotMachine = gameMode == GameMode.SlotMachine;
+
             //TODO: move to memIO/Pointers
             int seedbankSize = memIO.mem.ReadInt(memIO.ptr.lawnAppPtr + ",868,15c,24") - 1;  //10 seeds have max index of 9
             int maxConveryorBeltIndex = memIO.mem.ReadInt(memIO.ptr.lawnAppPtr + ",868,15c,34c") - 1;
+            if (inVaseBreaker || inRainingSeeds || inSlotMachine)
+                seedbankSize = floatingPackets.Count - 1;
 
             int prevX = gridInput.cursorX;
             int prevY = gridInput.cursorY;
@@ -1688,8 +1798,6 @@ namespace PvZA11y.Widgets
             }
 
             var plants = GetPlantsInBoardBank();
-            GameMode gameMode = (GameMode)memIO.GetGameMode();
-            bool inBeghouled = gameMode == GameMode.Beghouled;
 
             if (prevX != gridInput.cursorX || prevY != gridInput.cursorY)
             {
@@ -1858,6 +1966,8 @@ namespace PvZA11y.Widgets
             //Make sure we can't select invalid slots on conveyor levels
             for (int i = 0; i < seedbankSize; i++)
             {
+                if (inVaseBreaker | inSlotMachine | inRainingSeeds)
+                    break;
                 if (seedbankSlot < 0)
                     break;
                 if (plants[seedbankSlot].packetType == -1)
@@ -1918,11 +2028,7 @@ namespace PvZA11y.Widgets
                 }
             }
 
-            bool inVaseBreaker = VaseBreakerCheck();
-            bool inRainingSeeds = gameMode == GameMode.ItsRainingSeeds;
-            bool inWhackAZombie = gameMode == GameMode.WhackAZombie || memIO.GetPlayerLevel() == 15;
-            bool inIZombie = gameMode >= GameMode.IZombie1 && gameMode <= GameMode.IZombieEndless;
-            bool inSlotMachine = gameMode == GameMode.SlotMachine;
+            
 
             bool cycleInputIntent = intent == InputIntent.CycleLeft || intent == InputIntent.CycleRight || (intent >= InputIntent.Slot1 && intent <= InputIntent.Slot10);
 
@@ -1930,10 +2036,19 @@ namespace PvZA11y.Widgets
             //Otherwise, inform them of plant in newly switched slot
             if (cycleInputIntent && (inVaseBreaker || inRainingSeeds || inSlotMachine))
             {
-                heldPlantID = memIO.mem.ReadInt(memIO.ptr.boardChain + ",150,28");
-                if (heldPlantID != -1)
+                if (floatingPackets.Count > 0)
                 {
-                    string plantStr = Consts.plantNames[heldPlantID] + " in hand.";
+                    float frequency = 100.0f + (100.0f * seedbankSlot);
+                    float rVolume = (float)seedbankSlot / (float)seedbankSize;
+                    float lVolume = 1.0f - rVolume;
+
+                    rVolume *= Config.current.PlantSlotChangeVolume;
+                    lVolume *= Config.current.PlantSlotChangeVolume;
+                    Program.PlayTone(lVolume, rVolume, frequency, frequency, 100, SignalGeneratorType.Square);
+
+                    Program.MoveMouse((floatingPackets[seedbankSlot].posX + 25) / 800.0f, (floatingPackets[seedbankSlot].posY + 50) /600.0f);
+                    int heldPlantID = floatingPackets[seedbankSlot].packetType;
+                    string plantStr = Consts.plantNames[heldPlantID];
                     Console.WriteLine(plantStr);
                     Program.Say(plantStr, true);
                 }
@@ -2038,7 +2153,7 @@ namespace PvZA11y.Widgets
             }
 
             //Place plant
-            if(intent == InputIntent.Confirm && (plants[seedbankSlot].packetType >= 0 || inRainingSeeds))
+            if(intent == InputIntent.Confirm && (inRainingSeeds || inVaseBreaker || inSlotMachine || plants[seedbankSlot].packetType >= 0))
             {
                 bool isCobCannon = Program.GetPlantAtCell(gridInput.cursorX, gridInput.cursorY).plantType == (int)SeedType.SEED_COBCANNON;
                 isCobCannon |= Program.GetCursorType() == 8;
@@ -2048,7 +2163,24 @@ namespace PvZA11y.Widgets
 
                 //Click where plant needs to go. Not where plant is located (we already grab plant when auto-collecting everything on screen)
                 if (inVaseBreaker || inRainingSeeds || isCobCannon || inSlotMachine)
-                    PlacePlant(seedbankSlot, seedbankSize, plants[seedbankSlot].offsetX, false, false, false, false);
+                {
+                    bool isFrozen = memIO.GetBoardPaused();
+                    bool hasVase = CheckVaseAtTile();
+                    if (hasVase)
+                    {
+                        memIO.SetBoardPaused(false);
+                        PlacePlant(0, 0, 0, false, false, false, false);
+                        Task.Delay(200).Wait();  //Wait for vase to break
+                    }
+                    else if (floatingPackets.Count > 0)
+                    {
+                        memIO.SetBoardPaused(false);
+                        Program.Click((floatingPackets[seedbankSlot].posX + 25) / 800.0f, (floatingPackets[seedbankSlot].posY + 25) / 600.0f, false, false, 50, true);
+                        PlacePlant(seedbankSlot, seedbankSize, 0, false, false, false, false);
+                    }
+                    memIO.SetBoardPaused(isFrozen);
+                    UpdateFloatingSeedPackets();
+                }
                 else if(inZombiquarium)
                 {
                     int sunCost = seedbankSlot == 0 ? 100 : seedbankSlot == 1 ? 1000 : 5;
