@@ -113,6 +113,9 @@ namespace PvZA11y.Widgets
                     break;
             }
 
+            if (memIO.GetGameMode() == (int)GameMode.Zombiquarium)
+                height = 5;
+
             if (memIO.GetAdventureCompletions() < 1)
             {
                 if (memIO.GetPlayerLevel() == 0)
@@ -562,7 +565,7 @@ namespace PvZA11y.Widgets
 
             string waveInfo = "";
 
-            if (numFlags > 1)
+            if (numFlags >= 1)
                 waveInfo = "Wave " + completedFlags + " of " + numFlags;
 
             if (currentWave == numWaves)
@@ -773,7 +776,7 @@ namespace PvZA11y.Widgets
             else if (gameMode is GameMode.SeeingStars)
                 Program.GameplayTutorial(new string[] { "In this mode, you'll need to plant starfruits on your front yard, to make a large star shape.", "You'll find some placeholder tiles, which can only have startfruits planted there.", "Fill all of the starfruit tiles to win the game.", });
             else if (gameMode is GameMode.Zombiquarium)
-                Program.GameplayTutorial(new string[] { "This mode is not currently accessible.", "Check back again in a future update." });
+                Program.GameplayTutorial(new string[] { "You have a large aquarium tank, which currently contains two friendly snorkel zombies.", "Snorkel zombies will produce sun for you, but must remain fed with brains, otherwise they will die.", "You can spend sun to place brains, or to buy additional snorkel zombies.", "Once you reach 1000 sun, you can buy a trophy to complete the level." });
             else if (gameMode is GameMode.BeghouledTwist)
                 Program.GameplayTutorial(new string[] { "This mode is not currently accessible.", "Check back again in a future update." });
             else if (gameMode is GameMode.BigTroubleLittleZombie)
@@ -793,11 +796,11 @@ namespace PvZA11y.Widgets
             else if (gameMode is GameMode.ZomBotany2)
                 Program.GameplayTutorial(new string[] { "This minigame is the same as ZomBotany, but with many new types of plant-headed zombies.", "It takes place in your back yard, during the day." });
             else if (gameMode is GameMode.WallnutBowling2)
-                Program.GameplayTutorial(new string[] { "This is wall-nut bowling 2!", "It's pretty much the same as the first wall-nut bowling, but much harder.", "You'll also sometimes receive giant wall-nuts, which will always roll directly over anything that gets in their way, without ricocheting.", "This is a daytime front yard level." });
+                Program.GameplayTutorial(new string[] { "This is wall-nut bowling 2!", "It's very similar to wall-nut bowling 1, but you will encounter more zombies.", "You'll also receive giant wall-nuts, which will always roll directly over anything that gets in their way, without ricocheting.", "This is a daytime front yard level." });
             else if (gameMode is GameMode.PogoParty)
                 Program.GameplayTutorial(new string[] { "In this minigame, you must defend your roof from swarms of pogo zombies." });
             else if (gameMode is GameMode.DrZombossRevenge)
-                Program.GameplayTutorial(new string[] { "This minigame is a harder version of final boss of adventure mode.", "Dr. ZomBoss will have twice as much health, and will send zombies more frequently." });
+                Program.GameplayTutorial(new string[] { "This minigame is a harder version of the final boss of adventure mode.", "Dr. ZomBoss will have twice as much health, and will send zombies more frequently." });
         }
 
         int getIzombieBrainCount(bool thisRowOnly = false)
@@ -2422,7 +2425,7 @@ namespace PvZA11y.Widgets
                 }
                 else if (inBeghouled)
                 {
-                    int matches = memIO.mem.ReadInt(memIO.ptr.boardChain + ",178,60");  //TODO: URGENT: MAKE SURE WORKS ON BOTH GAME VERSIONS (ONLY TESTED ON STEAM)
+                    int matches = memIO.mem.ReadInt(memIO.ptr.boardChain + ",178,60");
                     info4String += " " + matches + " of 75 matches.";
                 }
                 else if (gameMode == GameMode.SeeingStars)
@@ -2451,7 +2454,7 @@ namespace PvZA11y.Widgets
                 }
                 else if(gameMode == GameMode.LastStand || IsSurvival())
                 {
-                    int stageCount = memIO.mem.ReadInt(memIO.ptr.boardChain + ",178,6c");   //TODO: URGENT: MAKE SURE WORKS ON BOTH GAME VERSIONS (ONLY TESTED ON STEAM)
+                    int stageCount = memIO.mem.ReadInt(memIO.ptr.boardChain + ",178,6c");
                     int maxStages = 0;
                     if (gameMode == GameMode.LastStand)
                         maxStages = 5;
@@ -2467,6 +2470,8 @@ namespace PvZA11y.Widgets
                         roundCountString = stageCount + " of " + maxStages + " stages completed";
                     info4String = GetWaveInfo() + ", " + roundCountString;
                 }
+                else if (gameMode == GameMode.Zombiquarium)
+                    info4String = "Save up 1000 sun to purchase the level trophy";
                 else
                 {
                     string waveInfo = GetWaveInfo();

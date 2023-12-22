@@ -1480,7 +1480,7 @@ namespace PvZA11y
 
         //TODO: Rework this completely
         public static void GetMinMaxY(ref int minY, ref int maxY)
-        {
+        {            
             //Get type of each row, to determine if plant can be placed there (eg; can't place on dirt rows in first few levels)
             int[] rowTypes = new int[6];
             for (int i = 0; i < 6; i++)
@@ -1665,6 +1665,10 @@ namespace PvZA11y
         static int tripwireAlarmState;
         static void PlayTripwireAlarm(bool intense)
         {
+            //Fish are friends, not food
+            if (memIO.GetGameMode() == (int)GameMode.Zombiquarium)
+                return;
+
             if(tripwireAlarmState == 0 && !intense)
             {
                 tripwireAlarmState = 1;
