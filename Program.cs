@@ -1678,6 +1678,11 @@ namespace PvZA11y
             if (memIO.GetGameMode() == (int)GameMode.Zombiquarium)
                 return;
 
+            //Zombies are frens in iZombie
+            GameMode gameMode = (GameMode)memIO.GetGameMode();
+            if (gameMode >= GameMode.IZombie1 && gameMode <= GameMode.IZombieEndless)
+                return;
+
             if(tripwireAlarmState == 0 && !intense)
             {
                 tripwireAlarmState = 1;
