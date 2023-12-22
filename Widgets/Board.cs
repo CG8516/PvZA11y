@@ -816,6 +816,14 @@ namespace PvZA11y.Widgets
             return count;
         }
 
+        bool IsSurvival()
+        {
+            GameMode gameMode = (GameMode)memIO.GetGameMode();
+            if (gameMode >= GameMode.SurvivalDay && gameMode <= GameMode.SurvivalEndless5)
+                return true;
+            return false;
+        }
+
         //Returns true if current plant packet is fully refreshed, and there's enough sun to place it
         public bool PlantPacketReady()
         {
@@ -2440,6 +2448,24 @@ namespace PvZA11y.Widgets
                 {
                     int vaseCount = GetVaseCount();
                     info4String = (vaseCount > 0 ? vaseCount : "no") + " vase" + (vaseCount != 1 ? "s" : "") + " remaining";
+                }
+                else if(gameMode == GameMode.LastStand || IsSurvival())
+                {
+                    int stageCount = memIO.mem.ReadInt(memIO.ptr.boardChain + ",178,6c");   //TODO: URGENT: MAKE SURE WORKS ON BOTH GAME VERSIONS (ONLY TESTED ON STEAM)
+                    int maxStages = 0;
+                    if (gameMode == GameMode.LastStand)
+                        maxStages = 5;
+                    else if (gameMode >= GameMode.SurvivalDay && gameMode <= GameMode.SurvivalRoof)
+                        maxStages = 5;
+                    else if (gameMode >= GameMode.SurvivalHardDay && gameMode <= GameMode.SurvivalHardRoof)
+                        maxStages = 10;
+
+                    string roundCountString = "";
+                    if (maxStages == 0)
+                        roundCountString = stageCount + " stages completed";
+                    else
+                        roundCountString = stageCount + " of " + maxStages + " stages completed";
+                    info4String = GetWaveInfo() + ", " + roundCountString;
                 }
                 else
                 {
