@@ -804,10 +804,14 @@ namespace PvZA11y
         public const int Imitater = 49;
         public const int PurchasePacketSlot = 50;
 
-        public const int NumDialogs = 51; // Assuming there are 51 dialogs
+        public const int unkDialog1 = 51; 
         public const int ZombatarLicense = 52;
+        public const int unkDialog2 = 53;
+        public const int unkDialog3 = 54;
+        public const int unkDialog4 = 55;
         public const int steamCloudSavingActive = 56;
         public const int stamCloudLocalChoice = 57;
+        //How many more are there?
     }
 
     

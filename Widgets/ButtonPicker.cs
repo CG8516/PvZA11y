@@ -52,6 +52,12 @@ namespace PvZA11y.Widgets
             this.prevWidget = prevWidget;
         }
 
+        public override void Interact(InputIntent intent)
+        {
+            listItems = GetButtons(memIO, pointerChain);
+            base.Interact(intent);
+        }
+
         public override void DenyInteraction()
         {
             //Select last item (usually cancel/back/no)
