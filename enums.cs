@@ -602,7 +602,7 @@ namespace PvZA11y
         Dancing,
         BackupDancer,
         DuckyTube,
-        Snrokel,
+        Snorkel,
         Zomboni,
         Bobsled,
         DolphinRider,

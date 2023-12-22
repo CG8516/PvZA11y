@@ -780,7 +780,7 @@ namespace PvZA11y.Widgets
             else if (gameMode is GameMode.SeeingStars)
                 Program.GameplayTutorial(new string[] { "In this mode, you'll need to plant starfruits on your front yard, to make a large star shape.", "You'll find some placeholder tiles, which can only have startfruits planted there.", "Fill all of the starfruit tiles to win the game.", });
             else if (gameMode is GameMode.Zombiquarium)
-                Program.GameplayTutorial(new string[] { "You have a large aquarium tank, which currently contains two friendly snorkel zombies.", "Snorkel zombies will produce sun for you, but must remain fed with brains, otherwise they will die.", "You can spend sun to place brains, or to buy additional snorkel zombies.", "Once you reach 1000 sun, you can buy a trophy to complete the level." });
+                Program.GameplayTutorial(new string[] { "You have a large aquarium tank, which currently contains two friendly snorkel zombies.", "Snorkel zombies will swim freely around the tank and produce sun for you, but if they don't eat enough brains, they will die.", "You can spend sun to feed them brains, or buy additional snorkel zombies.", "Once you reach 1000 sun, you can buy a trophy to complete the level." });
             else if (gameMode is GameMode.BeghouledTwist)
             {
                 Program.GameplayTutorial(new string[] { "Be-ghouled 2 is very similar to the original be-ghouled minigame", "You still need to make matches of 3, however, the controls have changed."});
@@ -1298,6 +1298,10 @@ namespace PvZA11y.Widgets
             if (zombie.buttered)
                 infoPrepend += "Buttered ";
 
+            bool zombiquarium = memIO.GetGameMode() == (int)GameMode.Zombiquarium;
+            if (zombiquarium && zombie.health <= 150 && zombie.zombieType == (int)ZombieType.Snorkel)
+                infoPrepend += "Hungry ";
+
 
             return infoPrepend + addonDescriptor + zombieName;
         }
@@ -1305,6 +1309,8 @@ namespace PvZA11y.Widgets
         //TODO: Clean this up. Passing 5 bools to a function is a pretty clear sign that the function needs to be split into different parts.
         public string? GetZombieInfo(bool currentTileOnly = false, bool beepOnFound = true, bool beepOnNone = true, bool includeTileName = true, bool countOnly = false)
         {
+            bool zombiquarium = memIO.GetGameMode() == (int)GameMode.Zombiquarium;
+            
             List<Zombie> zombies = GetZombies();
             int y = gridInput.cursorY;
             float dirtyOffset = gridInput.cursorX * 5f;
@@ -1313,7 +1319,7 @@ namespace PvZA11y.Widgets
 
             for (int i = 0; i < zombies.Count; i++)
             {
-                if (zombies[i].row == y)
+                if ((!zombiquarium && zombies[i].row == y) || (zombiquarium && (int)zombies[i].posY /100 == y))
                 {
                     if(!currentTileOnly)
                         Console.Write("{0} ", zombies[i].posX);
@@ -2045,26 +2051,14 @@ namespace PvZA11y.Widgets
                         //OOOOHHH boy, this will be crazy
                         bool matchable = BeghouledMatchablePlant();
                         if (matchable)
-                        {
-                            List<Program.ToneProperties> tones = new List<Program.ToneProperties>();
-                            tones.Add(new Program.ToneProperties() { leftVolume = Config.current.BeghouledAssistVolume, rightVolume = Config.current.BeghouledAssistVolume, startFrequency = 700, endFrequency = 700, duration = 100, signalType = SignalGeneratorType.Sin, startDelay = 0 });
-                            tones.Add(new Program.ToneProperties() { leftVolume = Config.current.BeghouledAssistVolume, rightVolume = Config.current.BeghouledAssistVolume, startFrequency = 800, endFrequency = 800, duration = 200, signalType = SignalGeneratorType.Sin, startDelay = 100 });
-                            Program.PlayTones(tones);
-                            Program.Vibrate(1, 1, 150);
-                        }
+                            Program.PlayBeghouledAssistTone();
                     }
 
                     if(inBeghouled2 && Config.current.Beghouled2MatchAssist)
                     {
                         bool matchable = Beghouled2MatchablePlant();
                         if (matchable)
-                        {
-                            List<Program.ToneProperties> tones = new List<Program.ToneProperties>();
-                            tones.Add(new Program.ToneProperties() { leftVolume = Config.current.BeghouledAssistVolume, rightVolume = Config.current.BeghouledAssistVolume, startFrequency = 700, endFrequency = 700, duration = 100, signalType = SignalGeneratorType.Sin, startDelay = 0 });
-                            tones.Add(new Program.ToneProperties() { leftVolume = Config.current.BeghouledAssistVolume, rightVolume = Config.current.BeghouledAssistVolume, startFrequency = 800, endFrequency = 800, duration = 200, signalType = SignalGeneratorType.Sin, startDelay = 100 });
-                            Program.PlayTones(tones);
-                            Program.Vibrate(1, 1, 150);
-                        }
+                            Program.PlayBeghouledAssistTone();
                     }
 
                     bool zombieFound = false;

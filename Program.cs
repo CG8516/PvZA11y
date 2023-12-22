@@ -1354,6 +1354,15 @@ namespace PvZA11y
             waveOutEvents.Add(waveOutEvent);
         }
 
+        public static void PlayBeghouledAssistTone()
+        {
+            List<ToneProperties> tones = new List<ToneProperties>();
+            tones.Add(new ToneProperties() { leftVolume = Config.current.BeghouledAssistVolume, rightVolume = Config.current.BeghouledAssistVolume, startFrequency = 700, endFrequency = 700, duration = 100, signalType = SignalGeneratorType.Sin, startDelay = 0 });
+            tones.Add(new ToneProperties() { leftVolume = Config.current.BeghouledAssistVolume, rightVolume = Config.current.BeghouledAssistVolume, startFrequency = 800, endFrequency = 800, duration = 200, signalType = SignalGeneratorType.Sin, startDelay = 100 });
+            PlayTones(tones);
+            Vibrate(1, 1, 150);
+        }
+
         public static void PlayBoundaryTone()
         {
             PlayTone(Config.current.HitBoundaryVolume, Config.current.HitBoundaryVolume, 70, 70, 50, SignalGeneratorType.Square);
