@@ -211,7 +211,7 @@ namespace PvZA11y.Widgets
             else
                 titleString = memIO.mem.ReadString(pointerChain + memIO.ptr.dialogTitleStrOffset + ",0");
 
-            titleString += "\r\nInputs: Up and Down to scroll list, Confirm to select, Left and Right to adjust sliders, Deny to close.";
+            titleString += (Config.current.SayAvailableInputs ? "\r\nInputs: Up and Down to scroll list, Confirm to select, Left and Right to adjust sliders, Deny to close." : "");
 
             return titleString + "\r\n" + listItems[0].text;
         }

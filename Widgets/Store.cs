@@ -637,7 +637,7 @@ namespace PvZA11y.Widgets
 
         protected override string? GetContent()
         {
-            return "Store\r\n" + inputDescription + GetContentUpdate();
+            return "Store\r\n" + (Config.current.SayAvailableInputs ? inputDescription : "") + GetContentUpdate();
         }
 
     }

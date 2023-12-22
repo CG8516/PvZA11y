@@ -66,7 +66,7 @@ namespace PvZA11y.Widgets
                 return null;
 
             startContent = startContent.ReplaceLineEndings(" ");
-            return startContent + "\r\n" + listItems[0].text + "\r\nInputs: Confirm to select, Deny to reject, Info1 to repeat, Up and Down to scroll options."; ;
+            return startContent + "\r\n" + listItems[0].text + (Config.current.SayAvailableInputs ? "\r\nInputs: Confirm to select, Deny to reject, Info1 to repeat, Up and Down to scroll options." : "");
         }
     }
 }

@@ -586,7 +586,7 @@ namespace PvZA11y.Widgets
 
         protected override string? GetContent()
         {
-            return "Zen Garden\r\n" + GetContentUpdate() + inputDescription;
+            return "Zen Garden\r\n" + GetContentUpdate() + (Config.current.SayAvailableInputs ? inputDescription : "");
         }
     }
 }

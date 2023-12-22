@@ -30,6 +30,11 @@ namespace PvZA11y.Widgets
         List<FloatingPacket> floatingPackets = new List<FloatingPacket>();
         int prevFloatingPacketCount;
 
+        InputIntent lastIntent;
+        long inputRepeatTimer;
+        int inputRepeatCount;
+        int inputRepeatCooldown = 900;  //How many ms can pass before an input is no longer considered a double/triple tap
+
         public struct Zombie
         {
             public int zombieType;
@@ -553,25 +558,24 @@ namespace PvZA11y.Widgets
 
             int completedFlags = currentWave / wavesPerFlag;
 
+            string percentageStr = (((float)currentWave / (float)numWaves) * 100.0f).ToString("0") + "% complete";
+
+            string waveInfo = "";
+
+            if (numFlags > 1)
+                waveInfo = "Wave " + completedFlags + " of " + numFlags;
+
+            if (currentWave == numWaves)
+                waveInfo = "Final Wave";
 
             string info = "";
 
-            info = (((float)currentWave / (float)numWaves) * 100.0f).ToString("0") + "% complete";
-            
-            if (numFlags > 1)
-                info += ", wave " + completedFlags + " of " + numFlags + " ";
-
             if (currentWave == numWaves)
-                info = "Final Wave";
-
-            /*
-            if (requestedInfo.percentageThroughLevel)
-                info += ((numWaves / currentWave) * 100.0f).ToString() + "%" + (requestedInfo.verboseText ? "complete" : "") + "\r\n";
-            if (requestedInfo.currentWave)
-                info += (requestedInfo.verboseText ? "Wave " : "") + currentWave.ToString() + "\r\n";
-            if (requestedInfo.wavesRemaining)
-                info += numWaves - currentWave + (requestedInfo.verboseText ? " waves remaining" : "") + "\r\n";
-            */
+                info = waveInfo;
+            else if (inputRepeatCount % 2 == 0)
+                info = percentageStr + ", " + waveInfo;
+            else
+                info = waveInfo + ", " + percentageStr;
 
             return info;
 
@@ -1754,8 +1758,65 @@ namespace PvZA11y.Widgets
             return vaseCount;
         }
 
+        void SayPlantSlotInfo(InputIntent intent, List<plantInBoardBank> plants)
+        {
+            string plantInfo = "";
+            string plantName = Consts.plantNames[plants[seedbankSlot].packetType];
+            string plantState = "";
+            bool isConveyor = ConveyorBeltCounter() > 0;
+            bool ready = PlantPacketReady();
+            bool canAfford = true;
+            if (ready && !isConveyor)
+                plantState = "Ready";
+            else if (!isConveyor)
+            {
+                bool refreshing = plants[seedbankSlot].isRefreshing;
+                int sunAmount = memIO.mem.ReadInt(memIO.ptr.boardChain + ",5578");
+                sunAmount += animatingSunAmount;
+                if (refreshing)
+                    plantState = "Refreshing";
+                else
+                {
+                    plantState = sunAmount + " of " + Consts.plantCosts[plants[seedbankSlot].packetType] + " sun";
+                    canAfford = false;
+                }
+            }
+            string plantSun = "";
+            if (!isConveyor)
+                plantSun = Consts.plantCosts[plants[seedbankSlot].packetType] + " sun";
+
+            if (inputRepeatCount == 1 && intent >= InputIntent.Slot1 && intent <= InputIntent.Slot10)
+                plantInfo = plantState + ", " + plantName + (canAfford ? ", " + plantSun : "");
+            else if (inputRepeatCount == 2 && intent >= InputIntent.Slot1 && intent <= InputIntent.Slot10)
+                plantInfo = plantSun + ", " + plantName + ", " + plantState;
+            else
+                plantInfo = plantName + ", " + plantState + (canAfford ? ", " + plantSun : "");
+
+            if (isConveyor)
+                plantInfo = plantInfo.Replace(", ", "");
+
+            Console.WriteLine(plantInfo);
+            Program.Say(plantInfo);
+        }
+
         public override void Interact(InputIntent intent)
         {
+            if (DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() <= inputRepeatTimer)
+            {
+                if (lastIntent != intent)
+                    inputRepeatCount = 0;
+                else
+                    inputRepeatCount++;
+
+                inputRepeatCount %= 3;
+
+                lastIntent = intent;
+            }
+            else
+                inputRepeatCount = 0;
+
+            inputRepeatTimer = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() + inputRepeatCooldown;
+
             UpdateFloatingSeedPackets();
 
             if(intent == InputIntent.Option)
@@ -1876,7 +1937,7 @@ namespace PvZA11y.Widgets
                     float freq = 1000.0f - ((gridInput.cursorY * 500.0f) / (float)gridInput.height);
 
                     bool plantFound = false;
-                    if (Config.current.SayPlantOnTileMove || Config.current.FoundObjectCueVolume > 0)
+                    if (Config.current.SayPlantOnTileMove || Config.current.FoundObjectCueVolume > 0 && !inBowling)
                     {
                         //Say plant at current tile
                         string? tileObjectInfo = GetCurrentTileObject(false, Config.current.FoundObjectCueVolume > 0, false);
@@ -2073,23 +2134,7 @@ namespace PvZA11y.Widgets
                     Program.PlaySlotTone(seedbankSlot, seedbankSize);
                     PlacePlant(seedbankSlot, seedbankSize, plants[seedbankSlot].offsetX, false, true, true); //Move mouse cursor to aid sighted players in knowing which seed packet is selected
 
-                    string plantInfo = Consts.plantNames[plants[0].packetType];
-                    bool ready = PlantPacketReady();
-                    if (ready)
-                        plantInfo += ", Ready,";
-                    else
-                    {
-                        bool refreshing = plants[0].isRefreshing;
-                        int sunAmount = memIO.mem.ReadInt(memIO.ptr.boardChain + ",5578");
-                        sunAmount += animatingSunAmount;
-                        if (refreshing)
-                            plantInfo += ", Refreshing,";
-                        else
-                            plantInfo += ", " + sunAmount + " out of";
-                    }
-                    plantInfo += " " + Consts.plantCosts[plants[0].packetType] + " sun";
-                    Console.WriteLine(plantInfo);
-                    Program.Say(plantInfo);
+                    SayPlantSlotInfo(intent, plants);
                 }
                 else if (floatingPackets.Count > 0)
                 {
@@ -2165,25 +2210,7 @@ namespace PvZA11y.Widgets
                         int packetType = plants[seedbankSlot].packetType;
                         if (packetType >= 0 && packetType < (int)SeedType.NUM_SEED_TYPES)
                         {
-                            string plantInfo = Consts.plantNames[plants[seedbankSlot].packetType];
-                            bool isConveyor = ConveyorBeltCounter() > 0;
-                            bool ready = PlantPacketReady();
-                            if (ready && !isConveyor)
-                                plantInfo += ", Ready,";
-                            else if (!isConveyor)
-                            {
-                                bool refreshing = plants[seedbankSlot].isRefreshing;
-                                int sunAmount = memIO.mem.ReadInt(memIO.ptr.boardChain + ",5578");
-                                sunAmount += animatingSunAmount;
-                                if (refreshing)
-                                    plantInfo += ", Refreshing,";
-                                else
-                                    plantInfo += ", " + sunAmount + " out of";
-                            }
-                            if(!isConveyor)
-                                plantInfo += " " + Consts.plantCosts[plants[seedbankSlot].packetType] + " sun";
-                            Console.WriteLine(plantInfo);
-                            Program.Say(plantInfo);
+                            SayPlantSlotInfo(intent, plants);
                         }
                         else if (packetType >= 60 && packetType <= 74)
                         {
@@ -2377,18 +2404,18 @@ namespace PvZA11y.Widgets
                 }
                 else if(inIZombie)
                 {
-                    info4String += 5-getIzombieBrainCount() + " out of 5 brains eaten";
+                    info4String += 5-getIzombieBrainCount() + " of 5 brains eaten";
                 }
                 else if(inSlotMachine)
                 {
                     int sunAmount = memIO.mem.ReadInt(memIO.ptr.boardChain + ",5578");
                     sunAmount += animatingSunAmount;
-                    info4String += " " + Program.FormatNumber(sunAmount) + " out of 2,000 sun";
+                    info4String += " " + Program.FormatNumber(sunAmount) + " of 2,000 sun";
                 }
                 else if (inBeghouled)
                 {
                     int matches = memIO.mem.ReadInt(memIO.ptr.boardChain + ",178,60");  //TODO: URGENT: MAKE SURE WORKS ON BOTH GAME VERSIONS (ONLY TESTED ON STEAM)
-                    info4String += " " + matches + " out of 75 matches.";
+                    info4String += " " + matches + " of 75 matches.";
                 }
                 else if (gameMode == GameMode.SeeingStars)
                 {
@@ -2406,7 +2433,7 @@ namespace PvZA11y.Widgets
                             remainingStars++;
                     }
 
-                    info4String = 14 - remainingStars + " out of 14 required stars";
+                    info4String = 14 - remainingStars + " of 14 required stars";
 
                 }
                 else if (inVaseBreaker)
@@ -2447,7 +2474,7 @@ namespace PvZA11y.Widgets
                 }
                 int sunAmount = memIO.mem.ReadInt(memIO.ptr.boardChain + ",5578");
                 sunAmount += animatingSunAmount;
-                string sunString = sunAmount + " sun.";
+                string sunString = Program.FormatNumber(sunAmount) + " sun.";
                 Console.WriteLine(sunString);
                 Program.Say(sunString, true);
             }

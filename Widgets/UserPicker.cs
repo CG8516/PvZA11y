@@ -53,7 +53,7 @@ namespace PvZA11y.Widgets
         {
             string? baseContent = base.GetContent();
             if (baseContent != null)
-                baseContent += "Inputs: Up and Down to scroll, Confirm to select, Deny to close, Info1 to rename, Info2 to delete";
+                baseContent += (Config.current.SayAvailableInputs ? "Inputs: Up and Down to scroll, Confirm to select, Deny to close, Info1 to rename, Info2 to delete" : "");
             return baseContent;
         }
 

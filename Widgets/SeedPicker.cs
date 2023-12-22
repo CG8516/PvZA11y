@@ -32,7 +32,7 @@ namespace PvZA11y.Widgets
             if(level == 8)
             {
                 Program.GameplayTutorial(new string[] { "Now that you have more than six plants, you'll have to start each level by choosing which ones you want to use.", "Navigate the plant picker similarly to the board.", "Press confirm to select or deselect a plant.", "Once you've picked enough plants, you can begin the game by pressing the start button." });
-                Program.GameplayTutorial(inputDescription.Replace("\r\nInputs:","All Inputs:").Split(','));
+                //Program.GameplayTutorial(inputDescription.Replace("\r\nInputs:","All Inputs:").Split(','));
             }
         }
 
@@ -426,7 +426,7 @@ namespace PvZA11y.Widgets
             int sunCost = Consts.plantCosts[0];
             string plantInfo = Consts.plantNames[0] + ": " + sunCost + ": " + Consts.plantDescriptions[0];
 
-            return info += inputDescription + plantInfo;
+            return info += (Config.current.SayAvailableInputs ? inputDescription : "") + plantInfo;
         }
     }
 }

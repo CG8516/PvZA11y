@@ -353,6 +353,7 @@ namespace PvZA11y.Widgets
             options.Add(new Option() { name = "Say zombies on cursor tile", description = "Says which zombies are on the current tile, when the cursor moves.", confirmAction = () => ToggleBool(ref Config.current.SayZombieOnTileMove), valueGrabber = () => GetBoolOptionValue(Config.current.SayZombieOnTileMove), category = OptionCategory.Narration });
             options.Add(new Option() { name = "Say lawnmower type", description = "When info4 is pressed, say what type of lawnmower is in the current row, if any.", confirmAction = () => ToggleBool(ref Config.current.SayLawnmowerType), valueGrabber = () => GetBoolOptionValue(Config.current.SayLawnmowerType), category = OptionCategory.Narration });
             options.Add(new Option() { name = "Say when tripwire has been crossed", description = "If zombie tripwire is enabled, say when a zombie has crossed the tripwire.", confirmAction = () => ToggleBool(ref Config.current.SayWhenTripwireCrossed), valueGrabber = () => GetBoolOptionValue(Config.current.SayWhenTripwireCrossed), category = OptionCategory.Narration });
+            options.Add(new Option() { name = "Say available inputs", description = "Reads the available inputs when a new dialogue has opened.", confirmAction = () => ToggleBool(ref Config.current.SayAvailableInputs), valueGrabber = () => GetBoolOptionValue(Config.current.SayAvailableInputs), category = OptionCategory.Narration });
             options.Add(new Option() { name = "Screen Reader Engine.", description = "Which screen reader engine to use, Use left and right to select, and press confirm to apply", leftRightAction = ScrollScreenReaders, valueGrabber = GetCurrentScreenreaderSelection, confirmAction = ConfirmScreenReader, category = OptionCategory.Narration });
 
             List<ToneProperties> boundaryTone = new List<ToneProperties>() { new ToneProperties() { leftVolume = 1, rightVolume = 1, startFrequency = 70, endFrequency = 70, duration = 50, signalType = SignalGeneratorType.Square, startDelay = 0 } };
@@ -494,6 +495,8 @@ namespace PvZA11y.Widgets
         protected override string? GetContent()
         {
             string inputStr = "Inputs: Up and Down to scroll list, CycleLeft and CycleRight to jump to categories, Confirm to toggle, Left and Right to toggle or change values, Deny to go back, Info1 to repeat description.\r\n";
+            if (!Config.current.SayAvailableInputs)
+                inputStr = "";
             ReadOptionText(false, inputStr);
             return null;
         }

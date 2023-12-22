@@ -52,7 +52,7 @@ namespace PvZA11y
 
         public InputRebind()
         {
-            SayCurrentOption("\r\nInputs: Confirm to rebind, Deny to close, Info1 to repeat, Info2 to say bound keys/buttons, Directional up and down to scroll list.");
+            SayCurrentOption(Config.current.SayAvailableInputs ? "\r\nInputs: Confirm to rebind, Deny to close, Info1 to repeat, Info2 to say bound keys/buttons, Directional up and down to scroll list." : "");
         }
 
         string GetBoundInputStr()

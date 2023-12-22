@@ -53,10 +53,10 @@ namespace PvZA11y.Widgets
             if(contents != null)
             {
                 if(pageID == 1)
-                    return contents + "\r\nInputs: Directions to navigate grid, Deny to return to index.\r\n" + GetPlantInfo();
+                    return contents + (Config.current.SayAvailableInputs ? "\r\nInputs: Directions to navigate grid, Deny to return to index.\r\n":"") + GetPlantInfo();
                 else if(pageID == 2)
-                    return contents + "\r\nInputs: Directions to navigate grid, Deny to return to index.\r\n" + GetZombieInfo();
-                return contents + "\r\nInputs: Directions to change option, Confirm to select, Deny to close.";
+                    return contents + (Config.current.SayAvailableInputs ? "\r\nInputs: Directions to navigate grid, Deny to return to index.\r\n":"") + GetZombieInfo();
+                return contents + (Config.current.SayAvailableInputs ? "\r\nInputs: Directions to change option, Confirm to select, Deny to close." : "");
             }
             return null;
         }
