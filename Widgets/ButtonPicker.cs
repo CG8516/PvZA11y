@@ -13,6 +13,7 @@ namespace PvZA11y.Widgets
     {
 
         public Widget? prevWidget = null;
+        string? prevContent = null;
 
         //Have to pass reference to memio/pointerchain, as this is called before base constructor (yucky)
         //Will happily accept pull requests for a cleaner implementation of this.
@@ -50,6 +51,7 @@ namespace PvZA11y.Widgets
         public ButtonPicker(MemoryIO memIO, string pointerChain, Widget? prevWidget = null) : base(memIO, pointerChain, GetButtons(memIO,pointerChain))
         {
             this.prevWidget = prevWidget;
+            hasUpdatedContents = true;
         }
 
         public override void Interact(InputIntent intent)
@@ -68,11 +70,25 @@ namespace PvZA11y.Widgets
         protected override string? GetContent()
         {
             string? startContent = base.GetContent();   //Widget title/body
+            prevContent = startContent;
+
             if (startContent is null)
                 return null;
 
-            startContent = startContent.ReplaceLineEndings(" ");
             return startContent + "\r\n" + listItems[0].text + (Config.current.SayAvailableInputs ? "\r\nInputs: Confirm to select, Deny to reject, Info1 to repeat, Up and Down to scroll options." : "");
+        }
+
+        protected override string? GetContentUpdate()
+        {
+            hasUpdatedContents = true;
+            string? currentText = SayTitle(false);
+            if (currentText != prevContent)
+            {
+                prevContent = currentText;
+                return currentText;
+            }
+            return null;
+
         }
     }
 }
