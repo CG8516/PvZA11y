@@ -557,6 +557,10 @@ namespace PvZA11y.Widgets
             string info = "";
 
             info = (((float)currentWave / (float)numWaves) * 100.0f).ToString("0") + "% complete";
+            
+            if (numFlags > 1)
+                info += ", wave " + completedFlags + " of " + numFlags + " ";
+
             if (currentWave == numWaves)
                 info = "Final Wave";
 
