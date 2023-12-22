@@ -53,6 +53,7 @@ namespace PvZA11y.Widgets
             public int uniqueID;
             public bool frozen;
             public bool buttered;
+            public int age;
         }
 
         public struct LawnMower
@@ -257,6 +258,7 @@ namespace PvZA11y.Widgets
                 Zombie zombie = new Zombie();
                 zombie.row = memIO.mem.ReadInt(memIO.ptr.boardChain + ",a8," + (index + 0x1c).ToString("X2"));
                 zombie.zombieType = memIO.mem.ReadInt(memIO.ptr.boardChain + ",a8," + (index + 0x24).ToString("X2"));
+                zombie.age = memIO.mem.ReadInt(memIO.ptr.boardChain + ",a8," + (index + 0x60).ToString("X2"));
 
                 zombie.health = memIO.mem.ReadInt(memIO.ptr.boardChain + ",a8," + (index + 0xc8).ToString("X2"));
                 zombie.maxHealth = memIO.mem.ReadInt(memIO.ptr.boardChain + ",a8," + (index + 0xcc).ToString("X2"));
@@ -1427,12 +1429,13 @@ namespace PvZA11y.Widgets
             this.animatingSunAmount = sun;
         }
 
-        public int GetFastZombieCount()
+        public int GetFastZombieCount(ref int lastRow)
         {
             var zombies = GetZombies();
             int poleVaultingCount = 0;
             int footballCount = 0;
             int bobsledCount = 0;
+            int youngest = 100000;
             foreach(var zombie in zombies)
             {
                 if ((ZombieType)zombie.zombieType is ZombieType.PoleVaulting)
@@ -1443,6 +1446,15 @@ namespace PvZA11y.Widgets
 
                 if ((ZombieType)zombie.zombieType is ZombieType.Bobsled)
                     bobsledCount++;
+
+                if ((ZombieType)zombie.zombieType is ZombieType.Bobsled or ZombieType.PoleVaulting or ZombieType.Football)
+                {
+                    if(zombie.age < youngest)
+                    {
+                        youngest = zombie.age;
+                        lastRow = zombie.row;
+                    }
+                }
             }
 
             return poleVaultingCount + footballCount + bobsledCount;

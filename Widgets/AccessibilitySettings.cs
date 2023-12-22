@@ -360,10 +360,9 @@ namespace PvZA11y.Widgets
             List<ToneProperties> boundaryTone = new List<ToneProperties>() { new ToneProperties() { leftVolume = 1, rightVolume = 1, startFrequency = 70, endFrequency = 70, duration = 50, signalType = SignalGeneratorType.Square, startDelay = 0 } };
             List<ToneProperties> fastAlert =
             [
-                new ToneProperties() { leftVolume = 1, rightVolume = 1, startFrequency = 500, endFrequency = 1000, duration = 200, signalType = SignalGeneratorType.Sweep, startDelay = 0 },
-                new ToneProperties() { leftVolume = 1, rightVolume = 1, startFrequency = 1000, endFrequency = 500, duration = 200, signalType = SignalGeneratorType.Sweep, startDelay = 0 },
-                new ToneProperties() { leftVolume = 1, rightVolume = 1, startFrequency = 500, endFrequency = 1000, duration = 200, signalType = SignalGeneratorType.Sweep, startDelay = 200 },
-                new ToneProperties() { leftVolume = 1, rightVolume = 1, startFrequency = 1000, endFrequency = 500, duration = 200, signalType = SignalGeneratorType.Sweep, startDelay = 200 },
+                new ToneProperties() { leftVolume = 0, rightVolume = Config.current.FastZombieCueVolume, startFrequency = 800, endFrequency = 800, duration = 50, signalType = SignalGeneratorType.SawTooth, startDelay = 0 },
+                new ToneProperties() { leftVolume = 0, rightVolume = Config.current.FastZombieCueVolume, startFrequency = 800, endFrequency = 800, duration = 50, signalType = SignalGeneratorType.SawTooth, startDelay = 100 },
+                new ToneProperties() { leftVolume = 0, rightVolume = Config.current.FastZombieCueVolume, startFrequency = 800, endFrequency = 800, duration = 50, signalType = SignalGeneratorType.SawTooth, startDelay = 200 }
             ];
 
             List<ToneProperties> slotTone = new List<ToneProperties>() { new ToneProperties() { leftVolume = 1, rightVolume = 1, startFrequency = 300, endFrequency = 300, duration = 50, signalType = SignalGeneratorType.Square, startDelay = 0 } };

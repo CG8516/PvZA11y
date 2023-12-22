@@ -1898,6 +1898,8 @@ namespace PvZA11y
 
                 int thisFastZombieCount = 0;
                 bool plantPacketReady = false;
+                int fastZombieRow = 0;
+                float gridHeight = 1;
 
                 if (currentWidget is Board)
                 {
@@ -1907,8 +1909,10 @@ namespace PvZA11y
                         nextFloatingPacketUpdate = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() + 200;   //Update once every 200ms, to avoid slowing the game too much (floating packet updates pause the board, to avoid memory relocations causing issues)
                     }
 
+                    gridHeight = ((Board)currentWidget).gridInput.height;
+
                     ((Board)currentWidget).SetAnimatingSunAmount(animatingSun);
-                    thisFastZombieCount = ((Board)currentWidget).GetFastZombieCount();
+                    thisFastZombieCount = ((Board)currentWidget).GetFastZombieCount(ref fastZombieRow);
                     plantPacketReady = ((Board)currentWidget).PlantPacketReady();
                     if (((Board)currentWidget).seedbankSlot != prevSeedbankSlot)
                         packetWasReady = false;
@@ -2014,11 +2018,11 @@ namespace PvZA11y
 
                 if(thisFastZombieCount > prevFastZombieCount && Config.current.FastZombieCueVolume > 0)
                 {
+                    float freq1 = 1000.0f - ((fastZombieRow * 500.0f) / gridHeight);
                     List<ToneProperties> tones = new List<ToneProperties>();
-                    tones.Add(new ToneProperties() { leftVolume = Config.current.FastZombieCueVolume, rightVolume = Config.current.FastZombieCueVolume, startFrequency = 500, endFrequency = 1000, duration = 200, signalType = SignalGeneratorType.Sweep, startDelay = 0 });
-                    tones.Add(new ToneProperties() { leftVolume = Config.current.FastZombieCueVolume, rightVolume = Config.current.FastZombieCueVolume, startFrequency = 1000, endFrequency = 500, duration = 200, signalType = SignalGeneratorType.Sweep, startDelay = 0 });
-                    tones.Add(new ToneProperties() { leftVolume = Config.current.FastZombieCueVolume, rightVolume = Config.current.FastZombieCueVolume, startFrequency = 500, endFrequency = 1000, duration = 200, signalType = SignalGeneratorType.Sweep, startDelay = 200 });
-                    tones.Add(new ToneProperties() { leftVolume = Config.current.FastZombieCueVolume, rightVolume = Config.current.FastZombieCueVolume, startFrequency = 1000, endFrequency = 500, duration = 200, signalType = SignalGeneratorType.Sweep, startDelay = 200 });
+                    tones.Add(new ToneProperties() { leftVolume = 0, rightVolume = Config.current.FastZombieCueVolume, startFrequency = freq1, endFrequency = freq1, duration = 50, signalType = SignalGeneratorType.SawTooth, startDelay = 0 });
+                    tones.Add(new ToneProperties() { leftVolume = 0, rightVolume = Config.current.FastZombieCueVolume, startFrequency = freq1, endFrequency = freq1, duration = 50, signalType = SignalGeneratorType.SawTooth, startDelay = 100 });
+                    tones.Add(new ToneProperties() { leftVolume = 0, rightVolume = Config.current.FastZombieCueVolume, startFrequency = freq1, endFrequency = freq1, duration = 50, signalType = SignalGeneratorType.SawTooth, startDelay = 200 });
                     PlayTones(tones);
                 }
 
