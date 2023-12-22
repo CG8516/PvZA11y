@@ -453,7 +453,8 @@ namespace PvZA11y
             "Gatling Head",
             "Squash Head",
             "Tallnut Head",
-            "Red Eye Gargantuar"
+            "Red Eye Gargantuar",
+            "Zombatar",
 };
 
         public static string[] zombieFullDescriptions = new string[]
