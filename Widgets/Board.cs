@@ -819,11 +819,23 @@ namespace PvZA11y.Widgets
             bool inBeghouled = gameMode is GameMode.Beghouled;
             bool conveyorLevel = ConveyorBeltCounter() > 0;
             bool inVaseBreaker = VaseBreakerCheck();
+            bool vaseBreakerEndless = gameMode is GameMode.VaseBreakerEndless;
             bool inRainingSeeds = gameMode is GameMode.ItsRainingSeeds;
+
+            int sunAmount = memIO.mem.ReadInt(memIO.ptr.boardChain + ",5578");
+            sunAmount += animatingSunAmount;
+
+            var plants = GetPlantsInBoardBank();
 
             if (inVaseBreaker || inRainingSeeds)
             {
                 int floatingCount = floatingPackets.Count;
+                if(vaseBreakerEndless && seedbankSlot == 0)
+                {
+                    if (plants[seedbankSlot].isRefreshing || sunAmount < 150)
+                        return false;
+                    return true;
+                }
                 if(floatingCount > prevFloatingPacketCount)
                 {
                     prevFloatingPacketCount = floatingCount;
@@ -853,9 +865,6 @@ namespace PvZA11y.Widgets
                 bool slotReady = memIO.mem.ReadInt(memIO.ptr.boardChain + ",178,54") == 0;
                 return slotReady;
             }
-
-            int sunAmount = memIO.mem.ReadInt(memIO.ptr.boardChain + ",5578");    //Such a huge struct //TODO: Is that the same struct, or does it just happen to usually be in memory after the board? ie; will a fragmented heap cause this to go somewhere else?
-            sunAmount += animatingSunAmount;
 
             if(inZombiquarium)
             {
@@ -891,8 +900,6 @@ namespace PvZA11y.Widgets
                     return true;
                 return false;
             }
-
-            var plants = GetPlantsInBoardBank();
 
             if (plants[seedbankSlot].packetType < 0)
                 return false;
@@ -1670,6 +1677,8 @@ namespace PvZA11y.Widgets
             bool wasPaused = memIO.GetBoardPaused();
             memIO.SetBoardPaused(true);
 
+            bool vaseBreakerEndless = memIO.GetGameMode() == (int)GameMode.VaseBreakerEndless;
+
             //Grab all coins, sunflowers, awards
             int maxCount = memIO.mem.ReadInt(memIO.ptr.boardChain + ",100");
 
@@ -1706,11 +1715,17 @@ namespace PvZA11y.Widgets
             floatingPackets.Sort((a, b) => b.disappearTime.CompareTo(a.disappearTime));
 
             int posX = 0;
+            int overflowIndex = 9;
+            if (vaseBreakerEndless)
+            {
+                posX = 145;
+                overflowIndex = 6;
+            }
             for(int i =0; i < floatingPackets.Count; i++)
             {
-                if (i == 9)
+                if (i == overflowIndex)
                     posX = 0;
-                floatingPackets[i] = floatingPackets[i] with { posX = posX, posY = i < 9 ? 0 : 550 };
+                floatingPackets[i] = floatingPackets[i] with { posX = posX, posY = i < overflowIndex ? 8 : 550 };
                 string newXStr = posX.ToString();
                 string newYStr = floatingPackets[i].posY.ToString();
                 int index = floatingPackets[i].arrayIndex * 216;
@@ -1771,12 +1786,15 @@ namespace PvZA11y.Widgets
             bool inWhackAZombie = gameMode == GameMode.WhackAZombie || memIO.GetPlayerLevel() == 15;
             bool inIZombie = gameMode >= GameMode.IZombie1 && gameMode <= GameMode.IZombieEndless;
             bool inSlotMachine = gameMode == GameMode.SlotMachine;
+            bool vaseBreakerEndless = gameMode is GameMode.VaseBreakerEndless;
 
             //TODO: move to memIO/Pointers
             int seedbankSize = memIO.mem.ReadInt(memIO.ptr.lawnAppPtr + ",868,15c,24") - 1;  //10 seeds have max index of 9
             int maxConveryorBeltIndex = memIO.mem.ReadInt(memIO.ptr.lawnAppPtr + ",868,15c,34c") - 1;
             if (inVaseBreaker || inRainingSeeds || inSlotMachine)
                 seedbankSize = floatingPackets.Count - 1;
+            if (vaseBreakerEndless)
+                seedbankSize++;
 
             int prevX = gridInput.cursorX;
             int prevY = gridInput.cursorY;
@@ -2037,18 +2055,35 @@ namespace PvZA11y.Widgets
             //Otherwise, inform them of plant in newly switched slot
             if (cycleInputIntent && (inVaseBreaker || inRainingSeeds || inSlotMachine))
             {
-                if (floatingPackets.Count > 0)
+                if(vaseBreakerEndless && seedbankSlot == 0)
                 {
-                    float frequency = 100.0f + (100.0f * seedbankSlot);
-                    float rVolume = (float)seedbankSlot / (float)seedbankSize;
-                    float lVolume = 1.0f - rVolume;
+                    Program.PlaySlotTone(seedbankSlot, seedbankSize);
+                    PlacePlant(seedbankSlot, seedbankSize, plants[seedbankSlot].offsetX, false, true, true); //Move mouse cursor to aid sighted players in knowing which seed packet is selected
 
-                    rVolume *= Config.current.PlantSlotChangeVolume;
-                    lVolume *= Config.current.PlantSlotChangeVolume;
-                    Program.PlayTone(lVolume, rVolume, frequency, frequency, 100, SignalGeneratorType.Square);
+                    string plantInfo = Consts.plantNames[plants[0].packetType];
+                    bool ready = PlantPacketReady();
+                    if (ready)
+                        plantInfo += ", Ready,";
+                    else
+                    {
+                        bool refreshing = plants[0].isRefreshing;
+                        int sunAmount = memIO.mem.ReadInt(memIO.ptr.boardChain + ",5578");
+                        sunAmount += animatingSunAmount;
+                        if (refreshing)
+                            plantInfo += ", Refreshing,";
+                        else
+                            plantInfo += ", " + sunAmount + " out of";
+                    }
+                    plantInfo += " " + Consts.plantCosts[plants[0].packetType] + " sun";
+                    Console.WriteLine(plantInfo);
+                    Program.Say(plantInfo);
+                }
+                else if (floatingPackets.Count > 0)
+                {
+                    Program.PlaySlotTone(seedbankSlot,seedbankSize);
 
-                    Program.MoveMouse((floatingPackets[seedbankSlot].posX + 25) / 800.0f, (floatingPackets[seedbankSlot].posY + 50) / 600.0f);
-                    int heldPlantID = floatingPackets[seedbankSlot].packetType;
+                    Program.MoveMouse((floatingPackets[seedbankSlot- (vaseBreakerEndless ? 1 : 0)].posX + 25) / 800.0f, (floatingPackets[seedbankSlot - (vaseBreakerEndless ? 1 : 0)].posY + 50) / 600.0f);
+                    int heldPlantID = floatingPackets[seedbankSlot - (vaseBreakerEndless ? 1 : 0)].packetType;
                     string plantStr = Consts.plantNames[heldPlantID];
                     Console.WriteLine(plantStr);
                     Program.Say(plantStr, true);
@@ -2059,13 +2094,7 @@ namespace PvZA11y.Widgets
             else if(cycleInputIntent)
             {
                 PlacePlant(seedbankSlot, seedbankSize, plants[seedbankSlot].offsetX, false, true, true); //Move mouse cursor to aid sighted players in knowing which seed packet is selected
-                float frequency = 100.0f + (100.0f * seedbankSlot);
-                float rVolume = (float)seedbankSlot / (float)seedbankSize;
-                float lVolume = 1.0f - rVolume;
-
-                rVolume *= Config.current.PlantSlotChangeVolume;
-                lVolume *= Config.current.PlantSlotChangeVolume;
-                Program.PlayTone(lVolume, rVolume, frequency, frequency, 100, SignalGeneratorType.Square);
+                Program.PlaySlotTone(seedbankSlot, seedbankSize);
 
                 if (inZombiquarium)
                 {
@@ -2175,10 +2204,31 @@ namespace PvZA11y.Widgets
                         PlacePlant(0, 0, 0, false, false, false, false);
                         Task.Delay(200).Wait();  //Wait for vase to break
                     }
+                    else if (vaseBreakerEndless && seedbankSlot == 0)
+                    {
+                        //Check if there's enough sun, and plant isn't on cooldown
+                        int sunCost = Consts.plantCosts[plants[seedbankSlot].packetType];
+
+                        bool notEnoughSun = sunAmount < sunCost;
+                        bool refreshing = plants[seedbankSlot].isRefreshing;
+
+                        if (notEnoughSun)
+                            SunWarning(sunAmount, sunCost);
+                        else if (refreshing)
+                        {
+                            string warning = (((float)plants[seedbankSlot].refreshCounter / (float)plants[seedbankSlot].refreshTime) * 99.9f).ToString("0.") + "% refreshed";
+                            Console.WriteLine(warning);
+                            Program.PlayTone(Config.current.MiscAlertCueVolume, Config.current.MiscAlertCueVolume, 250, 250, 50, SignalGeneratorType.Square);
+                            Program.PlayTone(Config.current.MiscAlertCueVolume, Config.current.MiscAlertCueVolume, 275, 275, 50, SignalGeneratorType.Square, 50);
+                            Program.Say(warning, true);
+                        }
+                        else
+                            PlacePlant(seedbankSlot, seedbankSize, plants[seedbankSlot].offsetX, true, false, false);
+                    }
                     else if (floatingPackets.Count > 0)
                     {
                         memIO.SetBoardPaused(false);
-                        Program.Click((floatingPackets[seedbankSlot].posX + 25) / 800.0f, (floatingPackets[seedbankSlot].posY + 25) / 600.0f, false, false, 50, true);
+                        Program.Click((floatingPackets[seedbankSlot - (vaseBreakerEndless ? 1 : 0)].posX + 25) / 800.0f, (floatingPackets[seedbankSlot - (vaseBreakerEndless ? 1 : 0)].posY + 25) / 600.0f, false, false, 50, true);
                         PlacePlant(seedbankSlot, seedbankSize, 0, false, false, false, false);
                     }
                     memIO.SetBoardPaused(isFrozen);
@@ -2242,7 +2292,6 @@ namespace PvZA11y.Widgets
                     }
                     else
                         PlacePlant(seedbankSlot, seedbankSize, plants[seedbankSlot].offsetX, true, false, false);
-                    //Program.PlacePlant(seedbankSize, plants[seedbankSlot].offsetX);    //Do synschronously, to avoid altering pause state while placing plant (can still cause issues if we alt-tab while placing though)
                 }
             }
 

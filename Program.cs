@@ -1714,6 +1714,16 @@ namespace PvZA11y
                 Environment.Exit(0);
             }
         }
+        public static void PlaySlotTone(float slotIndex, float maxSlot)
+        {
+            float frequency = 100.0f + (100.0f * slotIndex);
+            float rVolume = slotIndex / maxSlot;
+            float lVolume = 1.0f - rVolume;
+
+            rVolume *= Config.current.PlantSlotChangeVolume;
+            lVolume *= Config.current.PlantSlotChangeVolume;
+            PlayTone(lVolume, rVolume, frequency, frequency, 100, SignalGeneratorType.Square);
+        }
 
         static void SafeMain(string[] args)
         {

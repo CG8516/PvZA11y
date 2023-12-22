@@ -287,12 +287,7 @@ namespace PvZA11y.Widgets
                 //Sort them based on their xPosition to indicate which slot they're in
                 var pickedPlants = GetSelectedPlants();
 
-                float frequency = 100.0f + (100.0f * pickedPlantIndex);
-                float rVolume = (float)pickedPlantIndex / (float)seedBankSize;
-                float lVolume = 1.0f - rVolume;
-                lVolume *= Config.current.PlantSlotChangeVolume;
-                rVolume *= Config.current.PlantSlotChangeVolume;
-                Program.PlayTone(lVolume, rVolume, frequency, frequency, 100, SignalGeneratorType.Square);
+                Program.PlaySlotTone(pickedPlantIndex, seedBankSize);
 
                 int friendlySlotNumber = pickedPlantIndex + 1;
 

@@ -420,12 +420,7 @@ namespace PvZA11y.Widgets
 
             if(shouldReadTool)
             {
-                float frequency = 100.0f + (100.0f * toolIndex);
-                float rVolume = (float)toolIndex / (float)ZenTools.Count;
-                float lVolume = 1.0f - rVolume;
-                lVolume *= Config.current.PlantSlotChangeVolume;
-                rVolume *= Config.current.PlantSlotChangeVolume;
-                Program.PlayTone(lVolume, rVolume, frequency, frequency, 100, SignalGeneratorType.Square);
+                Program.PlaySlotTone(toolIndex, ZenTools.Count);
 
                 Console.WriteLine(ZenTools[toolIndex].name);
                 Program.Say(ZenTools[toolIndex].name, true);
