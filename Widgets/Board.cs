@@ -425,8 +425,12 @@ namespace PvZA11y.Widgets
             return false;
         }
 
-        Vector2 GetBoardCellPosition()
+        Vector2 GetBoardCellPosition(int plantX = -1, int plantY = -1)
         {
+            if (plantX == -1)
+                plantX = gridInput.cursorX;
+            if (plantY == -1)
+                plantY = gridInput.cursorY;
             LevelType levelType = memIO.GetLevelType();
 
             float yOffset = 0.16f;
@@ -439,12 +443,12 @@ namespace PvZA11y.Widgets
             if (levelType == LevelType.Roof || levelType == LevelType.Boss)
                 yOffset = 0.145f;
 
-            float cellX = 0.09f + (gridInput.cursorX * 0.1f);
-            float cellY = 0.22f + (gridInput.cursorY * yOffset);
+            float cellX = 0.09f + (plantX * 0.1f);
+            float cellY = 0.22f + (plantY * yOffset);
 
 
             if (levelType == LevelType.Roof || levelType == LevelType.Boss)
-                cellY += 0.04f * (4.0f - MathF.Min(gridInput.cursorX, 4.0f));
+                cellY += 0.04f * (4.0f - MathF.Min(plantX, 4.0f));
 
             return new Vector2(cellX, cellY);
 
@@ -778,7 +782,11 @@ namespace PvZA11y.Widgets
             else if (gameMode is GameMode.Zombiquarium)
                 Program.GameplayTutorial(new string[] { "You have a large aquarium tank, which currently contains two friendly snorkel zombies.", "Snorkel zombies will produce sun for you, but must remain fed with brains, otherwise they will die.", "You can spend sun to place brains, or to buy additional snorkel zombies.", "Once you reach 1000 sun, you can buy a trophy to complete the level." });
             else if (gameMode is GameMode.BeghouledTwist)
-                Program.GameplayTutorial(new string[] { "This mode is not currently accessible.", "Check back again in a future update." });
+            {
+                Program.GameplayTutorial(new string[] { "Be-ghouled 2 is very similar to the original be-ghouled minigame", "You still need to make matches of 3, however, the controls have changed."});
+                Program.GameplayTutorial(new string[] { "Pressing the deny button will perform a clockwise rotation, if a match can be made.", "The rotation includes the current plant, the plant below it, the plant diagonally down-left one, and the plant directly to the left.", "Because the action is performed on plants to the left and below, if you perform this action in the first column, or bottom row, it will perform the action in the second column or second-last row instead."});
+                Program.GameplayTutorial(new string[] { "As with the previous game, there is an optional match assistance in the accessibility settings, which will play a tone if rotating the current tile will create a match.", "It's also recommended that you reduce or disable zombie sonars while playing this minigame, as your only actionable defense is to purchase plant upgrades." });
+            }
             else if (gameMode is GameMode.BigTroubleLittleZombie)
                 Program.GameplayTutorial(new string[] { "This is the same minigame you experience in level 3,5, but much harder.", "You'll have to defeat huge swarms of tiny zombies, which have less health than full zombies, but they move much faster and deal the same damage.", "This is a conveyor belt level, and takes place in your back yard during the day." });
             else if (gameMode is GameMode.PortalCombat)
@@ -836,6 +844,7 @@ namespace PvZA11y.Widgets
             bool inSlotMachine = gameMode is GameMode.SlotMachine;
             bool inZombiquarium = gameMode is GameMode.Zombiquarium;
             bool inBeghouled = gameMode is GameMode.Beghouled;
+            bool inBeghouled2 = gameMode is GameMode.BeghouledTwist;
             bool conveyorLevel = ConveyorBeltCounter() > 0;
             bool inVaseBreaker = VaseBreakerCheck();
             bool vaseBreakerEndless = gameMode is GameMode.VaseBreakerEndless;
@@ -905,7 +914,7 @@ namespace PvZA11y.Widgets
 
                 return false;
             }
-            if(inBeghouled)
+            if(inBeghouled || inBeghouled2)
             {
                 if (seedbankSlot == 0 && sunAmount >= 1000)
                     return true;
@@ -1690,6 +1699,79 @@ namespace PvZA11y.Widgets
             return partOfMatch;
         }
 
+        bool Beghouled2MatchablePlant()
+        {
+            var allPlants = Program.GetPlantsOnBoard();
+            Program.PlantOnBoard thisPlant = new Program.PlantOnBoard();
+            thisPlant.plantType = -1;
+            foreach (var plant in allPlants)
+            {
+                if (plant.row == gridInput.cursorY && plant.column == gridInput.cursorX)
+                {
+                    thisPlant = plant;
+                    break;
+                }
+            }
+            if (thisPlant.plantType == -1)
+                return false;
+
+            //Sort plants to a 2d array for faster lookups
+            Program.PlantOnBoard[,] gridPlants = new Program.PlantOnBoard[5, 8];
+            for (int y = 0; y < 5; y++)
+            {
+                for (int x = 0; x < 8; x++)
+                    gridPlants[y, x] = new Program.PlantOnBoard() { plantType = -1 };
+            }
+            foreach (var plant in allPlants)
+                gridPlants[plant.row, plant.column] = plant;
+
+            //Plants spin clockwise. CLicking bottom-left corner of top-right plant, will spin plant and the one below, down-left, and left of it.
+            //Column A plants will need to target column B instead
+            //Bottom row will need to target row above it
+
+            //This way we can avoid array bound checking, as we'll always be within bounds (right?)
+            int plantX = gridInput.cursorX;
+            int plantY = gridInput.cursorY;
+            if (plantX == 0)
+                plantX = 1;
+            if (plantY == 4)
+                plantY = 3;
+
+            //Make sure none of the tiles are craters
+            if (gridPlants[plantY, plantX].plantType == -1 || gridPlants[plantY, plantX - 1].plantType == -1 || gridPlants[plantY + 1, plantX].plantType == -1 || gridPlants[plantY + 1, plantX - 1].plantType == -1)
+                return false;
+
+            //perform rotation operation
+            var tempPlant = gridPlants[plantY, plantX];
+            gridPlants[plantY, plantX] = gridPlants[plantY, plantX-1];
+            gridPlants[plantY, plantX-1] = gridPlants[plantY + 1, plantX - 1];
+            gridPlants[plantY + 1, plantX - 1] = gridPlants[plantY+1, plantX];
+            gridPlants[plantY + 1, plantX] = tempPlant;
+
+            //Check if the board has any matches
+            //Check horizontal matches
+            for(int y =0; y < 5; y++)
+            {
+                for(int x = 0; x < 6; x++)
+                {
+                    if (gridPlants[y, x].plantType == gridPlants[y, x + 1].plantType && gridPlants[y, x+1].plantType == gridPlants[y, x + 2].plantType && gridPlants[y, x].plantType != -1)
+                        return true;
+                }
+            }
+
+            //Check vertical matches
+            for (int x = 0; x < 8; x++)
+            {
+                for (int y = 0; y < 3; y++)
+                {
+                    if (gridPlants[y, x].plantType == gridPlants[y+1,x].plantType && gridPlants[y+1, x].plantType == gridPlants[y+2,x].plantType && gridPlants[y, x].plantType != -1)
+                        return true;
+                }
+            }
+
+            return false;
+        }
+
         public void UpdateFloatingSeedPackets()
         {
             //Temporarily pause game, to avoid issued caused by memory shuffling while processing
@@ -1866,6 +1948,7 @@ namespace PvZA11y.Widgets
 
             GameMode gameMode = (GameMode)memIO.GetGameMode();
             bool inBeghouled = gameMode == GameMode.Beghouled;
+            bool inBeghouled2 = gameMode == GameMode.BeghouledTwist;
             bool inVaseBreaker = VaseBreakerCheck();
             bool inRainingSeeds = gameMode == GameMode.ItsRainingSeeds;
             bool inWhackAZombie = gameMode == GameMode.WhackAZombie || memIO.GetPlayerLevel() == 15;
@@ -1961,6 +2044,19 @@ namespace PvZA11y.Widgets
                     {
                         //OOOOHHH boy, this will be crazy
                         bool matchable = BeghouledMatchablePlant();
+                        if (matchable)
+                        {
+                            List<Program.ToneProperties> tones = new List<Program.ToneProperties>();
+                            tones.Add(new Program.ToneProperties() { leftVolume = Config.current.BeghouledAssistVolume, rightVolume = Config.current.BeghouledAssistVolume, startFrequency = 700, endFrequency = 700, duration = 100, signalType = SignalGeneratorType.Sin, startDelay = 0 });
+                            tones.Add(new Program.ToneProperties() { leftVolume = Config.current.BeghouledAssistVolume, rightVolume = Config.current.BeghouledAssistVolume, startFrequency = 800, endFrequency = 800, duration = 200, signalType = SignalGeneratorType.Sin, startDelay = 100 });
+                            Program.PlayTones(tones);
+                            Program.Vibrate(1, 1, 150);
+                        }
+                    }
+
+                    if(inBeghouled2 && Config.current.Beghouled2MatchAssist)
+                    {
+                        bool matchable = Beghouled2MatchablePlant();
                         if (matchable)
                         {
                             List<Program.ToneProperties> tones = new List<Program.ToneProperties>();
@@ -2184,7 +2280,7 @@ namespace PvZA11y.Widgets
                     Console.WriteLine(functionString);
                     Program.Say(functionString);
                 }
-                else if(inBeghouled)
+                else if(inBeghouled || inBeghouled2)
                 {
                     string functionString = "";
                     if (!plants[seedbankSlot].active)
@@ -2298,7 +2394,7 @@ namespace PvZA11y.Widgets
 
 
                 }
-                else if (inBeghouled)
+                else if (inBeghouled || inBeghouled2)
                 {
                     int sunCost = seedbankSlot == 0 ? 1000 : seedbankSlot == 1 ? 500 : seedbankSlot == 2 ? 250 : seedbankSlot == 3 ? 100 : 200;
                     bool purchased = !plants[seedbankSlot].active;
@@ -2355,6 +2451,22 @@ namespace PvZA11y.Widgets
                         newIntent = Program.input.GetCurrentIntent();
                     if (newIntent is InputIntent.Up or InputIntent.Down or InputIntent.Left or InputIntent.Right)
                         DragPlant(newIntent);
+                }
+                else if (inBeghouled2)
+                {
+                    int plantX = gridInput.cursorX;
+                    int plantY = gridInput.cursorY;
+                    if (plantX == 0)
+                        plantX = 1;
+                    if (plantY == 4)
+                        plantY = 3;
+                    Vector2 cellPos = GetBoardCellPosition(plantX,plantY);
+                    cellPos.X -= 0.035f;
+                    cellPos.Y += 0.03f;
+                    bool wasPaused = memIO.GetBoardPaused();
+                    memIO.SetBoardPaused(false);
+                    Program.Click(cellPos.X,cellPos.Y,false,false,50,true);
+                    memIO.SetBoardPaused(wasPaused);
                 }
                 else if (inWhackAZombie)
                     PlacePlant(seedbankSlot, seedbankSize, plants[seedbankSlot].offsetX, false, false, false);
@@ -2423,7 +2535,7 @@ namespace PvZA11y.Widgets
                     sunAmount += animatingSunAmount;
                     info4String += " " + Program.FormatNumber(sunAmount) + " of 2,000 sun";
                 }
-                else if (inBeghouled)
+                else if (inBeghouled || inBeghouled2)
                 {
                     int matches = memIO.mem.ReadInt(memIO.ptr.boardChain + ",178,60");
                     info4String += " " + matches + " of 75 matches.";
