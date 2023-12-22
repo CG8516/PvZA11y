@@ -1745,6 +1745,15 @@ namespace PvZA11y.Widgets
             memIO.SetBoardPaused(wasPaused);
         }
 
+        int GetVaseCount()
+        {
+            int vaseCount = 0;
+            var items = Program.GetGridItems();
+            foreach (var item in items)
+                vaseCount += item.type == (int)GridItemType.Vase ? 1 : 0;
+            return vaseCount;
+        }
+
         public override void Interact(InputIntent intent)
         {
             UpdateFloatingSeedPackets();
@@ -2399,6 +2408,11 @@ namespace PvZA11y.Widgets
 
                     info4String = 14 - remainingStars + " out of 14 required stars";
 
+                }
+                else if (inVaseBreaker)
+                {
+                    int vaseCount = GetVaseCount();
+                    info4String = (vaseCount > 0 ? vaseCount : "no") + " vase" + (vaseCount != 1 ? "s" : "") + " remaining";
                 }
                 else
                 {
