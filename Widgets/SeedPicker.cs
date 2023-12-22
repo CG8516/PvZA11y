@@ -386,7 +386,7 @@ namespace PvZA11y.Widgets
                         typeName = "Front yard, day";
                         break;
                     case LevelType.Night:
-                        typeName = "Front yard, day";
+                        typeName = "Front yard, night";
                         break;
                     case LevelType.Pool:
                         typeName = "Back yard, day";
