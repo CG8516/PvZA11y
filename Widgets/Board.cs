@@ -1877,6 +1877,9 @@ namespace PvZA11y.Widgets
             bool isConveyor = ConveyorBeltCounter() > 0;
             bool ready = PlantPacketReady();
             bool canAfford = true;
+            bool isImitater = plants[seedbankSlot].packetType == (int)SeedType.SEED_IMITATER;
+            if (isImitater)
+                plantName = "Imitation " + Consts.plantNames[plants[seedbankSlot].imitaterType];
             if (ready && !isConveyor)
                 plantState = "Ready";
             else if (!isConveyor)

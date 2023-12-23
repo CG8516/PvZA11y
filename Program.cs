@@ -14,7 +14,7 @@ using PvZA11y.Widgets;
 using NAudio.Mixer;
 
 /*
-[PVZ-A11y Beta 1.13]
+[PVZ-A11y Beta 1.14]
 
 Blind and motor accessibility mod for Plants Vs Zombies.
 Allows input with rebindable keys and controller buttons, rather than requiring a mouse for input.
@@ -420,8 +420,10 @@ namespace PvZA11y
                 foundProcs = Process.GetProcessesByName("PlantsVsZombies");
                 Task.Delay(100).Wait();
             }
-
-            string procDir = foundProcs[0].MainModule.FileName;
+            ProcessModule? mainModule = foundProcs[0].MainModule;
+            if(mainModule == null)
+                return HookProcess();   //Process probably closed/crashed, or hasn't loaded yet. Try again.
+            string procDir = mainModule.FileName;
             procDir = Path.GetDirectoryName(procDir);
             appPath = procDir;
             Console.WriteLine(procDir);
@@ -485,7 +487,7 @@ namespace PvZA11y
 
             //TODO: Detect game version
 
-            string versionStr = gameProc.MainModule.FileVersionInfo.ProductVersion;
+            string? versionStr = gameProc.MainModule.FileVersionInfo.ProductVersion;
 
             //Steam version creates temporary/locked popcapgames1.exe, which will fail to grab version info. If that's the case, grab the verison info from PlantsVsZombies.exe instead.
             if (versionStr is null && appName == appNamePopcap && foundProcs != null && foundProcs.Length > 0)

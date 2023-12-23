@@ -133,7 +133,9 @@ namespace PvZA11y.Widgets
                 plantPickerState[i].seedState = (ChosenSeedState)BitConverter.ToInt32(plantPickerBytes, index);
                 index += 4;
                 plantPickerState[i].indexInBank = BitConverter.ToInt32(plantPickerBytes, index);
-                index += 16;
+                index += 12;
+                plantPickerState[i].imitaterType = (SeedType)BitConverter.ToInt32(plantPickerBytes, index);
+                index += 4;
                 plantPickerState[i].crazyDavePicked = BitConverter.ToInt32(plantPickerBytes, index) > 0;
                 index += 4;
             }
@@ -234,7 +236,7 @@ namespace PvZA11y.Widgets
                         plantInfo = "Not allowed. ";
                         break;
                 }
-
+                
                 plantInfo += (isPicked ? "Picked. " : "") + Consts.plantNames[pickerIndex] + ": " + sunCost + ": " + Consts.plantDescriptions[pickerIndex];
 
                 bool plantUnlocked = Program.CheckOwnedPlant(pickerIndex);
@@ -292,9 +294,15 @@ namespace PvZA11y.Widgets
                 int friendlySlotNumber = pickedPlantIndex + 1;
 
                 string plantName = friendlySlotNumber + ": Empty Slot";
-
                 if (pickedPlantIndex >= 0 && pickedPlantIndex < pickedPlants.Length)
-                    plantName = friendlySlotNumber + ": " + Consts.plantNames[(int)pickedPlants[pickedPlantIndex].seedType];
+                {
+                    bool isImitater = pickedPlants[pickedPlantIndex].seedType == SeedType.SEED_IMITATER;
+                    plantName = friendlySlotNumber + ": ";
+                    if(isImitater)
+                        plantName += "Imitation " + Consts.plantNames[(int)pickedPlants[pickedPlantIndex].imitaterType];
+                    else
+                        plantName += Consts.plantNames[(int)pickedPlants[pickedPlantIndex].seedType];
+                }
 
                 Console.WriteLine(plantName);
                 Program.Say(plantName, true);
