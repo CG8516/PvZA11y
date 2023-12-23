@@ -141,6 +141,15 @@ namespace PvZA11y
             else
                 keyboardBindsOk = false;
 
+            foreach(var pair in Config.current.keyBinds)
+            {
+                if(pair.Key >= 0xff)
+                {
+                    keyboardBindsOk = false;
+                    break;
+                }
+            }    
+
             if (keyboardBindsOk)
                 keyBinds = Config.current.keyBinds;
             else

@@ -77,11 +77,20 @@ namespace PvZA11y
 
             if (Config.current.keyBinds.ContainsValue(requiredInputs[inputIndex].intent))
             {
-                string keyName = ((System.Windows.Forms.Keys)Config.current.keyBinds.FirstOrDefault((x) => x.Value == requiredInputs[inputIndex].intent).Key).ToString();
-                keyName = keyName.Replace("Oem", "");
-                if (keyName[0] == 'D' && keyName[1] >= '0' && keyName[1] <= '9')
-                    keyName = keyName[1].ToString();
-                controllerStr += ", Keyboard: " + keyName;
+                uint keyCode = 0;
+                try
+                {
+                    keyCode = Config.current.keyBinds.FirstOrDefault((x) => x.Value == requiredInputs[inputIndex].intent).Key;
+                    string keyName = ((System.Windows.Forms.Keys)keyCode).ToString();
+                    keyName = keyName.Replace("Oem", "");
+                    if (keyName[0] == 'D' && keyName[1] >= '0' && keyName[1] <= '9')
+                        keyName = keyName[1].ToString();
+                    controllerStr += ", Keyboard: " + keyName;
+                }
+                catch
+                {
+                    controllerStr += ", Keyboard: Unknown Key " + keyCode.ToString();
+                }
             }
 
             return controllerStr;
