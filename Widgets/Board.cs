@@ -2049,7 +2049,7 @@ namespace PvZA11y.Widgets
                     float freq = 1000.0f - ((gridInput.cursorY * 500.0f) / (float)gridInput.height);
 
                     bool plantFound = false;
-                    if (Config.current.SayPlantOnTileMove || Config.current.FoundObjectCueVolume > 0 && !inBowling)
+                    if ((Config.current.SayPlantOnTileMove || Config.current.FoundObjectCueVolume > 0) && !inBowling)
                     {
                         //Say plant at current tile
                         string? tileObjectInfo = GetCurrentTileObject(false, Config.current.FoundObjectCueVolume > 0, false);
