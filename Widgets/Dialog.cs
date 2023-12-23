@@ -15,6 +15,7 @@ namespace PvZA11y.Widgets
     {
         public Vector2 relativePos; //position relative to parent/modal widget
         public string text;
+        public int extraData;
     }
 
     class Dialog : Widget
@@ -28,7 +29,7 @@ namespace PvZA11y.Widgets
             this.listItems = listItems;
         }
 
-        Vector2 GetItemPos()
+        public Vector2 GetItemPos()
         {
             UpdateWidgetPosition();
             Vector2 elementScreenPos = listItems[listIndex].relativePos;
@@ -126,7 +127,7 @@ namespace PvZA11y.Widgets
                 Program.PlayBoundaryTone();
         }
 
-        private void ConfineInteractionIndex()
+        public void ConfineInteractionIndex()
         {
             if (Config.current.WrapCursorInMenus)
             {
