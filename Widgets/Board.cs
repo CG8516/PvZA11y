@@ -2441,6 +2441,8 @@ namespace PvZA11y.Widgets
                         Program.Click((floatingPackets[seedbankSlot - (vaseBreakerEndless ? 1 : 0)].posX + 25) / 800.0f, (floatingPackets[seedbankSlot - (vaseBreakerEndless ? 1 : 0)].posY + 25) / 600.0f, false, false, 50, true);
                         PlacePlant(seedbankSlot, seedbankSize, 0, false, false, false, false);
                     }
+                    else if(isCobCannon)
+                        PlacePlant(0, 0, 0, false, false, false, false);
                     memIO.SetBoardPaused(isFrozen);
                     UpdateFloatingSeedPackets();
                 }
