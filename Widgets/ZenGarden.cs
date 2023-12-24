@@ -449,7 +449,10 @@ namespace PvZA11y.Widgets
             if (intent == InputIntent.CycleRight)
                 toolIndex++;
 
-            bool shouldReadTool = (intent == InputIntent.CycleLeft || intent == InputIntent.CycleRight);
+            if (intent >= InputIntent.Slot1 && intent <= InputIntent.Slot10)
+                toolIndex = intent - InputIntent.Slot1;
+
+            bool shouldReadTool = (intent == InputIntent.CycleLeft || intent == InputIntent.CycleRight || (intent >= InputIntent.Slot1 && intent <= InputIntent.Slot10));
 
             if (Config.current.WrapPlantSelection)
             {
