@@ -2620,12 +2620,8 @@ namespace PvZA11y.Widgets
                 {
                     int stageCount = memIO.mem.ReadInt(memIO.ptr.boardChain + ",178,6c");
                     int maxStages = 0;
-                    if (gameMode == GameMode.LastStand)
+                    if (gameMode == GameMode.LastStand || (gameMode >= GameMode.SurvivalDay && gameMode <= GameMode.SurvivalHardRoof))
                         maxStages = 5;
-                    else if (gameMode >= GameMode.SurvivalDay && gameMode <= GameMode.SurvivalRoof)
-                        maxStages = 5;
-                    else if (gameMode >= GameMode.SurvivalHardDay && gameMode <= GameMode.SurvivalHardRoof)
-                        maxStages = 10;
 
                     string roundCountString = "";
                     if (maxStages == 0)
