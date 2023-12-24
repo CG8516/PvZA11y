@@ -62,8 +62,8 @@ CycleLeft : Cycle left between plants, zen garden tools, and store pages.
 CycleRight: Cycle right between plants, zen garden tools, and store pages.
 ZombieMinus: Cycle backwards through zombies on the lawn.
 ZombiePlus: Cycle forwards through zombies on the lawn.
-Info1: Zombie sonar, repeat dialogue messages, say upcoming zombies while on plant selector, rename user when in user picker dialogue, say current coin balance in store, say zen garden plant name
-Info2: Plant and object information for current tile, delete user when in user picker dialogue, say zen garden plant status
-Info3: Say current sun count, say number of needy plants in zen garden, spin slots in SlotMachine minigames, say trophy count on gamemode selection screens
+Info1: Zombie sonar, repeat dialogue messages, say upcoming zombies while on plant selector, rename user when in user picker dialogue, say current coin balance in store, say zen garden plant name.
+Info2: Plant and object information for current tile, delete user when in user picker dialogue, say zen garden plant status.
+Info3: Say current sun count, say number of needy plants in zen garden, spin slots in SlotMachine minigames, say trophy count on gamemode selection screens, select/deselect imitater plant in plant picker.
 Info4: Say level progress, play audio cue if the current row has a lawnmower or a brain in iZombie levels, click snail in Zen Garden.
 Slot1 to Slot 10 will instantly select that plant/tool slot.

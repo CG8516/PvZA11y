@@ -11,7 +11,7 @@ namespace PvZA11y.Widgets
 {
     class SeedPicker : Widget
     {
-        string inputDescription = "\r\nInputs: Directional input to Navigate grid, Confirm to select/deselect plant, Deny to pause, Start to start level, Info1 to list zombies in level, Info2 to say level type, CycleLeft/CycleRight to list selected plants.\r\n";
+        string inputDescription = "\r\nInputs: Directional input to Navigate grid, Confirm to select/deselect plant, Deny to pause, Start to start level, Info1 to list zombies in level, Info2 to say level type, CycleLeft/CycleRight to list selected plants, Info3 to add or remove imitater clone of current plant.\r\n";
 
         GridInput gridInput;
         int pickedPlantIndex;   //Currently selected slot of the picked plants row (at the top of the screen)
@@ -110,6 +110,40 @@ namespace PvZA11y.Widgets
             return PlantIssue.None;
         }
 
+        void SetImitater(int slot, int plantID, bool increaseCount, bool shouldRemove)
+        {
+            if (shouldRemove)
+            {
+                memIO.mem.WriteMemory(memIO.ptr.lawnAppPtr + ",874," + (0xbc + ((int)SeedType.SEED_IMITATER * 0x3c) + 0x24).ToString("X2"), "int", "3");    //Clear InBank
+                memIO.mem.WriteMemory(memIO.ptr.lawnAppPtr + ",874," + (0xbc + ((int)SeedType.SEED_IMITATER * 0x3c) + 0x28).ToString("X2"), "int", "0");    //Clear Index
+                memIO.mem.WriteMemory(memIO.ptr.lawnAppPtr + ",874," + (0xbc + ((int)SeedType.SEED_IMITATER * 0x3c) + 0x34).ToString("X2"), "int", "-1");   //Clear imitaterType
+                int prevCount = memIO.mem.ReadInt(memIO.ptr.lawnAppPtr + ",874,d3c");
+                memIO.mem.WriteMemory(memIO.ptr.lawnAppPtr + ",874,d3c", "int", (prevCount - 1).ToString());
+                
+                //Shuffle plants from the right, to fill the empty gap.
+                for(int i =0; i < (int)SeedType.NUM_SEED_TYPES; i++)
+                {
+                    int slotIndex = memIO.mem.ReadInt(memIO.ptr.lawnAppPtr + ",874," + (0xbc + (i * 0x3c) + 0x28).ToString("X2"));
+                    if (slotIndex > slot)
+                    {
+                        memIO.mem.WriteMemory(memIO.ptr.lawnAppPtr + ",874," + (0xbc + (i * 0x3c) + 0x28).ToString("X2"), "int", (slotIndex - 1).ToString());
+                        int posX = memIO.mem.ReadInt(memIO.ptr.lawnAppPtr + ",874," + (0xbc + (i * 0x3c)).ToString("X2"));
+                        memIO.mem.WriteMemory(memIO.ptr.lawnAppPtr + ",874," + (0xbc + (i * 0x3c)).ToString("X2"), "int", (posX-50).ToString());
+                    }
+                }
+            }
+            else
+            {
+                memIO.mem.WriteMemory(memIO.ptr.lawnAppPtr + ",874," + (0xbc + ((int)SeedType.SEED_IMITATER * 0x3c) + 0x24).ToString("X2"), "int", "1");    //Write InBank
+                memIO.mem.WriteMemory(memIO.ptr.lawnAppPtr + ",874," + (0xbc + ((int)SeedType.SEED_IMITATER * 0x3c) + 0x28).ToString("X2"), "int", slot.ToString());    //Write Index
+                memIO.mem.WriteMemory(memIO.ptr.lawnAppPtr + ",874," + (0xbc + ((int)SeedType.SEED_IMITATER * 0x3c) + 0x34).ToString("X2"), "int", plantID.ToString()); //Write imitaterType
+                if (increaseCount)
+                {
+                    int prevCount = memIO.mem.ReadInt(memIO.ptr.lawnAppPtr + ",874,d3c");
+                    memIO.mem.WriteMemory(memIO.ptr.lawnAppPtr + ",874,d3c", "int", (prevCount + 1).ToString());
+                }
+            }
+        }
 
         void RefreshPlantPickerState()
         {
@@ -170,6 +204,50 @@ namespace PvZA11y.Widgets
             }
 
             return sortedPlants;
+        }
+
+        void TryAddImitation(int seedBankSize)
+        {
+            bool ownsImitater = memIO.GetPlayerPurchase(StoreItem.GameUpgradeImitater) > 0;
+            if (!ownsImitater)
+                return;
+
+            RefreshPlantPickerState();
+            var selectedPlants = GetSelectedPlants();
+            int pickCount = selectedPlants.Length;
+            int freeSlot = -1;
+            bool increaseCount = true;
+            bool shouldRemove = false;
+
+            //Check if imitater is already one of the picked plants
+            for (int i = 0; i < pickCount; i++)
+            {
+                if (selectedPlants[i].seedType == SeedType.SEED_IMITATER)
+                {
+                    freeSlot = i;
+                    increaseCount = false;
+                    break;
+                }
+            }
+            if(freeSlot == -1 && pickCount < seedBankSize)
+                freeSlot = pickCount;
+
+            if (freeSlot == -1)
+                return;
+
+            int pickerIndex = (gridInput.cursorY * 8) + gridInput.cursorX;
+
+            PlantIssue issue = FindPlantIssues((SeedType)pickerIndex);
+            if (issue is PlantIssue.NotAllowed)
+                return;
+
+            foreach (var plant in selectedPlants)
+            {
+                if (plant.imitaterType == plantPickerState[pickerIndex].seedType)
+                    shouldRemove = true;
+            }
+
+            SetImitater(freeSlot, pickerIndex, increaseCount, shouldRemove);
         }
 
         public override void Interact(InputIntent intent)
@@ -314,8 +392,7 @@ namespace PvZA11y.Widgets
             {
                 RefreshPlantPickerState();
 
-                int startPickCount = GetSelectedPlants().Length;
-                int endPickCount = startPickCount;
+                int pickCount = GetSelectedPlants().Length;
 
                 PlantIssue issue = FindPlantIssues((SeedType)pickerIndex);
                 if(issue is PlantIssue.NotAllowed)
@@ -333,7 +410,7 @@ namespace PvZA11y.Widgets
                 if (seedState == ChosenSeedState.InBank || seedState == ChosenSeedState.InChooser)
                 {
                     //If player tries to add seed to an alread-full seedbank, play a tone
-                    if (seedState == ChosenSeedState.InChooser && startPickCount == seedBankSize)
+                    if (seedState == ChosenSeedState.InChooser && pickCount == seedBankSize)
                         Program.PlayTone(Config.current.MiscAlertCueVolume, Config.current.MiscAlertCueVolume, 300, 300, 100, SignalGeneratorType.Triangle);
                     else
                         Program.Click(clickX, clickY);
@@ -341,6 +418,9 @@ namespace PvZA11y.Widgets
 
                 hasUpdatedContents = true;
             }
+
+            if (intent is InputIntent.Info3)
+                TryAddImitation(seedBankSize);
 
             if (intent == InputIntent.Start)
             {
