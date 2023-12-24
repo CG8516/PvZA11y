@@ -14,7 +14,7 @@ namespace PvZA11y.Widgets
 {
     class ZenGarden : Widget
     {
-        string inputDescription = "\r\nInputs: Directions to move around garden, Confirm to use tool, Deny or Start to leave, Info1 to say plant on current tile, Info2 to say plant need on current tile, Info3 to say number of needy plants, CycleLeft/CycleRight to change tools, Option to visit the store";
+        string inputDescription = "\r\nInputs: Directions to move around garden, Confirm to use tool, Deny or Start to leave, Info1 to say plant on current tile, Info2 to say plant need on current tile, Info3 to say number of needy plants, CycleLeft/CycleRight to change tools, Option to visit the store.";
 
         struct ZenTool
         {

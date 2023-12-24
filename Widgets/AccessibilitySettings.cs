@@ -56,13 +56,13 @@ namespace PvZA11y.Widgets
             switch(value)
             {
                 case 1:
-                    return "Full Sonar";
+                    return "Full Sonar.";
                 case 2:
-                    return "Beeps only";
+                    return "Beeps only.";
                 case 3:
-                    return "Count only";
+                    return "Count only.";
                 default:
-                    return "Off";
+                    return "Off.";
             }
         }
 
@@ -71,31 +71,31 @@ namespace PvZA11y.Widgets
             switch (value)
             {
                 case 1:
-                    return "A";
+                    return "A.";
                 case 2:
-                    return "B";
+                    return "B.";
                 case 3:
-                    return "C";
+                    return "C.";
                 case 4:
-                    return "D";
+                    return "D.";
                 case 5:
-                    return "E";
+                    return "E.";
                 case 6:
-                    return "F";
+                    return "F.";
                 case 7:
-                    return "G";
+                    return "G.";
                 case 8:
-                    return "H";
+                    return "H.";
                 case 9:
-                    return "I";
+                    return "I.";
                 default:
-                    return "Off";
+                    return "Off.";
             }
         }
 
         string GetBoolOptionValue(bool value)
         {
-            return value ? "On" : "Off";
+            return value ? "On." : "Off.";
         }
 
         void ToggleBool(ref bool value)
@@ -154,15 +154,15 @@ namespace PvZA11y.Widgets
             switch(value)
             {
                 case 1:
-                    return "0.5 seconds";
+                    return "0.5 seconds.";
                 case 2:
-                    return "1 second";
+                    return "1 second.";
                 case 3:
-                    return "2 seconds";
+                    return "2 seconds.";
                 case 4:
-                    return "3 seconds";
+                    return "3 seconds.";
                 default:
-                    return "Off";
+                    return "Off.";
             }
         }
 
@@ -242,6 +242,7 @@ namespace PvZA11y.Widgets
 
             string optionText = availableScreenreaders[selectedScreenreader].name;
             optionText += " " + options[optionIndex].name;
+            optionText += ". " + options[optionIndex].description;
 
             Console.WriteLine(optionText);
 
@@ -284,26 +285,26 @@ namespace PvZA11y.Widgets
             AccessibleOutput.SapiOutput sapi = new AccessibleOutput.SapiOutput();
             IAccessibleOutput? auto = Config.AutoScreenReader();
 
-            availableScreenreaders.Add(new ScreenReader() { name = "Automatic", output = auto, selection = Config.ScreenReaderSelection.Auto });
+            availableScreenreaders.Add(new ScreenReader() { name = "Automatic.", output = auto, selection = Config.ScreenReaderSelection.Auto });
             if (Config.current.screenReaderSelection is Config.ScreenReaderSelection.Auto)
                 selectedScreenreader = 0;
 
             if (jaws is not null && jaws.IsAvailable())
-                availableScreenreaders.Add(new ScreenReader() { name = "JAWS (NOT RECOMMENDED)", output = jaws, selection = Config.ScreenReaderSelection.Jaws });
+                availableScreenreaders.Add(new ScreenReader() { name = "JAWS (NOT RECOMMENDED).", output = jaws, selection = Config.ScreenReaderSelection.Jaws });
             if (Config.current.screenReaderSelection is Config.ScreenReaderSelection.Jaws)
                 selectedScreenreader = availableScreenreaders.Count - 1;
 
             if (nvda.IsAvailable())
-                availableScreenreaders.Add(new ScreenReader() { name = "NVDA", output = nvda, selection = Config.ScreenReaderSelection.Nvda });
+                availableScreenreaders.Add(new ScreenReader() { name = "NVDA.", output = nvda, selection = Config.ScreenReaderSelection.Nvda });
             if (Config.current.screenReaderSelection is Config.ScreenReaderSelection.Nvda)
                 selectedScreenreader = availableScreenreaders.Count - 1;
 
             if (sapi.IsAvailable())
-                availableScreenreaders.Add(new ScreenReader() { name = "SAPI", output = sapi, selection = Config.ScreenReaderSelection.Sapi });
+                availableScreenreaders.Add(new ScreenReader() { name = "SAPI.", output = sapi, selection = Config.ScreenReaderSelection.Sapi });
             if (Config.current.screenReaderSelection is Config.ScreenReaderSelection.Sapi)
                 selectedScreenreader = availableScreenreaders.Count - 1;
 
-            availableScreenreaders.Add(new ScreenReader() { name = "Deactivate", output = null, selection = Config.ScreenReaderSelection.Disabled });
+            availableScreenreaders.Add(new ScreenReader() { name = "Deactivate.", output = null, selection = Config.ScreenReaderSelection.Disabled });
             if (Config.current.screenReaderSelection is Config.ScreenReaderSelection.Disabled)
                 selectedScreenreader = availableScreenreaders.Count - 1;
             
@@ -482,7 +483,7 @@ namespace PvZA11y.Widgets
             if (currentCategory != thisCategory)
             {
                 currentCategory = thisCategory;
-                optionText = options[optionIndex].category.ToString() + "\r\n" + optionText;
+                optionText = options[optionIndex].category.ToString() + ".\r\n" + optionText;
             }
 
             optionText = prepend + optionText;

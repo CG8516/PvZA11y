@@ -13,7 +13,7 @@ namespace PvZA11y.Widgets
     class Store : Widget
     {
 
-        string inputDescription = "Inputs: Confirm to buy, Deny to close, Info1 to say coin balance, Horizontal directions and Cycle buttons to switch categories, Vertical directions to scroll items\r\n";
+        string inputDescription = "Inputs: Confirm to buy, Deny to close, Info1 to say coin balance, Horizontal directions and Cycle buttons to switch categories, Vertical directions to scroll items.\r\n";
         public Store (MemoryIO memIO, string pointerChain) : base(memIO, pointerChain)
         {
             ReloadStore();
