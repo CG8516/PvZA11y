@@ -1291,6 +1291,10 @@ namespace PvZA11y
             if (daveMessageIndex >= 2100 && daveMessageIndex <= 2104)
                 return true;
 
+            //All plants achievement dialog
+            if (daveMessageIndex >= 4000 && daveMessageIndex <= 4004)
+                return true;
+
             //if(daveMessageIndex != -1)
               //  Console.WriteLine("NO DAVE OVERRIDE: " + daveMessageIndex);
             return false;
