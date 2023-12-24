@@ -1828,6 +1828,7 @@ namespace PvZA11y
 
             long lastSweep = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             long nextFloatingPacketUpdate = 0;  //When to scan for floating seed packets (need to delay, to avoid slowing the game)
+            int prevSunAmount = 0;
             while (true)
             {
                 //Ensure window/draw specs, and hwnd are accurate
@@ -1914,7 +1915,7 @@ namespace PvZA11y
                 bool plantPacketReady = false;
                 int fastZombieRow = 0;
                 float gridHeight = 1;
-
+                int newSunAmount = 0;
                 if (currentWidget is Board)
                 {
                     if(nextFloatingPacketUpdate <= DateTimeOffset.UtcNow.ToUnixTimeMilliseconds())
@@ -1926,6 +1927,15 @@ namespace PvZA11y
                     gridHeight = ((Board)currentWidget).gridInput.height;
 
                     ((Board)currentWidget).SetAnimatingSunAmount(animatingSun);
+
+                    newSunAmount = ((Board)currentWidget).GetTotalSun();
+                    if (newSunAmount > prevSunAmount && Config.current.SaySunCountOnCollect)
+                    {
+                        string sunString = FormatNumber(newSunAmount) + " Sun";
+                        Console.WriteLine(sunString);
+                        Say(sunString);
+                    }
+
                     thisFastZombieCount = ((Board)currentWidget).GetFastZombieCount(ref fastZombieRow);
                     plantPacketReady = ((Board)currentWidget).PlantPacketReady();
                     if (((Board)currentWidget).seedbankSlot != prevSeedbankSlot)
@@ -2008,6 +2018,8 @@ namespace PvZA11y
                 }
                 else
                     prevSeedbankSlot = -1;
+
+                prevSunAmount = newSunAmount;
 
                 if(currentWidget is ZenGarden && Config.current.AutoWakeStinky)
                 {

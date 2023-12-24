@@ -746,7 +746,7 @@ namespace PvZA11y.Widgets
                 }
                 if (level == 35)
                 {
-                    Program.GameplayTutorial(new string[] { "This is VaseBreaker, which takes place at night in your front yard.", "There are columns of vases on the right side of your lawn.", "Press confirm on a vase to break it open.", "Breaking a vase can spawn a zombie, or put a plant in your hand.", "Your goal is to break all the vases, and defeat all the zombies." });
+                    Program.GameplayTutorial(new string[] { "This is VaseBreaker, which takes place at night in your front yard.", "There are columns of vases on the right side of your lawn.", "Press confirm on a vase to break it open.", "Breaking a vase can spawn a zombie, or put a plant in your deck.", "If you don't use a plant quickly enough, it will disappear from your deck.", "Your goal is to break all the vases, and defeat all the zombies." });
                 }
                 if (level == 36)
                 {
@@ -1442,6 +1442,11 @@ namespace PvZA11y.Widgets
         public void SetAnimatingSunAmount(int sun)
         {
             this.animatingSunAmount = sun;
+        }
+
+        public int GetTotalSun()
+        {
+            return animatingSunAmount + memIO.mem.ReadInt(memIO.ptr.boardChain + ",5578");
         }
 
         public int GetFastZombieCount(ref int lastRow)
@@ -2654,18 +2659,28 @@ namespace PvZA11y.Widgets
 
             if(intent == InputIntent.Info3)
             {
-                if(inSlotMachine)
+                if (inputRepeatCount == 1)
                 {
-                    //bool slotReady = memIO.mem.ReadInt(memIO.ptr.boardChain + ",178,54") == 0;
-                    //if (slotReady)
-                    Program.Click(0.62f, 0.1f);
-                    return;
+                    int coinCount = memIO.GetPlayerCoinCount();
+                    string coinString = Program.FormatNumber(coinCount*10) + " coins.";
+                    Console.WriteLine(coinString);
+                    Program.Say(coinString);
                 }
-                int sunAmount = memIO.mem.ReadInt(memIO.ptr.boardChain + ",5578");
-                sunAmount += animatingSunAmount;
-                string sunString = Program.FormatNumber(sunAmount) + " sun.";
-                Console.WriteLine(sunString);
-                Program.Say(sunString, true);
+                else
+                {
+                    if (inSlotMachine)
+                    {
+                        //bool slotReady = memIO.mem.ReadInt(memIO.ptr.boardChain + ",178,54") == 0;
+                        //if (slotReady)
+                        Program.Click(0.62f, 0.1f);
+                        return;
+                    }
+                    int sunAmount = memIO.mem.ReadInt(memIO.ptr.boardChain + ",5578");
+                    sunAmount += animatingSunAmount;
+                    string sunString = Program.FormatNumber(sunAmount) + " sun.";
+                    Console.WriteLine(sunString);
+                    Program.Say(sunString, true);
+                }
             }
         }
     }

@@ -57,6 +57,7 @@ namespace PvZA11y
             public bool SayZombieOnTileMove = true;
             public bool SayWhenTripwireCrossed = true;
             public bool SayAvailableInputs = true;
+            public bool SaySunCountOnCollect = false;
             public ScreenReaderSelection screenReaderSelection = ScreenReaderSelection.Auto;
 
             //Core functionality

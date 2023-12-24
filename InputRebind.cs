@@ -36,7 +36,7 @@ namespace PvZA11y
             new RequiredInput(){intent = InputIntent.ZombiePlus, description = "Cycle forwards through zombies on the lawn."},
             new RequiredInput(){intent = InputIntent.Info1, description = "Zombie sonar, repeat dialogue messages, say upcoming zombies while on plant selector, rename user when in user picker dialogue, say current coin balance in store, say zen garden plant name, double-tap for lawnmower and iZombie brain information."},
             new RequiredInput(){intent = InputIntent.Info2, description = "Plant and object information for current tile, say level type while on plant selector, delete user when in user picker dialogue, say zen garden plant status."},
-            new RequiredInput(){intent = InputIntent.Info3, description = "Say current sun count, say number of needy plants in zen garden, spin slots in SlotMachine minigames, say trophy count on gamemode selection screens, select/deselect imitater plant in plant picker."},
+            new RequiredInput(){intent = InputIntent.Info3, description = "Say current sun count, say number of needy plants in zen garden, spin slots in SlotMachine minigames, say trophy count on gamemode selection screens, select/deselect imitater plant in plant picker, double-tap to say coin count while in a game."},
             new RequiredInput(){intent = InputIntent.Info4, description = "Say level progress"},
             new RequiredInput(){intent = InputIntent.Slot1, description = "Instantly select plant/tool slot 1."},
             new RequiredInput(){intent = InputIntent.Slot2, description = "Instantly select plant/tool slot 2."},
