@@ -516,7 +516,7 @@ namespace PvZA11y.Widgets
                     float rVolume = gridInput.cursorX / (float)gridInput.width;
                     float lVolume = 1.0f - rVolume;
                     float freq = 1000.0f - ((gridInput.cursorY * 500.0f) / 5.0f);
-                    if (currentPlant is null || currentPlant?.need == ZenPlantNeed.None)
+                    if (currentPlant is null)
                     {
                         lVolume *= Config.current.GridPositionCueVolume;
                         rVolume *= Config.current.GridPositionCueVolume;
@@ -526,7 +526,16 @@ namespace PvZA11y.Widgets
                     {
                         lVolume *= Config.current.FoundObjectCueVolume;
                         rVolume *= Config.current.FoundObjectCueVolume;
-                        Program.PlayTone(lVolume, rVolume, freq, freq, 100, SignalGeneratorType.Square);
+                        if (currentPlant?.need == ZenPlantNeed.None)
+                        {
+                            Program.PlayTone(lVolume, rVolume, freq, freq, 100, SignalGeneratorType.Triangle);
+                            Program.Vibrate(0.1f, 0.1f, 50);
+                        }
+                        else
+                        {
+                            Program.PlayTone(lVolume, rVolume, freq, freq, 100, SignalGeneratorType.Square);
+                            Program.Vibrate(0.7f, 0.7f, 100);
+                        }
                     }
 
                     //Move cursor to plant grid for sighted players
