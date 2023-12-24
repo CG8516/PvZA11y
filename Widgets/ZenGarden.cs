@@ -132,12 +132,12 @@ namespace PvZA11y.Widgets
 
             int fertilizerCount = memIO.GetPlayerPurchase((int)StoreItem.ZenFertilizer);
             fertilizerCount -= 1000;
-            if (fertilizerCount > 0)
+            if (fertilizerCount >= 0)
                 ZenTools.Add(new ZenTool() { posX = xPos += xInc, name = "Fertilizer: " + fertilizerCount.ToString("N0") });
 
             int bugSprayCount = memIO.GetPlayerPurchase((int)StoreItem.ZenBugSpray);
             bugSprayCount -= 1000;
-            if (bugSprayCount > 0)
+            if (bugSprayCount >= 0)
                 ZenTools.Add(new ZenTool() { posX = xPos += xInc, name = "Bug Spray: " + bugSprayCount.ToString("N0") });
 
             bool hasPhonograph = memIO.GetPlayerPurchase((int)StoreItem.ZenPhonograph) > 0;
@@ -147,7 +147,7 @@ namespace PvZA11y.Widgets
             int chocolateCount = memIO.GetPlayerPurchase((int)StoreItem.Chocolate);
             chocolateCount -= 1000;
             chocolateCount = chocolateCount < 0 ? 0 : chocolateCount;
-            if (chocolateCount > 0)
+            if (chocolateCount >= 0)
                 ZenTools.Add(new ZenTool() { posX = xPos += xInc, name = "Chocolate: " + chocolateCount.ToString("N0") });
 
             bool hasGlove = memIO.GetPlayerPurchase((int)StoreItem.ZenGardeningGlove) > 0;
@@ -388,7 +388,25 @@ namespace PvZA11y.Widgets
 
         }
 
-        
+        string GetNeedString(ZenPlant? plant)
+        {
+            string needInfo = "";
+            if (plant is not null)
+            {
+                needInfo = plant.Value.need.ToString();
+                if (plant.Value.need == 0)
+                    needInfo = "Happy";
+                else
+                    needInfo = needInfo + " needed";
+
+                if (plant.Value.mushroomInMain)
+                    needInfo = "Nocturnal. Needs to be moved to mushroom garden";
+
+                if (plant.Value.aquaticInMain)
+                    needInfo = "Aquatic. Needs to be moved to aquarium garden";
+            }
+            return needInfo;
+        }
 
         public override void Interact(InputIntent intent)
         {
@@ -443,6 +461,27 @@ namespace PvZA11y.Widgets
                 if (prevX != gridInput.cursorX || prevY != gridInput.cursorY)
                 {
 
+                    string tileInfo = "";
+                    if(currentPlant != null)
+                    {
+                        if (Config.current.SayPlantOnTileMove)
+                        {
+                            if(currentPlant?.need != ZenPlantNeed.None)
+                                tileInfo = GetNeedString(currentPlant);
+                            if (tileInfo.Length > 0)
+                                tileInfo += ", ";
+                            tileInfo += Consts.plantNames[currentPlant.Value.id];
+                        }
+                    }
+
+                    if(Config.current.SayTilePosOnMove)
+                        tileInfo += (tileInfo.Length > 0 ? ", " : "") + string.Format("{0}-{1}", (char)(gridInput.cursorX + 'A'), gridInput.cursorY + 1);
+
+                    if(tileInfo.Length > 0)
+                    {
+                        Console.WriteLine(tileInfo);
+                        Program.Say(tileInfo);
+                    }
 
                     float rVolume = gridInput.cursorX / (float)gridInput.width;
                     float lVolume = 1.0f - rVolume;
@@ -483,20 +522,7 @@ namespace PvZA11y.Widgets
                 {
                     string needInfo = "No plant";
                     if (currentPlant is not null)
-                    {
-                        needInfo = currentPlant.Value.need.ToString();
-                        if (currentPlant.Value.need == 0)
-                            needInfo = "Happy";
-                        else
-                            needInfo = needInfo + " needed";
-
-                        if (currentPlant.Value.mushroomInMain)
-                            needInfo = "Nocturnal. Needs to be moved to mushroom garden";
-
-                        if (currentPlant.Value.aquaticInMain)
-                            needInfo = "Aquatic. Needs to be moved to aquarium garden";
-
-                    }
+                        needInfo = GetNeedString(currentPlant);
                     Console.WriteLine(needInfo);
                     Program.Say(needInfo, true);
                 }
