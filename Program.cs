@@ -1868,7 +1868,7 @@ namespace PvZA11y
                             messageStr = "Press the deny button, then a direction, to swap plants and make matches of three.";
                         if (messageStr == "No possible moves!")
                             messageStr = "Reshuffling to make possible moves.";
-                        if (!messageStr.Contains("fell asleep") && !messageStr.Contains("Click on the shovel"))
+                        if (!messageStr.Contains("Click on the shovel"))
                         {
                             Console.WriteLine(messageStr);
                             Say(messageStr, true);
