@@ -33,7 +33,7 @@ namespace PvZA11y.Widgets
         InputIntent lastIntent;
         long inputRepeatTimer;
         int inputRepeatCount;
-        int inputRepeatCooldown = 900;  //How many ms can pass before an input is no longer considered a double/triple tap
+        int inputRepeatCooldown = 600;  //How many ms can pass before an input is no longer considered a double/triple tap
 
         public struct Zombie
         {
@@ -1938,12 +1938,10 @@ namespace PvZA11y.Widgets
                     inputRepeatCount++;
 
                 inputRepeatCount %= 3;
-
-                lastIntent = intent;
             }
             else
                 inputRepeatCount = 0;
-
+            lastIntent = intent;
             inputRepeatTimer = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() + inputRepeatCooldown;
 
             UpdateFloatingSeedPackets();
@@ -2012,12 +2010,46 @@ namespace PvZA11y.Widgets
             //Zombie info hotkey
             if (intent == InputIntent.Info1)
             {
-                string? zombiesThisRow = GetZombieInfo();
-                if(zombiesThisRow == null)
-                    zombiesThisRow = "No Zombies";
+                if (inputRepeatCount == 1)
+                {
+                    var lawnMowers = GetLawnMowers(true);
 
-                Console.WriteLine(zombiesThisRow);
-                Program.Say(zombiesThisRow);
+                    float freq = 1000.0f - ((gridInput.cursorY * 500.0f) / (float)gridInput.height);
+                    string infoString = "Unprotected";
+                    if (lawnMowers.Count > 0)
+                    {
+                        infoString = lawnMowers[0].mowerType.ToString();
+                        Program.PlayTone(Config.current.MiscAlertCueVolume, 0, freq, freq, 100, SignalGeneratorType.Square, 0);
+                    }
+                    
+                    if (inIZombie)
+                    {
+                        if (getIzombieBrainCount(true) > 0)
+                        {
+                            infoString = "Brain remaining";
+                            Program.PlayTone(Config.current.MiscAlertCueVolume, 0, freq, freq, 100, SignalGeneratorType.Square, 0);
+                        }
+                        else
+                            infoString = "No brain";
+
+                        
+                    }
+
+                    if(infoString != "")
+                    {
+                        Console.WriteLine(infoString);
+                        Program.Say(infoString);
+                    }
+                }
+                else
+                {
+                    string? zombiesThisRow = GetZombieInfo();
+                    if (zombiesThisRow == null)
+                        zombiesThisRow = "No Zombies";
+
+                    Console.WriteLine(zombiesThisRow);
+                    Program.Say(zombiesThisRow);
+                }
             }
 
             var plants = GetPlantsInBoardBank();
@@ -2526,20 +2558,6 @@ namespace PvZA11y.Widgets
                 //return;
 
                 string info4String = "";
-
-                var lawnMowers = GetLawnMowers(true);
-
-                float freq = 1000.0f - ((gridInput.cursorY * 500.0f) / (float)gridInput.height);
-
-                if (lawnMowers.Count > 0)
-                {
-                    if(Config.current.SayLawnmowerType)
-                        info4String += lawnMowers[0].mowerType.ToString();
-                    Program.PlayTone(Config.current.MiscAlertCueVolume, 0, freq, freq, 100, SignalGeneratorType.Square, 0);
-                }
-
-                if(getIzombieBrainCount(true) > 0)
-                    Program.PlayTone(Config.current.MiscAlertCueVolume, 0, freq, freq, 100, SignalGeneratorType.Square, 0);
 
                 //GetZombossHealth
                 bool zomBossMinigame = memIO.GetGameMode() == (int)GameMode.DrZombossRevenge;
