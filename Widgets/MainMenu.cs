@@ -14,6 +14,7 @@ namespace PvZA11y.Widgets
 
         InputIntent[] lastIntents = new InputIntent[5];
         int lastIntentIndex = 0;
+        Achievements? achievements = null;
 
         static ListItem[] InitListItems(MemoryIO memIO)
         {
@@ -47,6 +48,7 @@ namespace PvZA11y.Widgets
                 new ListItem(){text = "Mini-games" + (minigamesUnlocked? "" : " (Locked)"), relativePos = new Vector2(0.7f,0.4f)},
                 new ListItem(){text = "Puzzle" + (puzzlesUnlocked? "" : " (Locked)"), relativePos = new Vector2(0.7f,0.5f)},
                 new ListItem(){text = "Survival" + (survivalUnlocked? "" : " (Locked)"), relativePos = new Vector2(0.7f,0.65f)},
+                new ListItem(){text = "Achievements", relativePos = new Vector2(0.1f,0.6f)},
                 new ListItem(){text = "Zen Garden" + (zenGardenUnlocked? "" : " (Locked)"), relativePos = new Vector2(0.3f,0.8f)},
                 new ListItem(){text = "Almanac" + (almanacUnlocked? "" : " (Locked)"), relativePos = new Vector2(0.46f,0.78f)},
                 new ListItem(){text = "Store" + (storeUnlocked? "" : " (Locked)"), relativePos = new Vector2(0.58f,0.85f)},                
@@ -78,6 +80,19 @@ namespace PvZA11y.Widgets
 
         public override void Interact(InputIntent intent)
         {
+            if (achievements != null)
+            {
+                achievements.Interact(intent);
+                if (achievements.menuClosed)
+                {
+                    achievements = null;
+                    hasUpdatedContents = true;
+                    hasReadContent = false;
+                }
+
+                return;
+            }
+
             base.Interact(intent);
 
 
@@ -110,7 +125,18 @@ namespace PvZA11y.Widgets
 
         public override void ConfirmInteraction()
         {
-            Program.Click(listItems[listIndex].relativePos);
+            if (listIndex == 5)
+            {
+                achievements = new Achievements(memIO);
+                string? title = achievements.GetCurrentWidgetText();
+                if(title != null)
+                {
+                    Console.WriteLine(title);
+                    Program.Say(title);
+                }
+            }
+            else
+                Program.Click(listItems[listIndex].relativePos);
         }
     }
 }

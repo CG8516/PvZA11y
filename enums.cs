@@ -499,6 +499,56 @@ namespace PvZA11y
             false,  false,  false,  true,   true,   true,   false,  false,  false,
             false,  false,  false,  true,   false,  false,  true,   false,  false
         };
+
+        public static string[] achievementNames = new string[]
+        {
+            "Home Lawn Security",
+            "Nobel Peas Prize",
+            "Better Off Dead",
+            "China Shop",
+            "Spudow!",
+            "Explodonator",
+            "Morticulturalist",
+            "Don't Pea in The Pool",
+            "Roll Some Heads",
+            "Grounded",
+            "Cryptozombologist",
+            "Penny Pincher",
+            "Sunny Days",
+            "Popcorn Party",
+            "Good Morning",
+            "No Fungus Among Us",
+            "Beyond The Grave",
+            "Immortal",
+            "Towering Wisdom",
+            "Mustache Mode",
+            "Disco Is Undead",
+        };
+
+        public static string[] achievementDescriptions = new string[]
+        {
+            "Complete adventure mode",
+            "Get the golden sunflower trophy",
+            "Get to a streak of 10 in iZombie endless",
+            "Get to a streak of 15 in Vasebreaker endless",
+            "Blow up a zombie using a potato mine",
+            "Take out 10 zombies with a single cherry bomb",
+            "Collect all 49 plants (including plants from crazy dave's shop)",
+            "Complete a daytime pool level without using pea shooters of any kind",
+            "Bowl over 5 zombies with a single wall-nut.",
+            "Defeat a normal roof level without using any catapult plants",
+            "Discover the yeti zombie",
+            "Pick up 30 coins in a row on a single level, without letting any disappear",
+            "Accumulate 8,000 sun during a single level",
+            "Defeat 2 gargantuars with corn cob missiles in a single level",
+            "Complete a daytime level by planting only mushrooms and coffee beans",
+            "Complete a nighttime level without planting any mushrooms",
+            "Beat all 20 mini games",
+            "Survival 20 waves of pure zombie ferocity",
+            "Grow the tree of wisdom to 100 feet",
+            "Enable mustache mode",
+            "Hypnotize the lead zombie dancer",
+        };
     }
 
     enum GameMode
