@@ -1899,6 +1899,8 @@ namespace PvZA11y.Widgets
             bool isImitater = plants[seedbankSlot].packetType == (int)SeedType.SEED_IMITATER;
             int sunCost = isImitater ? Consts.plantCosts[plants[seedbankSlot].imitaterType] : Consts.plantCosts[plants[seedbankSlot].packetType];
             string sunString = sunCost.ToString();
+            if (isConveyor)
+                sunString = "";
             if (isImitater)
                 plantName = "Imitation " + Consts.plantNames[plants[seedbankSlot].imitaterType];
             if (ready && !isConveyor)
