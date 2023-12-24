@@ -2002,7 +2002,7 @@ namespace PvZA11y
                 else
                     prevSeedbankSlot = -1;
 
-                if(currentWidget is ZenGarden)
+                if(currentWidget is ZenGarden && Config.current.AutoWakeStinky)
                 {
                     int timestamp = (int)CurrentEpoch();
                     int stinkyValue = memIO.GetPlayerPurchase(StoreItem.ZenStinkyTheSnail);

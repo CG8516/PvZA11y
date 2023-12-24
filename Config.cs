@@ -49,6 +49,7 @@ namespace PvZA11y
             public bool MoveOnZombieCycle = true;
             public int BeghouledMatchAssist = 1;
             public bool Beghouled2MatchAssist = true;
+            public bool AutoWakeStinky = false;
 
             //Narration
             public bool SayTilePosOnMove = false;

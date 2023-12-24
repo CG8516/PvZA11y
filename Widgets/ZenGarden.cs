@@ -20,6 +20,7 @@ namespace PvZA11y.Widgets
         {
             public float posX;
             public string name;
+            public bool isChoc;
         }
 
         public struct ZenPlant
@@ -148,7 +149,7 @@ namespace PvZA11y.Widgets
             chocolateCount -= 1000;
             chocolateCount = chocolateCount < 0 ? 0 : chocolateCount;
             if (chocolateCount >= 0)
-                ZenTools.Add(new ZenTool() { posX = xPos += xInc, name = "Chocolate: " + chocolateCount.ToString("N0") });
+                ZenTools.Add(new ZenTool() { posX = xPos += xInc, name = "Chocolate: " + chocolateCount.ToString("N0"), isChoc = true });
 
             bool hasGlove = memIO.GetPlayerPurchase((int)StoreItem.ZenGardeningGlove) > 0;
             if (hasGlove)
@@ -408,6 +409,32 @@ namespace PvZA11y.Widgets
             return needInfo;
         }
 
+        void ClickStinky()
+        {
+            //If not holding a plant in a glove, Click tool/button
+            if (Program.GetCursorType() == (int)CursorType.PlantFromGlove)
+                return;
+
+            bool hasStinky = memIO.GetPlayerPurchase(StoreItem.ZenStinkyTheSnail) > 0;
+            if (!hasStinky)
+                return;
+
+            //Check if holding chocolate
+            if (ZenTools[toolIndex].isChoc)
+                Program.Click(ZenTools[toolIndex].posX, 0.05f, false, false, 50, true);
+
+            var gridItems = Program.GetGridItems();
+            foreach (var gridItem in gridItems)
+            {
+                if (gridItem.type == (int)GridItemType.Stinky)
+                {
+                    Program.Click(gridItem.floatX / 800.0f, gridItem.floatY / 600.0f);
+                    break;
+                }
+            }
+            
+        }
+
         public override void Interact(InputIntent intent)
         {
             RefreshState();
@@ -544,6 +571,9 @@ namespace PvZA11y.Widgets
                     Program.Say(heightStr, true);
                 }
             }
+
+            if (currentPage == 0 && intent is InputIntent.Info4)
+                ClickStinky();
 
             //If back/pause is pressed, click MainMenu button
             if (intent == InputIntent.Deny || intent == InputIntent.Start)
