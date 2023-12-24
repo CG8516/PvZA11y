@@ -610,6 +610,10 @@ namespace PvZA11y
             //Positions that aren't exact board tiles (stinky uses these)
             public float floatX;
             public float floatY;
+
+            public int vasePlant;
+            public int vaseZombie;
+            public int transparent;
         }
 
 
@@ -681,6 +685,9 @@ namespace PvZA11y
                 gridItem.y = mem.ReadInt(memIO.ptr.boardChain + ",134," + (index + 0x14).ToString("X2"));
                 gridItem.floatX = mem.ReadFloat(memIO.ptr.boardChain + ",134," + (index + 0x24).ToString("X2"));
                 gridItem.floatY = mem.ReadFloat(memIO.ptr.boardChain + ",134," + (index + 0x28).ToString("X2"));
+                gridItem.vaseZombie = mem.ReadInt(memIO.ptr.boardChain + ",134," + (index + 0x3c).ToString("X2"));
+                gridItem.vasePlant = mem.ReadInt(memIO.ptr.boardChain + ",134," + (index + 0x40).ToString("X2"));
+                gridItem.transparent = mem.ReadInt(memIO.ptr.boardChain + ",134," + (index + 0x4c).ToString("X2"));
                 gridItems.Add(gridItem);
 
                 //Console.WriteLine("Added item at {0} {1}", gridItem.x, gridItem.y);

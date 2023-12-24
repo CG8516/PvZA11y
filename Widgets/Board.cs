@@ -984,6 +984,9 @@ namespace PvZA11y.Widgets
             bool hasIce = CheckIceAtTile();
             bool hasSquarePortal = false;
             bool hasCirclePortal = false;
+            int vasePlant = -1;
+            int vaseZombie = -1;
+            int transparent = 0;
             for (int i = 0; i < gridItems.Count; i++)
             {
                 if (gridItems[i].x == gridInput.cursorX && gridItems[i].y == gridInput.cursorY)
@@ -998,6 +1001,9 @@ namespace PvZA11y.Widgets
                         hasCirclePortal = true;
                     else if (gridItems[i].type == (int)GridItemType.PortalSquare)
                         hasSquarePortal = true;
+                    vasePlant = gridItems[i].vasePlant;
+                    vaseZombie = gridItems[i].vaseZombie;
+                    transparent = gridItems[i].transparent;
                 }
                 //Sometimes portals in 'portal combat' minigame spawn in column 9, but display in column 8
                 if(gridInput.cursorX == 8 && gridItems[i].x == 9 && gridItems[i].y == gridInput.cursorY)
@@ -1044,7 +1050,14 @@ namespace PvZA11y.Widgets
                 else if (hasGravestone)
                     plantInfoString = "Gravestone";
                 else if (vaseType != -1)
-                    plantInfoString = vaseType == 3 ? "Vase" : vaseType == 4 ? "Plant vase" : "Zombie vase";
+                {
+                    if (vasePlant != -1 && transparent > 0)
+                        plantInfoString = Consts.plantNames[vasePlant] + " in vase";
+                    else if (vaseZombie != -1 && transparent > 0)
+                        plantInfoString = Consts.zombieNames[vaseZombie] + " zombie in vase";
+                    else
+                        plantInfoString = vaseType == 3 ? "Vase" : vaseType == 4 ? "Plant vase" : "Zombie vase";
+                }
                 else if (hasIce)
                     plantInfoString = "Ice";
                 else if (starfruitTemplate)
