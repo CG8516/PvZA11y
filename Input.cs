@@ -338,7 +338,7 @@ namespace PvZA11y
 
         }
 
-        public void GetKeyOrButton(ref uint pressedKey, ref GamepadButtons pressedButton)
+        public void GetKeyOrButton(ref uint pressedKey, ref GamepadButtons pressedButton, bool allowKeyboard = true, bool allowController = true)
         {
             pressedKey = 0;
             pressedButton = GamepadButtons.None;
@@ -349,31 +349,43 @@ namespace PvZA11y
 
             while (pressedKey == 0 && pressedButton == GamepadButtons.None)
             {
-                if (CheckEscapeHeld())
+                bool escapePressed = false;
+                if (CheckEscapeHeld(ref escapePressed))
                     return;
-                
-                if (XInput.GetState(0, out State state))
+
+                if (allowController)
                 {
-                    foreach(GamepadButtons button in Enum.GetValues(typeof(GamepadButtons)))
+                    if (XInput.GetState(0, out State state))
                     {
-                        if (button is GamepadButtons.None)
-                            continue;
-                        if(state.Gamepad.Buttons.HasFlag(button))
+                        foreach (GamepadButtons button in Enum.GetValues(typeof(GamepadButtons)))
                         {
-                            pressedButton = button;
-                            return;
+                            if (button is GamepadButtons.None)
+                                continue;
+                            if (state.Gamepad.Buttons.HasFlag(button))
+                            {
+                                pressedButton = button;
+                                return;
+                            }
                         }
                     }
                 }
 
-                for(uint i =1; i < 0xff; i++)
+                if (allowKeyboard)
                 {
-                    if(NativeKeyboard.IsKeyDown(i))
+                    if(escapePressed)
                     {
-                        pressedKey = i;
+                        pressedKey = Key.Escape;
                         return;
                     }
+                    for (uint i = 1; i < 0xff; i++)
+                    {
+                        if (NativeKeyboard.IsKeyDown(i))
+                        {
+                            pressedKey = i;
+                            return;
+                        }
 
+                    }
                 }
 
             }
@@ -399,11 +411,11 @@ namespace PvZA11y
             ClearIntents();
         }
 
-        public bool CheckEscapeHeld(int holdTimeMs = 3000)
+        public bool CheckEscapeHeld(ref bool wasPressed, int holdTimeMs = 3000)
         {
 
             bool escapeDown = NativeKeyboard.IsKeyDown(Key.Escape);
-
+            wasPressed = escapeDown;
             long milliseconds = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             while (escapeDown)
             {
@@ -411,7 +423,7 @@ namespace PvZA11y
                 if (DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - milliseconds >= holdTimeMs)
                     return true;
 
-                Task.Delay(30).Wait();  //Avoid excess cpu usage
+                Task.Delay(1).Wait();
             }
 
             return false;
@@ -575,6 +587,11 @@ namespace PvZA11y
             prevState = state;
 
             return intents;
+        }
+
+        public void StopThread()
+        {
+            running = false;
         }
     }
 }

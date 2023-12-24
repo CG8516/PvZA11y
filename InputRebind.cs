@@ -22,6 +22,11 @@ namespace PvZA11y
 
         RequiredInput[] requiredInputs = new RequiredInput[]
         {
+            new RequiredInput(){intent = InputIntent.None, description = "Reset all keyboard binds to default"},
+            new RequiredInput(){intent = InputIntent.None, description = "Reset all controller binds to default"},
+            new RequiredInput(){intent = InputIntent.None, description = "Set all keyboard binds"},
+            new RequiredInput(){intent = InputIntent.None, description = "Set all controller binds"},
+
             new RequiredInput(){intent = InputIntent.Up, description = "Scroll menu up, directional input for grid navigation."},
             new RequiredInput(){intent = InputIntent.Down, description = "Scroll menu down, directional input for board navigation."},
             new RequiredInput(){intent = InputIntent.Left, description = "Adjust menu value, directional input for board navigation."},
@@ -29,7 +34,7 @@ namespace PvZA11y
             new RequiredInput(){intent = InputIntent.Confirm, description = "Plant placement and confirming menu choices."},
             new RequiredInput(){intent = InputIntent.Deny, description = "Shovel plants, deny menu choices."},
             new RequiredInput(){intent = InputIntent.Start, description = "Open the pause menu, start game from plant selector."},
-            new RequiredInput(){intent = InputIntent.Option, description = "Toggle freeze mode, open the store from Zen Garden, start wave in Last Stand"},
+            new RequiredInput(){intent = InputIntent.Option, description = "Toggle freeze mode, open the store from Zen Garden, start wave in Last Stand."},
             new RequiredInput(){intent = InputIntent.CycleLeft, description = "Cycle left between plants, zen garden tools, and store pages."},
             new RequiredInput(){intent = InputIntent.CycleRight, description = "Cycle right between plants, zen garden tools, and store pages."},
             new RequiredInput(){intent = InputIntent.ZombieMinus, description = "Cycle backwards through zombies on the lawn."},
@@ -37,7 +42,7 @@ namespace PvZA11y
             new RequiredInput(){intent = InputIntent.Info1, description = "Zombie sonar, repeat dialogue messages, say upcoming zombies while on plant selector, rename user when in user picker dialogue, say current coin balance in store, say zen garden plant name, double-tap for lawnmower and iZombie brain information."},
             new RequiredInput(){intent = InputIntent.Info2, description = "Plant and object information for current tile, say level type while on plant selector, delete user when in user picker dialogue, say zen garden plant status."},
             new RequiredInput(){intent = InputIntent.Info3, description = "Say current sun count, say number of needy plants in zen garden, spin slots in SlotMachine minigames, say trophy count on gamemode selection screens, select/deselect imitater plant in plant picker, double-tap to say coin count while in a game."},
-            new RequiredInput(){intent = InputIntent.Info4, description = "Say level progress"},
+            new RequiredInput(){intent = InputIntent.Info4, description = "Say level progress."},
             new RequiredInput(){intent = InputIntent.Slot1, description = "Instantly select plant/tool slot 1."},
             new RequiredInput(){intent = InputIntent.Slot2, description = "Instantly select plant/tool slot 2."},
             new RequiredInput(){intent = InputIntent.Slot3, description = "Instantly select plant/tool slot 3."},
@@ -56,7 +61,7 @@ namespace PvZA11y
         }
 
         string GetBoundInputStr()
-        {
+        {            
             string controllerStr = "";
 
             if (Config.current.controllerBinds.ContainsValue(requiredInputs[inputIndex].intent))
@@ -97,13 +102,16 @@ namespace PvZA11y
         }
 
         void SayCurrentOption(string? prependStr = null)
-        {
+        {               
             if (prependStr == null)
                 prependStr = "";
 
             string thisInputStr = prependStr + requiredInputs[inputIndex].intent.ToString() + ", " + requiredInputs[inputIndex].description;
 
             thisInputStr += " " + GetBoundInputStr();
+
+            if (requiredInputs[inputIndex].intent == InputIntent.None)
+                thisInputStr = prependStr + requiredInputs[inputIndex].description;
 
             Console.WriteLine(thisInputStr);
             Program.Say(thisInputStr);
@@ -144,7 +152,7 @@ namespace PvZA11y
 
             if (intent is InputIntent.Up or InputIntent.Down or InputIntent.Info1)
                 SayCurrentOption();
-            if(intent is InputIntent.Info2)
+            if(intent is InputIntent.Info2 && inputIndex > 3)
             {
                 string boundInputs = GetBoundInputStr();
                 Console.WriteLine(boundInputs);
@@ -153,10 +161,30 @@ namespace PvZA11y
 
             if (intent is InputIntent.Confirm)
             {
-                string? result = BindInput();
+                if (inputIndex == 0)
+                {
+                    Program.input.StopThread();
+                    Config.current.keyBinds = new Dictionary<uint, InputIntent>();
+                    Program.input = new Input();
+                    SayCurrentOption("All keyboard binds have been reset!\r\n");
+                }
+                else if (inputIndex == 1)
+                {
+                    Program.input.StopThread();
+                    Config.current.controllerBinds = new Dictionary<GamepadButtons, InputIntent>();
+                    Program.input = new Input();
+                    SayCurrentOption("All controller binds have been reset!\r\n");
+                }
+                else if (inputIndex == 2)
+                    BindAllInputs(false);
+                else if(inputIndex == 3)
+                    BindAllInputs(true);
+                else
+                {
+                    string? result = BindInput();
+                    SayCurrentOption(result);
+                }
                 Program.input.ClearIntents();
-
-                SayCurrentOption(result);
                 Program.input.WaitForNoInput();
             }
 
@@ -164,19 +192,60 @@ namespace PvZA11y
             return true;
         }
 
-        string? BindInput()
+        void BindAllInputs(bool controller = false)
         {
+            for(int i =0; i < requiredInputs.Length; i++)
+            {
+                InputIntent intent = requiredInputs[i].intent;
+
+                if (intent is InputIntent.None)
+                    continue;
+
+                if (controller)
+                {
+                    if (intent is InputIntent.ZombieMinus or InputIntent.ZombiePlus)
+                        continue;
+                    if (intent >= InputIntent.Slot1 && intent <= InputIntent.Slot10)
+                        continue;
+                    
+                    string? result = BindInput(i, false, true);
+                    if (result == null)
+                        return;
+                }
+                else
+                {
+                    string? result = BindInput(i, true, false);
+                    if (result == null)
+                        return;
+                }
+            }
+
+            SayCurrentOption("Rebinding Complete!\r\n");
+        }
+
+        string? BindInput(int index = -1, bool allowKeyboard = true, bool allowController = true)
+        {
+            if (index == -1)
+                index = inputIndex;
             //Try grabbing keyboard or controller input
-            RequiredInput reqInput = requiredInputs[inputIndex];
+            RequiredInput reqInput = requiredInputs[index];
             string instruction = reqInput.intent.ToString();
-            instruction += ", Press a keyboard or controller button to map to this input, or hold escape to cancel.";
+            instruction += ", Press a ";
+            if (allowKeyboard && allowController)
+                instruction += "keyboard or controller ";
+            else if (allowController)
+                instruction += "controller ";
+            else if (allowKeyboard)
+                instruction += "keyboard ";
+
+            instruction += "button to map to this input, or hold escape to cancel.";
             Console.WriteLine(instruction);
             Program.Say(instruction);
 
             GamepadButtons pressedButton = GamepadButtons.None;
             uint pressedKey = 0;
 
-            Program.input.GetKeyOrButton(ref pressedKey, ref pressedButton);
+            Program.input.GetKeyOrButton(ref pressedKey, ref pressedButton, allowKeyboard, allowController);
 
             //If user pressed escape while grabbing controller button, cancel this
             if (pressedButton == GamepadButtons.None && pressedKey == 0)
