@@ -34,6 +34,7 @@ namespace PvZA11y
             public bool WrapCursorOnGrids = false;
             public bool WrapPlantSelection = true;
             public bool KeyRepetition = true;
+            public int DoubleTapDelay = 600;
             public Dictionary<uint, InputIntent> keyBinds = new Dictionary<uint, InputIntent>();
             public Dictionary<GamepadButtons, InputIntent> controllerBinds = new Dictionary<GamepadButtons, InputIntent>();
             public bool ControllerVibration = true;

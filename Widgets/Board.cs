@@ -33,7 +33,6 @@ namespace PvZA11y.Widgets
         InputIntent lastIntent;
         long inputRepeatTimer;
         int inputRepeatCount;
-        int inputRepeatCooldown = 600;  //How many ms can pass before an input is no longer considered a double/triple tap
 
         public struct Zombie
         {
@@ -1947,7 +1946,7 @@ namespace PvZA11y.Widgets
             else
                 inputRepeatCount = 0;
             lastIntent = intent;
-            inputRepeatTimer = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() + inputRepeatCooldown;
+            inputRepeatTimer = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() + Config.current.DoubleTapDelay;
 
             UpdateFloatingSeedPackets();
 

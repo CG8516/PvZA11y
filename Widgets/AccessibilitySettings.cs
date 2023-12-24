@@ -322,6 +322,28 @@ namespace PvZA11y.Widgets
             return;
         }
 
+        void SetDoubletapDelay(InputIntent intent)
+        {
+            if (intent is InputIntent.Left)
+                Config.current.DoubleTapDelay -= 100;
+            else if (intent is InputIntent.Right)
+                Config.current.DoubleTapDelay += 100;
+
+            if (Config.current.DoubleTapDelay > 4000)
+                Config.current.DoubleTapDelay = 4000;
+
+            if (Config.current.DoubleTapDelay < 100)
+                Config.current.DoubleTapDelay = 100;
+
+            Config.SaveConfig();
+        }
+
+        string GetDoubleTapDelay()
+        {
+            float delayValue = (float)Config.current.DoubleTapDelay / 1000.0f;
+            return delayValue.ToString("0.0") + " seconds.";
+        }
+
         void MainAccessibilityMenu()
         {
             options.Clear();
@@ -334,6 +356,7 @@ namespace PvZA11y.Widgets
             options.Add(new Option() { name = "Grid cursor wrapping", description = "Jump to the opposite side of grids when passing the bounds", confirmAction = () => ToggleBool(ref Config.current.WrapCursorOnGrids), valueGrabber = () => GetBoolOptionValue(Config.current.WrapCursorOnGrids), category = OptionCategory.Input });
             options.Add(new Option() { name = "Plant selection wrapping", description = "Loop selection when cycling plants and Zen Garden tools", confirmAction = () => ToggleBool(ref Config.current.WrapPlantSelection), valueGrabber = () => GetBoolOptionValue(Config.current.WrapPlantSelection), category = OptionCategory.Input });
             options.Add(new Option() { name = "Key repetition", description = "Repeat directional inputs when held", confirmAction = () => ToggleBool(ref Config.current.KeyRepetition), valueGrabber = () => GetBoolOptionValue(Config.current.KeyRepetition), category = OptionCategory.Input });
+            options.Add(new Option() { name = "Double tap delay", description = "Higher values will allow more time to perform a double-tap. Lower values will require faster tapping, but may offer a more responsive experience", confirmAction = () => DummyLeftRightAction(InputIntent.None), leftRightAction = SetDoubletapDelay, valueGrabber = GetDoubleTapDelay, category = OptionCategory.Input });
             options.Add(new Option() { name = "Controller vibration", description = "Whether controller vibration will be used or not", confirmAction = () => ToggleBool(ref Config.current.ControllerVibration), valueGrabber = () => GetBoolOptionValue(Config.current.ControllerVibration), category = OptionCategory.Input });
             options.Add(new Option() { name = "Rebind inputs", description = "Allows you to rebind all controls.", confirmAction = InputRebindMenu, leftRightAction = DummyLeftRightAction });
 
