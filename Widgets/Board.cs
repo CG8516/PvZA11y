@@ -936,6 +936,8 @@ namespace PvZA11y.Widgets
 
             
             int sunCost = inIZombie ? Consts.iZombieSunCosts[plants[seedbankSlot].packetType - 60] : Consts.plantCosts[plants[seedbankSlot].packetType];
+            if (plants[seedbankSlot].packetType == (int)SeedType.SEED_IMITATER)
+                sunCost = Consts.plantCosts[plants[seedbankSlot].imitaterType];
 
             bool notEnoughSun = sunAmount < sunCost;
             bool refreshing = plants[seedbankSlot].isRefreshing;
@@ -1297,7 +1299,7 @@ namespace PvZA11y.Widgets
             if (zombie.headless)
                 addonDescriptor = "Headless ";
 
-            if (zombie.zombieType == (int)ZombieType.Digger && zombie.holdingSomething)
+            if (zombie.zombieType == (int)ZombieType.Digger && zombie.phase == 32)
                 infoPrepend += "Underground  ";
             else if (zombie.zombieType == (int)ZombieType.Pogo && !zombie.holdingSomething)
                 infoPrepend += "Grounded ";
@@ -1891,6 +1893,8 @@ namespace PvZA11y.Widgets
             bool ready = PlantPacketReady();
             bool canAfford = true;
             bool isImitater = plants[seedbankSlot].packetType == (int)SeedType.SEED_IMITATER;
+            int sunCost = isImitater ? Consts.plantCosts[plants[seedbankSlot].imitaterType] : Consts.plantCosts[plants[seedbankSlot].packetType];
+            string sunString = sunCost.ToString();
             if (isImitater)
                 plantName = "Imitation " + Consts.plantNames[plants[seedbankSlot].imitaterType];
             if (ready && !isConveyor)
@@ -1904,20 +1908,18 @@ namespace PvZA11y.Widgets
                     plantState = "Refreshing";
                 else
                 {
-                    plantState = sunAmount + " of " + Consts.plantCosts[plants[seedbankSlot].packetType] + " sun";
+                    plantState = sunAmount + " of " + sunCost.ToString() + " sun";
                     canAfford = false;
                 }
             }
-            string plantSun = "";
-            if (!isConveyor)
-                plantSun = Consts.plantCosts[plants[seedbankSlot].packetType] + " sun";
+            
 
             if (inputRepeatCount == 1 && intent >= InputIntent.Slot1 && intent <= InputIntent.Slot10)
-                plantInfo = plantState + ", " + plantName + (canAfford ? ", " + plantSun : "");
+                plantInfo = plantState + ", " + plantName + (canAfford ? ", " + sunString : "");
             else if (inputRepeatCount == 2 && intent >= InputIntent.Slot1 && intent <= InputIntent.Slot10)
-                plantInfo = plantSun + ", " + plantName + ", " + plantState;
+                plantInfo = sunString + ", " + plantName + ", " + plantState;
             else
-                plantInfo = plantName + ", " + plantState + (canAfford ? ", " + plantSun : "");
+                plantInfo = plantName + ", " + plantState + (canAfford ? ", " + sunString : "");
 
             if (isConveyor)
                 plantInfo = plantInfo.Replace(", ", "");
@@ -2377,6 +2379,8 @@ namespace PvZA11y.Widgets
                     {
                         //Check if there's enough sun, and plant isn't on cooldown
                         int sunCost = Consts.plantCosts[plants[seedbankSlot].packetType];
+                        if (plants[seedbankSlot].packetType == (int)SeedType.SEED_IMITATER)
+                            sunCost = Consts.plantCosts[plants[seedbankSlot].imitaterType];
 
                         bool notEnoughSun = sunAmount < sunCost;
                         bool refreshing = plants[seedbankSlot].isRefreshing;
@@ -2437,6 +2441,8 @@ namespace PvZA11y.Widgets
                 {
                     //Check if there's enough sun, and plant isn't on cooldown
                     int sunCost = inIZombie? Consts.iZombieSunCosts[plants[seedbankSlot].packetType - 60] : Consts.plantCosts[plants[seedbankSlot].packetType];
+                    if (plants[seedbankSlot].packetType == (int)SeedType.SEED_IMITATER)
+                        sunCost = Consts.plantCosts[plants[seedbankSlot].imitaterType];
 
                     bool notEnoughSun = sunAmount < sunCost;
                     bool refreshing = plants[seedbankSlot].isRefreshing;

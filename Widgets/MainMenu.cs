@@ -40,6 +40,14 @@ namespace PvZA11y.Widgets
                 levelNum = 10;
             }
 
+            int trophyState = 0;
+
+            if (memIO.GetAdventureCompletions() > 0)
+                trophyState = 1;
+
+            if (CheckTrophies(memIO) >= 48)
+                trophyState = 2;
+
 
             ListItem[] listItems = new ListItem[]
             {
@@ -48,7 +56,7 @@ namespace PvZA11y.Widgets
                 new ListItem(){text = "Mini-games" + (minigamesUnlocked? "" : " (Locked)"), relativePos = new Vector2(0.7f,0.4f)},
                 new ListItem(){text = "Puzzle" + (puzzlesUnlocked? "" : " (Locked)"), relativePos = new Vector2(0.7f,0.5f)},
                 new ListItem(){text = "Survival" + (survivalUnlocked? "" : " (Locked)"), relativePos = new Vector2(0.7f,0.65f)},
-                new ListItem(){text = "Achievements", relativePos = new Vector2(0.1f,0.6f)},
+                new ListItem(){text = "Achievements" + (trophyState == 1 ? ", Silver trophy" : trophyState == 2 ? ", Gold trophy" : ""), relativePos = new Vector2(0.1f,0.6f)},
                 new ListItem(){text = "Zen Garden" + (zenGardenUnlocked? "" : " (Locked)"), relativePos = new Vector2(0.3f,0.8f)},
                 new ListItem(){text = "Almanac" + (almanacUnlocked? "" : " (Locked)"), relativePos = new Vector2(0.46f,0.78f)},
                 new ListItem(){text = "Store" + (storeUnlocked? "" : " (Locked)"), relativePos = new Vector2(0.58f,0.85f)},                
@@ -59,6 +67,39 @@ namespace PvZA11y.Widgets
 
 
             return listItems;
+        }
+
+        static int CheckTrophies(MemoryIO memIO)
+        {
+            int trophyCount = 0;
+
+            //Puzzle modes
+            for (int i = (int)GameMode.VaseBreaker1; i < (int)GameMode.VaseBreakerEndless; i++)
+            {
+                if (memIO.GetChallengeScore(i) > 0)
+                    trophyCount++;
+            }
+            for (int i = (int)GameMode.IZombie1; i < (int)GameMode.IZombieEndless; i++)
+            {
+                if (memIO.GetChallengeScore(i) > 0)
+                    trophyCount++;
+            }
+
+            //Survival modes
+            for (int i = (int)GameMode.SurvivalDay; i < (int)GameMode.SurvivalEndless1; i++)
+            {
+                if (memIO.GetChallengeScore(i) > 0)
+                    trophyCount++;
+            }
+
+            //Minigames
+            for (int i = (int)GameMode.ZomBotany; i <= (int)GameMode.DrZombossRevenge; i++)
+            {
+                if (memIO.GetChallengeScore(i) > 0)
+                    trophyCount++;
+            }
+
+            return trophyCount;
         }
 
         public MainMenu(MemoryIO memIO) : base(memIO, "", InitListItems(memIO))
