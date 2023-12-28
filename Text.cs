@@ -122,6 +122,7 @@ namespace PvZA11y
                 string[] newPlantTooltips = deserializer.Deserialize<string[]>(File.ReadAllText(langDir + "\\" + langName + "\\PlantTooltips.yaml"));
                 string[] newPlantAlmanacDescriptions = deserializer.Deserialize<string[]>(File.ReadAllText(langDir + "\\" + langName + "\\PlantAlmanacDescriptions.yaml"));
                 string[] newZombieAlmanacDescriptions = deserializer.Deserialize<string[]>(File.ReadAllText(langDir + "\\" + langName + "\\ZombieAlmanacDescriptions.yaml"));
+                string[] newZombieNames = deserializer.Deserialize<string[]>(File.ReadAllText(langDir + "\\" + langName + "\\ZombieNames.yaml"));
                 string[] newAchievementNames = deserializer.Deserialize<string[]>(File.ReadAllText(langDir + "\\" + langName + "\\AchievementNames.yaml"));
                 string[] newAchivementDescriptions = deserializer.Deserialize<string[]>(File.ReadAllText(langDir + "\\" + langName + "\\AchievementDescriptions.yaml"));
                 var newTreeDialoge = deserializer.Deserialize<Dictionary<int, string>>(File.ReadAllText(langDir + "\\" + langName + "\\TreeDialogue.yaml"));
@@ -135,6 +136,7 @@ namespace PvZA11y
                 achievementDescriptions = newAchivementDescriptions;
                 TreeDialogue = newTreeDialoge;
                 tutorial = newTutorials;
+                zombieNames = newZombieNames;
                 Console.WriteLine("Language '{0}' loaded successfully!", langName);
                 Config.current.Language = langName;
                 Config.SaveConfig();
