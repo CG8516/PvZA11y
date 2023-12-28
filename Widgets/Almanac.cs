@@ -97,7 +97,7 @@ namespace PvZA11y.Widgets
 
                 string rechargeText = rechargeTime == 750 ? "Fast.\r\n" : rechargeTime == 3000 ? "Slow.\r\n" : "Very Slow.\r\n";
 
-                plantInfo = Consts.plantNames[pickerIndex] + ": " + sunCost + " sun.\r\nRecharge time: " + rechargeText + Consts.plantFullDescriptions[pickerIndex];
+                plantInfo = Text.plantNames[pickerIndex] + ": " + sunCost + " sun.\r\nRecharge time: " + rechargeText + Text.plantAlmanacDescriptions[pickerIndex];
             }
 
             return plantInfo;
@@ -109,7 +109,7 @@ namespace PvZA11y.Widgets
             if (ZombiePage.cursorY == 5 && ZombiePage.cursorX == 2)
                 zombieIndex = 25;
 
-            string zombieString = Consts.zombieNames[zombieIndex] + ".\r\n" + Consts.zombieFullDescriptions[zombieIndex];
+            string zombieString = Text.zombieNames[zombieIndex] + ".\r\n" + Text.zombieAlmanacDescriptions[zombieIndex];
 
             int[] zombieLevels = new int[] { 1, 3, 6, 8, 11, 13, 16, 18, 18, 21, 23, 26, 26, 28, 31, 33, 36, 38, 40, 41, 43, 46, 48, 48, 50, 99, 99, 99, 99, 99, 99, 48, 99, 99, 99, 99 };
 
@@ -230,7 +230,7 @@ namespace PvZA11y.Widgets
                             float clickY = 0.1f;
                             Program.MoveMouse(clickX, clickY);
                             Program.Click(clickX, clickY);
-                            string plantInfo = Consts.plantNames[(int)SeedType.SEED_IMITATER] + ": " + Consts.plantFullDescriptions[(int)SeedType.SEED_IMITATER];
+                            string plantInfo = Text.plantNames[(int)SeedType.SEED_IMITATER] + ": " + Text.plantAlmanacDescriptions[(int)SeedType.SEED_IMITATER];
                             Console.WriteLine(plantInfo);
                             Program.Say(plantInfo, true);
                         }

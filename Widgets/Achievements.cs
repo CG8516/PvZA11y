@@ -18,7 +18,7 @@ namespace PvZA11y.Widgets
             {
                 int achieved = memIO.mem.ReadByte(memIO.ptr.playerInfoChain + "," + (0x24 + i).ToString("X2"));
                 items[i].extraData = achieved;
-                items[i].text = Consts.achievementNames[i] + " : " + Consts.achievementDescriptions[i];
+                items[i].text = Text.achievementNames[i] + " : " + Text.achievementDescriptions[i];
             }
             return items;
         }

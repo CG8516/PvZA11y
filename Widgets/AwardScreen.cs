@@ -72,7 +72,7 @@ namespace PvZA11y.Widgets
             int plant = Program.MaxOwnedSeedIndex(playerLevel);
 
             string awardTitle = "You got a new plant!";
-            string awardBody = Consts.plantNames[plant] + ": " + Consts.plantDescriptions[plant]; //TODO: Move plantNames and plantDescriptions somewhere better
+            string awardBody = Text.plantNames[plant] + ": " + Text.plantTooltips[plant]; //TODO: Move plantNames and plantDescriptions somewhere better
 
             bool adventureMode = memIO.GetGameMode() == 0;
             awardType = memIO.GetAwardType();

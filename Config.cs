@@ -60,6 +60,7 @@ namespace PvZA11y
             public bool SayAvailableInputs = true;
             public bool SaySunCountOnCollect = false;
             public ScreenReaderSelection screenReaderSelection = ScreenReaderSelection.Auto;
+            public string Language = "English";
 
             //Core functionality
             public bool RestartOnCrash = true;

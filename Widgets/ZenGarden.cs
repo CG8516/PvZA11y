@@ -172,7 +172,7 @@ namespace PvZA11y.Widgets
                 if (wheelbarrowPlantID == -1)
                     ZenTools.Add(new ZenTool() { posX = xPos += xInc, name = "Wheel Barrow" });
                 else
-                    ZenTools.Add(new ZenTool() { posX = xPos += xInc, name = "Wheel Barrow with " + Consts.plantNames[wheelbarrowPlantID] });
+                    ZenTools.Add(new ZenTool() { posX = xPos += xInc, name = "Wheel Barrow with " + Text.plantNames[wheelbarrowPlantID] });
             }
 
             bool hasTree = memIO.GetPlayerPurchase((int)StoreItem.ZenTreeOfWisdom) > 0;
@@ -500,7 +500,7 @@ namespace PvZA11y.Widgets
                                 tileInfo = GetNeedString(currentPlant);
                             if (tileInfo.Length > 0)
                                 tileInfo += ", ";
-                            tileInfo += Consts.plantNames[currentPlant.Value.id];
+                            tileInfo += Text.plantNames[currentPlant.Value.id];
                         }
                     }
 
@@ -553,7 +553,7 @@ namespace PvZA11y.Widgets
                 {
                     string plantInfo = "Empty tile";
                     if (currentPlant is not null)
-                        plantInfo = Consts.plantNames[currentPlant.Value.id];
+                        plantInfo = Text.plantNames[currentPlant.Value.id];
                     Console.WriteLine(plantInfo);
                     Program.Say(plantInfo, true);
                 }

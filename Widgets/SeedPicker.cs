@@ -30,10 +30,7 @@ namespace PvZA11y.Widgets
                 return;
             int level = memIO.GetPlayerLevel();
             if(level == 8)
-            {
-                Program.GameplayTutorial(new string[] { "Now that you have more than six plants, you'll have to start each level by choosing which ones you want to use.", "Navigate the plant picker similarly to the board.", "Press confirm to select or deselect a plant.", "Once you've picked enough plants, you can begin the game by pressing the start button." });
-                //Program.GameplayTutorial(inputDescription.Replace("\r\nInputs:","All Inputs:").Split(','));
-            }
+                Program.GameplayTutorial(Text.tutorial.Level8);
         }
 
         struct plantInPicker
@@ -315,7 +312,7 @@ namespace PvZA11y.Widgets
                         break;
                 }
                 
-                plantInfo += (isPicked ? "Picked. " : "") + Consts.plantNames[pickerIndex] + ": " + sunCost + ": " + Consts.plantDescriptions[pickerIndex];
+                plantInfo += (isPicked ? "Picked. " : "") + Text.plantNames[pickerIndex] + ": " + sunCost + ": " + Text.plantTooltips[pickerIndex];
 
                 bool plantUnlocked = Program.CheckOwnedPlant(pickerIndex);
 
@@ -377,9 +374,9 @@ namespace PvZA11y.Widgets
                     bool isImitater = pickedPlants[pickedPlantIndex].seedType == SeedType.SEED_IMITATER;
                     plantName = friendlySlotNumber + ": ";
                     if(isImitater)
-                        plantName += "Imitation " + Consts.plantNames[(int)pickedPlants[pickedPlantIndex].imitaterType];
+                        plantName += "Imitation " + Text.plantNames[(int)pickedPlants[pickedPlantIndex].imitaterType];
                     else
-                        plantName += Consts.plantNames[(int)pickedPlants[pickedPlantIndex].seedType];
+                        plantName += Text.plantNames[(int)pickedPlants[pickedPlantIndex].seedType];
                 }
 
                 Console.WriteLine(plantName);
@@ -457,7 +454,7 @@ namespace PvZA11y.Widgets
                 zombieTypes.Sort();
                 string totalZombieTypeString = "";
                 foreach(int zombieType in zombieTypes)
-                    totalZombieTypeString += Consts.zombieNames[zombieType] + ", ";
+                    totalZombieTypeString += Text.zombieNames[zombieType] + ", ";
 
                 Console.WriteLine(totalZombieTypeString);
                 Program.Say(totalZombieTypeString);
@@ -512,7 +509,7 @@ namespace PvZA11y.Widgets
             string info = "Choose your Plants!";
 
             int sunCost = Consts.plantCosts[0];
-            string plantInfo = Consts.plantNames[0] + ": " + sunCost + ": " + Consts.plantDescriptions[0];
+            string plantInfo = Text.plantNames[0] + ": " + sunCost + ": " + Text.plantTooltips[0];
 
             return info += (Config.current.SayAvailableInputs ? inputDescription : "") + plantInfo;
         }

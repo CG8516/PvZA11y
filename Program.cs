@@ -14,7 +14,7 @@ using PvZA11y.Widgets;
 using NAudio.Mixer;
 
 /*
-[PVZ-A11y Beta 1.14]
+[PVZ-A11y Beta 1.15]
 
 Blind and motor accessibility mod for Plants Vs Zombies.
 Allows input with rebindable keys and controller buttons, rather than requiring a mouse for input.
@@ -631,19 +631,23 @@ namespace PvZA11y
 
         public static void GameplayTutorial(string[] tutorial)
         {
+            foreach (var tut in tutorial)
+                GameplayTutorial(tut);
+        }
+
+        public static void GameplayTutorial(string tutorial)
+        {
             memIO.SetBoardPaused(true);
-            Program.input.ClearIntents();
+            input.ClearIntents();
 
             int currentLine = 0;
-            int lineCount = tutorial.Length;
-            string completeTutorial = tutorial[0];
-            for (int i = 1; i < lineCount; i++)
-                completeTutorial += "\r\n" + tutorial[i];
+            string[] splitLines = tutorial.Split("\r\n");
+            int lineCount = splitLines.Length;
 
-            Console.WriteLine(completeTutorial);
-            Program.Say(completeTutorial);
+            Console.WriteLine(tutorial);
+            Say(tutorial);
 
-            InputIntent intent = Program.input.GetCurrentIntent();
+            InputIntent intent = input.GetCurrentIntent();
             while (intent != InputIntent.Confirm)
             {
                 if (intent is InputIntent.Up)
@@ -656,9 +660,9 @@ namespace PvZA11y
                     currentLine = currentLine < 0 ? 0 : currentLine;
                     currentLine = currentLine >= lineCount ? lineCount - 1 : currentLine;
                     Console.WriteLine(tutorial[currentLine]);
-                    Program.Say(tutorial[currentLine]);
+                    Program.Say(splitLines[currentLine]);
                 }
-                intent = Program.input.GetCurrentIntent();
+                intent = input.GetCurrentIntent();
             }
             memIO.SetBoardPaused(false);
         }
@@ -930,7 +934,7 @@ namespace PvZA11y
                     if (plantHeldID == -1)
                         return sunAmount;
 
-                    string plantHoldStr = Consts.plantNames[plantHeldID] + " in hand.";
+                    string plantHoldStr = Text.plantNames[plantHeldID] + " in hand.";
                     Console.WriteLine(plantHoldStr);
                     Say(plantHoldStr, true);
                     return sunAmount;
@@ -1304,11 +1308,13 @@ namespace PvZA11y
         //TODO: Move all Console.WriteLine calls to here instead. Will cleanup the code significantly, and we don't want to print anything we aren't saying, anyway. (except when debugging of course)
         public static void Say(string? text, bool interrupt = true)
         {
+            if (text == null || text.Length == 0)
+                return;
             try
             {
                 if (Config.current.screenReaderSelection is Config.ScreenReaderSelection.Auto)
                     Config.current.ScreenReader = Config.AutoScreenReader();
-                if (Config.current.ScreenReader != null && text != null)
+                if (Config.current.ScreenReader != null)
                     Config.current.ScreenReader.Speak(text, interrupt);
             }
             catch
@@ -1540,86 +1546,6 @@ namespace PvZA11y
 
         static int VasebreakerHeldPlantID = -1;
 
-        static string CleanupAlmanacDescription(string input)
-        {            
-            char[] outChars = new char[input.Length+10];
-            bool skipChar = false;
-            int addedChars = 0;
-            string statStr = "{STAT}";
-            string nocturnalStr = "{NOCTURNAL}";
-            string aquaticStr = "{AQUATIC}";
-            string keymetalStr = "{KEYMETAL}";  //Wtf is this? key metal? yucky.
-            string keywordStr = "{KEYWORD}";
-            bool endLineWithPeriod = false;
-            for (int i = 0; i < input.Length; i++)
-            {
-                if (input[i] == '{')
-                    skipChar = true;
-                if (input[i] == '}')
-                {
-                    skipChar = false;
-                    continue;
-                }
-                if (input[i] == '[')
-                {
-                    //If start of next entry, go back to before the last \r\n and stop.
-                    addedChars -= 2;
-                    break;
-                }
-                
-                if (!skipChar)
-                {
-                    //If trailing space, replace that with '.', otherwise replace the return symbol '\r', not used by terminal anyway.
-                    if (endLineWithPeriod && (input[i] == '\r' || (input[i] == '\n' && input[i-1] != '\r')))
-                    {
-                        endLineWithPeriod = false;
-                        if (outChars[addedChars - 1] == ' ')
-                        {
-                            outChars[addedChars - 1] = '.';
-                            outChars[addedChars] = '\r';
-                            outChars[addedChars+1] = '\n';
-                            addedChars++;
-                        }
-                        else
-                        {
-                            outChars[addedChars] = '.';
-                            outChars[addedChars+1] = '\r';
-                            outChars[addedChars+2] = '\n';
-                            addedChars+=2;
-                        }
-
-                        while (input[i] == '\r' || input[i] == '\n')
-                            i++;
-                        i--;
-                    }
-                    else
-                        outChars[addedChars] = input[i];
-
-                    addedChars++;
-                }
-                else
-                {
-                    if(!endLineWithPeriod)
-                    {
-                        //Loops? We ain't got no loops. We don't need no loops. I DON'T HAVE TO SHOW YOU ANY STINKIN' LOOPS!
-                        //This is called for pretty much every '{}' keyword in a plant/zombie almanac description.
-                        //In total, across all plants/zombies, it's called maybe three hundred times? idk. You think I didn't just pull that number out of my ass?
-                        //It's done at startup, and the results are cached. So performance really isn't an issue.
-                        //If you want to improve startup times on a 30+ year old cpu, feel free to optimise it.
-                        if ((input.Length - i >= statStr.Length && input.Substring(i, statStr.Length) == statStr)
-                            || (input.Length - i >= nocturnalStr.Length && input.Substring(i, nocturnalStr.Length) == nocturnalStr)
-                            || (input.Length - i >= aquaticStr.Length && input.Substring(i, aquaticStr.Length) == aquaticStr)
-                            || (input.Length - i >= keymetalStr.Length && input.Substring(i, keymetalStr.Length) == keymetalStr)
-                            || (input.Length - i >= keywordStr.Length && input.Substring(i, keywordStr.Length) == keywordStr)
-                            )
-                            endLineWithPeriod = true;
-                    }
-                }
-            }
-
-            return new string(outChars, 0, addedChars);
-        }
-
         static void OnProcessExit(object sender, EventArgs e)
         {
             Console.WriteLine("I'm out of here");
@@ -1628,10 +1554,12 @@ namespace PvZA11y
 
         static void Main(string[] args)
         {
+
+            Console.OutputEncoding = Encoding.Unicode;
             Console.WriteLine("Starting...");
 
 
-            //This is pretty gross, but kind of required if the app crashes while your mid-game
+            //This is pretty gross, but kind of required until more edge-cases are handled safely
             try
             {
                 SafeMain(args);
@@ -1663,6 +1591,7 @@ namespace PvZA11y
                     Console.WriteLine("Failed to save crashlog!");
                 }
 
+                Console.ReadLine();
 
                 //Restart the mod
                 if (Config.current != null && Config.current.RestartOnCrash)
@@ -1759,6 +1688,7 @@ namespace PvZA11y
         static void SafeMain(string[] args)
         {
             Config.LoadConfig();
+            Text.FindLanguages();
             input = new Input();    //Start input scanning thread
 
             Process gameProc = HookProcess();           
@@ -1861,7 +1791,7 @@ namespace PvZA11y
                     int heldPlantID = mem.ReadInt(memIO.ptr.boardChain + ",150,28");
                     if (heldPlantID != -1 && VasebreakerHeldPlantID == -1)
                     {
-                        string plantStr = Consts.plantNames[heldPlantID] + " in hand.";
+                        string plantStr = Text.plantNames[heldPlantID] + " in hand.";
                         Console.WriteLine(plantStr);
                         Say(plantStr, true);
                     }
@@ -1898,9 +1828,9 @@ namespace PvZA11y
                     int newTreeDialogue = mem.ReadInt(memIO.ptr.boardChain + ",178,b8");
                     if (newTreeDialogue != CurrentTreeDialogue)
                     {
-                        if (Consts.TreeDialogue.ContainsKey(newTreeDialogue))
+                        if (Text.TreeDialogue.ContainsKey(newTreeDialogue))
                         {
-                            string dialogue = Consts.TreeDialogue[newTreeDialogue];
+                            string dialogue = Text.TreeDialogue[newTreeDialogue];
                             Console.WriteLine(dialogue);
                             Say(dialogue, false);
                         }
