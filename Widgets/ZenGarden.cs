@@ -147,7 +147,6 @@ namespace PvZA11y.Widgets
 
             int chocolateCount = memIO.GetPlayerPurchase((int)StoreItem.Chocolate);
             chocolateCount -= 1000;
-            chocolateCount = chocolateCount < 0 ? 0 : chocolateCount;
             if (chocolateCount >= 0)
                 ZenTools.Add(new ZenTool() { posX = xPos += xInc, name = "Chocolate: " + chocolateCount.ToString("N0"), isChoc = true });
 
@@ -428,7 +427,7 @@ namespace PvZA11y.Widgets
             {
                 if (gridItem.type == (int)GridItemType.Stinky)
                 {
-                    Program.Click(gridItem.floatX / 800.0f, gridItem.floatY / 600.0f);
+                    Program.Click((gridItem.floatX+32.0f) / 800.0f, (gridItem.floatY+32.0f) / 600.0f);
                     break;
                 }
             }
