@@ -111,7 +111,7 @@ namespace PvZA11y.Widgets
 
             string zombieString = Text.zombieNames[zombieIndex] + ".\r\n" + Text.zombieAlmanacDescriptions[zombieIndex];
 
-            int[] zombieLevels = new int[] { 1, 3, 6, 8, 11, 13, 16, 18, 18, 21, 23, 26, 26, 28, 31, 33, 36, 38, 40, 41, 43, 46, 48, 48, 50, 99, 99, 99, 99, 99, 99, 48, 99, 99, 99, 99 };
+            int[] zombieLevels = new int[] { 1, 1, 3, 6, 8, 11, 13, 16, 18, 19, 21, 23, 26, 27, 28, 31, 33, 36, 38, 40, 41, 43, 46, 48, 49, 50, 99, 99, 99, 99, 99, 48, 99, 99, 99, 99 };
 
             int playerLevel = memIO.GetPlayerLevel();
             int adventureCompletions = memIO.GetAdventureCompletions();

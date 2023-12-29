@@ -1487,18 +1487,18 @@ namespace PvZA11y
         public static int MaxOwnedSeedIndex(int playerLevel)
         {
             int zone = ((playerLevel - 1) / 10) + 1;
-            int lvl = ((playerLevel - 1) % 10);
+            int lvl = ((playerLevel - 1) % 10) + 1;
             int unlockedSeeds = (zone - 1) * 8 + lvl;
-            if (lvl+1 >= 10)
+            if (lvl >= 10)
                 unlockedSeeds -= 2;
             //else if (lvl == 10)
                 //unlockedSeeds -= 3;
             else if (lvl >= 5)
                 unlockedSeeds -= 1;
-            if (unlockedSeeds > 39)
-                unlockedSeeds = 39;
+            if (unlockedSeeds > 40)
+                unlockedSeeds = 40;
 
-            return int.Min(49,unlockedSeeds);
+            return unlockedSeeds -1;
         }
 
         public static bool IsAquatic(SeedType plant)
