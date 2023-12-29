@@ -59,6 +59,7 @@ namespace PvZA11y
             public bool SayWhenTripwireCrossed = true;
             public bool SayAvailableInputs = true;
             public bool SaySunCountOnCollect = false;
+            public bool SayCoinValueOnCollect = false;
             public ScreenReaderSelection screenReaderSelection = ScreenReaderSelection.Auto;
             public string Language = "English";
 

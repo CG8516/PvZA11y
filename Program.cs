@@ -659,8 +659,8 @@ namespace PvZA11y
                 {
                     currentLine = currentLine < 0 ? 0 : currentLine;
                     currentLine = currentLine >= lineCount ? lineCount - 1 : currentLine;
-                    Console.WriteLine(tutorial[currentLine]);
-                    Program.Say(splitLines[currentLine]);
+                    Console.WriteLine(splitLines[currentLine]);
+                    Say(splitLines[currentLine]);
                 }
                 intent = input.GetCurrentIntent();
             }
@@ -907,12 +907,12 @@ namespace PvZA11y
 
                     continue;
                 }
-                    
 
+                
                 //Get pos, add a couple of pixels to account for rounding errors
                 Vector2 pos = new Vector2();
-                pos.X = (mem.ReadFloat(memIO.ptr.boardChain + ",fc," + (index + 0x24).ToString("X2"))+2.0f) / 800.0f;
-                pos.Y = (mem.ReadFloat(memIO.ptr.boardChain + ",fc," + (index + 0x28).ToString("X2"))+2.0f) / 600.0f;
+                pos.X = (mem.ReadFloat(memIO.ptr.boardChain + ",fc," + (index + 0x24).ToString("X2"))+8.0f) / 800.0f;
+                pos.Y = (mem.ReadFloat(memIO.ptr.boardChain + ",fc," + (index + 0x28).ToString("X2"))+8.0f) / 600.0f;
 
                 //If at/above the seed picker/bank, don't click.
                 if (pos.Y < 0.15f)
@@ -924,6 +924,35 @@ namespace PvZA11y
 
                 //Wait until click goes through
                 Click(pos);
+
+                if (Config.current.SayCoinValueOnCollect)
+                {
+                    string sayStr = "";
+                    switch ((CoinType)coinType)
+                    {
+                        case CoinType.Silver:
+                            sayStr = "10 coins";
+                            break;
+                        case CoinType.Gold:
+                            sayStr = "50 coins";
+                            break;
+                        case CoinType.Diamond:
+                            sayStr = "1,000 coins";
+                            break;
+                        case CoinType.AwardMoneyBag:
+                            sayStr = "250 coins";
+                            break;
+                        case CoinType.AwardBagDiamond:
+                            sayStr = "3,000 coins";
+                            break;
+                    }
+
+                    if (sayStr.Length > 0)
+                    {
+                        Console.WriteLine(sayStr);
+                        Say(sayStr);
+                    }
+                }
 
                 //If we're now holding a plant after clicking, don't click anything else.
                 cursorType = GetCursorType();
