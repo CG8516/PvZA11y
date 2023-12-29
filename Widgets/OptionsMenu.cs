@@ -168,8 +168,8 @@ namespace PvZA11y.Widgets
 
                     float handleTargetX = (sliderPos.X + sliderSize.X * sliderPercent);
 
-                    Vector2 downPos = relativePos + new Vector2((handleStartX) / 800.0f, (sliderPos.Y) / 600.0f);
-                    Vector2 upPos = relativePos + new Vector2((handleTargetX) / 800.0f, (sliderPos.Y) / 600.0f);
+                    Vector2 downPos = relativePos + new Vector2((handleStartX) / 800.0f, (sliderPos.Y + (sliderSize.Y/2)) / 600.0f);
+                    Vector2 upPos = relativePos + new Vector2((handleTargetX) / 800.0f, (sliderPos.Y + (sliderSize.Y / 2)) / 600.0f);
 
                     float frequency = 400 + (200.0f * sliderPercent);
 
@@ -177,7 +177,8 @@ namespace PvZA11y.Widgets
                     if (listIndex == 0)
                         Program.PlayTone(sliderPercent, sliderPercent, frequency, frequency, 50, SignalGeneratorType.Sin);
 
-                    Program.Click(downPos.X, downPos.Y, upPos.X, upPos.Y);  //Drag slider
+                    Program.Click(downPos.X, downPos.Y, upPos.X, upPos.Y, false);  //Drag slider
+                    Task.Delay(50).Wait();
                 }
             }
 

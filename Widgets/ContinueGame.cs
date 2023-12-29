@@ -20,6 +20,13 @@ namespace PvZA11y.Widgets
         {
         }
 
+        public override void DenyInteraction()
+        {
+            //Select cancel
+            listIndex = listItems.Length - 1;
+            ConfirmInteraction();
+        }
+
         protected override string? GetContent()
         {
             return "Continue Game?\r\n" + "Do you want to continue your current game, or restart the level?";

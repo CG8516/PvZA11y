@@ -225,10 +225,10 @@ namespace PvZA11y
 
         static nint gameWHnd;
 
-        static int windowWidth;
-        static int windowHeight;
-        static int drawWidth;
-        static int drawHeight;
+        public static int windowWidth;
+        public static int windowHeight;
+        public static int drawWidth;
+        public static int drawHeight;
 
         static int drawStartX;
 
@@ -304,9 +304,12 @@ namespace PvZA11y
             return 1;
         }
 
-        public static void Click(float downX, float downY, float upX, float upY)
+        public static void Click(float downX, float downY, float upX, float upY, bool async = true)
         {
-            Task.Run(() => ClickTask(downX, downY, upX, upY));
+            if (async)
+                Task.Run(() => ClickTask(downX, downY, upX, upY));
+            else
+                ClickTask(downX, downY, upX, upY);
         }
 
         public static void MoveMouse(float x, float y)

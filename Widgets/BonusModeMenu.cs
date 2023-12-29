@@ -178,6 +178,14 @@ namespace PvZA11y.Widgets
             Program.Say(trophyStr);
         }
 
+        public override void ConfirmInteraction()
+        {
+            Vector2 clickPos = GetItemPos();
+            clickPos.X += 0.05f;
+            clickPos.Y += 0.05f;
+            Program.Click(clickPos.X, clickPos.Y, false, false, 50, true);
+        }
+
         public override void Interact(InputIntent intent)
         {
             listItems = GetGameButtons(memIO);  //Update button list, because sometimes the screen loads before the buttons have been initialized :(
@@ -215,6 +223,8 @@ namespace PvZA11y.Widgets
                     Program.Vibrate(0.1f, 0.1f, 50);
                 ConfineInteractionIndex();
                 Vector2 mousePos = GetItemPos();
+                mousePos.X += 0.05f;
+                mousePos.Y += 0.05f;
                 Program.MoveMouse(mousePos.X, mousePos.Y);
 
                 float freq = 1250.0f - ((((float)listIndex / (float)listItems.Length) * 5000.0f) / 5.0f);
