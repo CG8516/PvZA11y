@@ -24,6 +24,7 @@
 
 	<ItemGroup>
     <PackageReference Include="AccessibleOutput" Version="1.0.0" />
+    <PackageReference Include="K4os.Hash.xxHash" Version="1.0.8" />
     <PackageReference Include="Memory.dll.x86" Version="1.2.26" />
     <PackageReference Include="NAudio" Version="2.2.1" />
     <PackageReference Include="SoundTouch.Net.NAudioSupport" Version="2.3.2" />

@@ -10,7 +10,7 @@ namespace PvZA11y
     public static class Text
     {
 
-        static string langDir = "Language";
+        public static string langDir = "Language";
 
         public static string[] plantNames;
 
@@ -138,7 +138,7 @@ namespace PvZA11y
                 tutorial = newTutorials;
                 zombieNames = newZombieNames;
                 Console.WriteLine("Language '{0}' loaded successfully!", langName);
-                Config.current.Language = langName;
+                Config.current.LanguageID = K4os.Hash.xxHash.XXH32.DigestOf(Encoding.Unicode.GetBytes(langName));
                 Config.SaveConfig();
                 return true;
             }
@@ -178,7 +178,8 @@ namespace PvZA11y
             foreach (var dir in languageDirs)
             {
                 string langName = dir.Substring(langDir.Length + 1);
-                if (langName == Config.current.Language)
+                uint langHash = K4os.Hash.xxHash.XXH32.DigestOf(Encoding.Unicode.GetBytes(langName));
+                if (langHash == Config.current.LanguageID)
                 {
                     langLoaded = LoadLanguage(langName);
                     break;

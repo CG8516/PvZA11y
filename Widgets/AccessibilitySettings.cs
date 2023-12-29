@@ -29,6 +29,7 @@ namespace PvZA11y.Widgets
 
         List<ScreenReader> availableScreenreaders;
         int selectedScreenreader;
+        uint selectedLanguageID = Config.current.LanguageID;
 
         enum OptionCategory
         {
@@ -197,6 +198,48 @@ namespace PvZA11y.Widgets
             }
         }
 
+        void ScrollLanguages(InputIntent intent)
+        {
+            string? selectedLanguage = GetCurrentLanguageSelection();
+            if (selectedLanguage == null)
+                return;
+            string[]? languages = GetAvailiableLanguages();
+
+            if (languages == null || languages.Length < 1)
+                return;
+
+            Array.Sort(languages);
+
+            int langIndex = 0;
+            for(int i =0; i < languages.Length; i++)
+            {
+                if(selectedLanguage == languages[i])
+                {
+                    langIndex = i;
+                    break;
+                }
+            }
+
+
+            if (intent is InputIntent.Left)
+                langIndex--;
+            if (intent is InputIntent.Right)
+                langIndex++;
+
+            if (Config.current.WrapCursorInMenus)
+            {
+                langIndex = langIndex < 0 ? languages.Length - 1 : langIndex;
+                langIndex = langIndex >= languages.Length ? 0 : langIndex;
+            }
+            else
+            {
+                langIndex = langIndex < 0 ? 0 : langIndex;
+                langIndex = langIndex >= languages.Length ? languages.Length - 1 : langIndex;
+            }
+
+            selectedLanguageID = K4os.Hash.xxHash.XXH32.DigestOf(Encoding.Unicode.GetBytes(languages[langIndex]));
+        }
+
         void ConfirmScreenReader()
         {
             if (Config.current.ScreenReader is not null)
@@ -216,6 +259,12 @@ namespace PvZA11y.Widgets
                 Config.current.ScreenReader = availableScreenreaders[selectedScreenreader].output;
                 Config.SaveConfig(availableScreenreaders[selectedScreenreader].selection);
             }
+        }
+
+        void ConfirmLanguage()
+        {
+            Config.current.LanguageID = selectedLanguageID;
+            Text.FindLanguages();
         }
 
         void ConfirmScreenReaderDisable(InputIntent intent)
@@ -261,6 +310,53 @@ namespace PvZA11y.Widgets
                 availableScreenreaders[0].output.Speak(optionText, true);
 
             return null;    //Prevent option readout from reading the menu option with the currently applied (not selected) voice
+        }
+
+        string[]? GetAvailiableLanguages()
+        {
+            bool langExists = Directory.Exists(Text.langDir);
+
+            if (!langExists)
+            {
+                string errorMsg = "Error! Language directory not found!";
+                Console.WriteLine(errorMsg);
+                Program.Say(errorMsg);
+                return null;
+            }
+
+            var languageDirs = Directory.GetDirectories(Text.langDir);
+
+            if (languageDirs == null || languageDirs.Length == 0)
+            {
+                string errorMsg = "Error! No language files found!";
+                Console.WriteLine(errorMsg);
+                Program.Say(errorMsg);
+                return null;
+            }
+
+            for (int i = 0; i < languageDirs.Length; i++)
+                languageDirs[i] = languageDirs[i].Substring(Text.langDir.Length + 1);
+
+            return languageDirs;
+        }
+
+        string? GetCurrentLanguageSelection()
+        {
+            string[]? languageNames = GetAvailiableLanguages();
+            if (languageNames == null || languageNames.Length < 0)
+                return null;
+
+            string? currentName = null;
+            foreach(var name in languageNames)
+            {
+                if(K4os.Hash.xxHash.XXH32.DigestOf(Encoding.Unicode.GetBytes(name)) == selectedLanguageID)
+                {
+                    currentName = name;
+                    break;
+                }
+            }
+
+            return currentName;
         }
 
         void GetAvailableScreenreaders()
@@ -477,6 +573,7 @@ namespace PvZA11y.Widgets
             //Other
             options.Add(new Option() { name = "Restart on crash", description = "Automatically attempt to restart the mod if it crashes", confirmAction = () => ToggleBool(ref Config.current.RestartOnCrash), valueGrabber = () => GetBoolOptionValue(Config.current.RestartOnCrash), category = OptionCategory.Other });
             options.Add(new Option() { name = "Move mouse cursor", description = "Move the mouse cursor to visually indicate where clicks will be performed", confirmAction = () => ToggleBool(ref Config.current.MoveMouseCursor), valueGrabber = () => GetBoolOptionValue(Config.current.MoveMouseCursor), category = OptionCategory.Other });
+            options.Add(new Option() { name = "Language", description = "Which language to use", leftRightAction = ScrollLanguages, valueGrabber = GetCurrentLanguageSelection, confirmAction = ConfirmLanguage, category = OptionCategory.Other });
         }
 
         public AccessibilitySettings(MemoryIO memIO) : base(memIO, "")

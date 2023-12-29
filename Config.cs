@@ -61,7 +61,7 @@ namespace PvZA11y
             public bool SaySunCountOnCollect = false;
             public bool SayCoinValueOnCollect = false;
             public ScreenReaderSelection screenReaderSelection = ScreenReaderSelection.Auto;
-            public string Language = "English";
+            public uint LanguageID = K4os.Hash.xxHash.XXH32.DigestOf(Encoding.Unicode.GetBytes("English"));
 
             //Core functionality
             public bool RestartOnCrash = true;
