@@ -931,19 +931,19 @@ namespace PvZA11y
                     switch ((CoinType)coinType)
                     {
                         case CoinType.Silver:
-                            sayStr = "10 coins";
+                            sayStr = "10 coins!";
                             break;
                         case CoinType.Gold:
-                            sayStr = "50 coins";
+                            sayStr = "50 coins!";
                             break;
                         case CoinType.Diamond:
-                            sayStr = "1,000 coins";
+                            sayStr = "1,000 coins!";
                             break;
                         case CoinType.AwardMoneyBag:
-                            sayStr = "250 coins";
+                            sayStr = "250 coins!";
                             break;
                         case CoinType.AwardBagDiamond:
-                            sayStr = "3,000 coins";
+                            sayStr = "3,000 coins!";
                             break;
                     }
 
@@ -1894,7 +1894,7 @@ namespace PvZA11y
                     newSunAmount = ((Board)currentWidget).GetTotalSun();
                     if (newSunAmount > prevSunAmount && Config.current.SaySunCountOnCollect)
                     {
-                        string sunString = FormatNumber(newSunAmount) + " Sun";
+                        string sunString = FormatNumber(newSunAmount) + " Sun!";
                         Console.WriteLine(sunString);
                         Say(sunString);
                     }
