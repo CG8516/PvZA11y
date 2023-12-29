@@ -245,6 +245,13 @@ namespace PvZA11y.Widgets
             }
 
             SetImitater(freeSlot, pickerIndex, increaseCount, shouldRemove);
+
+
+            //Set "Let's Rock" button to enabled/disabled, if enough plants have been picked
+            if (GetSelectedPlants().Length == seedBankSize)
+                memIO.mem.WriteMemory(memIO.ptr.lawnAppPtr + ",874,A0" + memIO.ptr.buttonDisabledOffet, "byte", "0");
+            else
+                memIO.mem.WriteMemory(memIO.ptr.lawnAppPtr + ",874,A0" + memIO.ptr.buttonDisabledOffet, "byte", "1");
         }
 
         public override void Interact(InputIntent intent)

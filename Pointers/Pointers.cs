@@ -99,6 +99,8 @@ namespace PvZA11y
         public string zenPlantCountOffset = ",378";
         public uint zenPlantStartOffset = 0x37c;
 
+        public string buttonDisabledOffet = ",1a";
+
         public string usernamePickerCountOffset = ",198";   //usernamePickerWidget[,userCountOffset]
         public string usernamePickerNamesOffset = ",18c";   //usernamePickerWidget[,nameListOffset]
 

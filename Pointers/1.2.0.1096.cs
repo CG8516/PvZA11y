@@ -85,6 +85,8 @@ namespace PvZA11y
 
             ret.playerChallengeScoreOffsetInt = 0x58;
 
+            ret.buttonDisabledOffet = ",22";
+
             return ret;
         }
     }
