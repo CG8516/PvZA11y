@@ -28,6 +28,7 @@
     <PackageReference Include="Memory.dll.x86" Version="1.2.26" />
     <PackageReference Include="NAudio" Version="2.2.1" />
     <PackageReference Include="SoundTouch.Net.NAudioSupport" Version="2.3.2" />
+    <PackageReference Include="System.Management" Version="8.0.0" />
     <PackageReference Include="System.Speech" Version="7.0.0" />
     <PackageReference Include="Vortice.XInput" Version="3.3.4" />
     <PackageReference Include="YamlDotNet" Version="13.7.1" />

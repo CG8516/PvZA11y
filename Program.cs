@@ -79,7 +79,7 @@ namespace PvZA11y
         [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
         private static extern IntPtr GetForegroundWindow();
 
-
+        
         /// <summary>
         /// Provides keyboard access.
         /// </summary>
@@ -143,7 +143,25 @@ namespace PvZA11y
 
         const uint WM_RBUTTONDOWN = 0x0204;
         const uint WM_RBUTTONUP = 0x0205;
-        
+
+        static bool steamLaunchAttempted = false;
+        static int GetParentProcessId(Process process)
+        {
+            try
+            {
+                using (var mo = new System.Management.ManagementObject(string.Format("win32_process.handle='{0}'", process.Id)))
+                {
+                    mo.Get();
+                    return (int)(uint)mo["ParentProcessId"];
+
+                }
+            }
+            catch
+            {
+                Console.WriteLine("Failed to find parent process");
+                return -1;
+            }
+        }
 
         struct plantInPicker
         {
@@ -422,7 +440,34 @@ namespace PvZA11y
             {
                 foundProcs = Process.GetProcessesByName("PlantsVsZombies");
                 Task.Delay(100).Wait();
+                if((foundProcs == null || foundProcs.Length < 1) && Config.current.AutoLaunchGame && !steamLaunchAttempted)
+                {
+                    ProcessStartInfo startInfo = new ProcessStartInfo(Config.current.GameStartPath);
+                    startInfo.WorkingDirectory = Directory.GetParent(Config.current.GameStartPath).FullName;
+                    startInfo.UseShellExecute = true;
+                    if (Config.current.GameStartPath.StartsWith("steam:"))
+                        steamLaunchAttempted = true;
+                    Console.WriteLine("Starting '{0}' in '{1}'", Config.current.GameStartPath, startInfo.WorkingDirectory);
+                    Process.Start(startInfo);
+                    return HookProcess();
+                }
             }
+
+            bool isSteam = false;
+            int parentPid = GetParentProcessId(foundProcs[0]);
+            if (parentPid != -1)
+            {
+                Process parentProc = Process.GetProcessById(parentPid);
+                if (parentProc != null)
+                {
+                    Console.WriteLine("Parent process: Pid: {0}, Name: {1}", parentPid, parentProc.ProcessName);
+                    if (parentProc.ProcessName == "steam")
+                        isSteam = true;
+                }
+            }
+
+            Console.WriteLine("IsSteam: {0}", isSteam);
+
             ProcessModule? mainModule = foundProcs[0].MainModule;
             if(mainModule == null)
                 return HookProcess();   //Process probably closed/crashed, or hasn't loaded yet. Try again.
@@ -523,6 +568,15 @@ namespace PvZA11y
 
             if (!didOpen)
                 Environment.Exit(1);
+
+            if (isSteam)
+                Config.current.GameStartPath = "steam://rungameid/3590";
+            else if (!reqpopcapgame1)
+                Config.current.GameStartPath = gameProc.MainModule.FileName;
+            else if(foundProcs != null && foundProcs.Length > 0 && foundProcs[0].MainModule != null)
+                Config.current.GameStartPath = foundProcs[0].MainModule.FileName;
+
+            Config.SaveConfig();
 
             return gameProc;
 

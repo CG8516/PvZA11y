@@ -61,11 +61,13 @@ namespace PvZA11y
             public bool SaySunCountOnCollect = false;
             public bool SayCoinValueOnCollect = false;
             public ScreenReaderSelection screenReaderSelection = ScreenReaderSelection.Auto;
-            public uint LanguageID = K4os.Hash.xxHash.XXH32.DigestOf(Encoding.Unicode.GetBytes("English"));
 
             //Core functionality
             public bool RestartOnCrash = true;
             public bool MoveMouseCursor = true;
+            public bool AutoLaunchGame = false;
+            public uint LanguageID = K4os.Hash.xxHash.XXH32.DigestOf(Encoding.Unicode.GetBytes("English"));
+            public string GameStartPath = "";
 
             //Volumes
             public float MenuPositionCueVolume = 0.3f;

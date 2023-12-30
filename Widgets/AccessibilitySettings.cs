@@ -573,6 +573,7 @@ namespace PvZA11y.Widgets
             //Other
             options.Add(new Option() { name = "Restart on crash", description = "Automatically attempt to restart the mod if it crashes", confirmAction = () => ToggleBool(ref Config.current.RestartOnCrash), valueGrabber = () => GetBoolOptionValue(Config.current.RestartOnCrash), category = OptionCategory.Other });
             options.Add(new Option() { name = "Move mouse cursor", description = "Move the mouse cursor to visually indicate where clicks will be performed", confirmAction = () => ToggleBool(ref Config.current.MoveMouseCursor), valueGrabber = () => GetBoolOptionValue(Config.current.MoveMouseCursor), category = OptionCategory.Other });
+            options.Add(new Option() { name = "Automatically launch game", description = "Attempt to load the game process, if it's not already running.", confirmAction = () => ToggleBool(ref Config.current.AutoLaunchGame), valueGrabber = () => GetBoolOptionValue(Config.current.AutoLaunchGame), category = OptionCategory.Other });
             options.Add(new Option() { name = "Language", description = "Which language to use", leftRightAction = ScrollLanguages, valueGrabber = GetCurrentLanguageSelection, confirmAction = ConfirmLanguage, category = OptionCategory.Other });
         }
 
