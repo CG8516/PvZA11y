@@ -11,8 +11,8 @@ namespace PvZA11y.Widgets
     {
         static ListItem[] listItems = new ListItem[]
         {
-            new ListItem(){relativePos = new Vector2(0.1f,0.95f), text = "Replay"},
-            new ListItem(){relativePos = new Vector2(0.5f,0.95f), text = "Main Menu"}
+            new ListItem(){relativePos = new Vector2(0.1f,0.95f), text = Text.menus.replayCredits},
+            new ListItem(){relativePos = new Vector2(0.5f,0.95f), text = Text.menus.mainMenu}
         };
 
         public Credits(MemoryIO memIO) : base(memIO, "", listItems)

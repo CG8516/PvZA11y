@@ -24,9 +24,9 @@ namespace PvZA11y.Widgets
         bool inBuyConfirmationDialogue = false;
         StorePage[] storePages = new StorePage[3]
         {
-            new StorePage(){pageName = "Game Upgrades."},
-            new StorePage(){pageName = "Plant Upgrades."},
-            new StorePage(){pageName = "Zen Garden."}
+            new StorePage(){pageName = Text.menus.gameUpgrades},
+            new StorePage(){pageName = Text.menus.plantUpgrades},
+            new StorePage(){pageName = Text.menus.zenGarden + "."}
         };
 
         struct StoreEntry
@@ -106,8 +106,8 @@ namespace PvZA11y.Widgets
             if (seedSlotValue < 4)
                 gameUpgrades.Add(new StoreEntry()
                 {
-                    name = "Additional Seed Slot",
-                    description = "This extra seed slot will let you choose " + (7 + seedSlotValue) + " plants per level!",
+                    name = Text.store.itemNames.seedSlot,
+                    description = Text.store.itemDescriptions.seedSlot.Replace("[0]", (7+seedSlotValue).ToString()),
                     price = seedSlotCost,
                     itemType = StoreItem.GameUpgradeSeedSlot
                 });
@@ -115,16 +115,16 @@ namespace PvZA11y.Widgets
             if (playerPurchases[(int)StoreItem.GameUpgradePoolCleaner] == 0)
                 gameUpgrades.Add(new StoreEntry()
                 {
-                    name = "Pool cleaner",
-                    description = "These Pool Cleaners add an extra line of defense on levels with a pool!",
+                    name = Text.store.itemNames.poolCleaners,
+                    description = Text.store.itemDescriptions.poolCleaners,
                     price = 1000,
                     itemType = StoreItem.GameUpgradePoolCleaner
                 });
 
             gameUpgrades.Add(new StoreEntry()
             {
-                name = (rakeAvailable ? "" : "Out of stock. ") + "Garden Rake",
-                description = "This Garden Rake takes out the first zombie that steps on it! It lasts for 3 levels!",
+                name = (rakeAvailable ? "" : Text.store.NoStock) + Text.store.itemNames.gardenRake,
+                description = Text.store.itemDescriptions.gardenRake,
                 price = 200,
                 outOfStock = !rakeAvailable,
                 itemType = StoreItem.GameUpgradeRake
@@ -133,8 +133,8 @@ namespace PvZA11y.Widgets
             if (roofCleanerAvailable)
                 gameUpgrades.Add(new StoreEntry()
                 {
-                    name = "Roof Cleaners",
-                    description = "These Roof Cleaners add an extra line of defense for those difficult roof levels!",
+                    name = Text.store.itemNames.roofCleaners,
+                    description = Text.store.itemDescriptions.roofCleaners,
                     price = 3000,
                     itemType = StoreItem.GameUpgradeRoofCleaner
                 });
@@ -142,8 +142,8 @@ namespace PvZA11y.Widgets
             if (finishedAdventure && playerPurchases[(int)StoreItem.GameUpgradeImitater] == 0)
                 gameUpgrades.Add(new StoreEntry()
                 {
-                    name = "Imitater",
-                    description = "This Imitater lets you have two of the same plant during a level!",
+                    name = Text.plantNames[(int)SeedType.SEED_IMITATER],
+                    description = Text.store.itemDescriptions.imitater,
                     price = 30000,
                     itemType = StoreItem.GameUpgradeImitater
                 });
@@ -151,8 +151,8 @@ namespace PvZA11y.Widgets
             if (finishedAdventure && playerPurchases[(int)StoreItem.GameUpgradeFirstaid] == 0)
                 gameUpgrades.Add(new StoreEntry()
                 {
-                    name = "Wall-Nut First Aid",
-                    description = "Wall-nut First Aid lets you plant fresh new wall-nuts over damaged ones! Works for tall-nuts and pumpkins too!",
+                    name = Text.store.itemNames.wallnutAid,
+                    description = Text.store.itemDescriptions.wallnutAid,
                     price = 2000,
                     itemType = StoreItem.GameUpgradeFirstaid
                 });
@@ -162,8 +162,8 @@ namespace PvZA11y.Widgets
             if (playerPurchases[(int)StoreItem.PlantGatlingpea] == 0)
                 plantUpgrades.Add(new StoreEntry()
                 {
-                    name = "Gatling Pea",
-                    description = "Plant these on your repeaters to turn them into gatling peas! Gatling peas shoot four peas at a time!",
+                    name = Text.plantNames[(int)SeedType.SEED_GATLINGPEA],
+                    description = Text.store.itemDescriptions.gatlingPea,
                     price = 5000,
                     itemType = StoreItem.PlantGatlingpea
                 });
@@ -171,8 +171,8 @@ namespace PvZA11y.Widgets
             if (playerPurchases[(int)StoreItem.PlantTwinsunflower] == 0)
                 plantUpgrades.Add(new StoreEntry()
                 {
-                    name = "Twin Sunflowers",
-                    description = "Plant these on your sunflowers to turn them into twin sunflowers! Twin sunflowers give twice as much sun as a sunflower!",
+                    name = Text.plantNames[(int)SeedType.SEED_TWINSUNFLOWER],
+                    description = Text.store.itemDescriptions.twinSunflower,
                     price = 5000,
                     itemType = StoreItem.PlantTwinsunflower
                 });
@@ -180,8 +180,8 @@ namespace PvZA11y.Widgets
             if (gloomShroomAvailable)
                 plantUpgrades.Add(new StoreEntry()
                 {
-                    name = "Gloom Shroom",
-                    description = "Plant these on your fume-shrooms to turn them into gloom-shrooms! Gloom-shrooms do rapid attacks in a small area!",
+                    name = Text.plantNames[(int)SeedType.SEED_GLOOMSHROOM],
+                    description = Text.store.itemDescriptions.gloomShroom,
                     price = 7500,
                     itemType = StoreItem.PlantGloomshroom
                 });
@@ -189,8 +189,8 @@ namespace PvZA11y.Widgets
             if (catTailAvailable)
                 plantUpgrades.Add(new StoreEntry()
                 {
-                    name = "CatTail",
-                    description = "Plant these on your lily pads to turn them into cattails! Cattails can attack any lane and take down balloon zombies!",
+                    name = Text.plantNames[(int)SeedType.SEED_CATTAIL],
+                    description = Text.store.itemDescriptions.catTail,
                     price = 10000,
                     itemType = StoreItem.PlantCattail
                 });
@@ -198,8 +198,8 @@ namespace PvZA11y.Widgets
             if (spikeRockAvailable)
                 plantUpgrades.Add(new StoreEntry()
                 {
-                    name = "Spike Rock",
-                    description = "Plant these on your spikeweeds to turn them into spikerocks! Spikerocks do twice the damage and are extremely durable!",
+                    name = Text.plantNames[(int)SeedType.SEED_SPIKEROCK],
+                    description = Text.store.itemDescriptions.spikeRock,
                     price = 7500,
                     itemType = StoreItem.PlantSpikerock
                 });
@@ -207,8 +207,8 @@ namespace PvZA11y.Widgets
             if (goldMagnetAvailable)
                 plantUpgrades.Add(new StoreEntry()
                 {
-                    name = "Gold Magnet",
-                    description = "Plant these on your magnet-shrooms to turn them into gold magnets! Gold magnets collect coins and diamonds for you!",
+                    name = Text.plantNames[(int)SeedType.SEED_GOLD_MAGNET],
+                    description = Text.store.itemDescriptions.goldMagnet,
                     price = 3000,
                     itemType = StoreItem.PlantGoldMagnet
                 });
@@ -216,8 +216,8 @@ namespace PvZA11y.Widgets
             if (finishedAdventure && playerPurchases[(int)StoreItem.PlantWintermelon] == 0)
                 plantUpgrades.Add(new StoreEntry()
                 {
-                    name = "Winter Melon",
-                    description = "Plant these on your melon-pults to turn them into winter melons! Winter melons do heavy damage and slow groups of zombies!",
+                    name = Text.plantNames[(int)SeedType.SEED_WINTERMELON],
+                    description = Text.store.itemDescriptions.winterMelon,
                     price = 10000,
                     itemType = StoreItem.PlantWintermelon
                 });
@@ -225,8 +225,8 @@ namespace PvZA11y.Widgets
             if (finishedAdventure && playerPurchases[(int)StoreItem.PlantCobcannon] == 0)
                 plantUpgrades.Add(new StoreEntry()
                 {
-                    name = "Cob Cannon",
-                    description = "Plant these on your kernel-pults to turn them into cob cannons! Click on a cob cannon to launch a deadly attack!",
+                    name = Text.plantNames[(int)SeedType.SEED_COBCANNON],
+                    description = Text.store.itemDescriptions.cobCannon,
                     price = 20000,
                     itemType = StoreItem.PlantCobcannon
                 });
@@ -237,8 +237,8 @@ namespace PvZA11y.Widgets
             if (zenGarden1Available && playerPurchases[(int)StoreItem.ZenGoldWateringcan] == 0)
                 zenGarden.Add(new StoreEntry()
                 {
-                    name = "Golden Watering Can",
-                    description = "The Golden Watering Can lets you water several plants at once!",
+                    name = Text.store.itemNames.goldenCan,
+                    description = Text.store.itemDescriptions.goldenCan,
                     price = 10000,
                     itemType = StoreItem.ZenGoldWateringcan
                 });
@@ -250,8 +250,8 @@ namespace PvZA11y.Widgets
             if (zenGarden1Available)
                 zenGarden.Add(new StoreEntry()
                 {
-                    name = (fertilizerInStock ? "" : "Out Of Stock. ") + "5 Fertilizer",
-                    description = "Your Zen Garden plants need fertilizer to grow!",
+                    name = (fertilizerInStock ? "" : Text.store.NoStock) + Text.store.itemNames.fertilizer,
+                    description = Text.store.itemDescriptions.fertilizer,
                     price = 750,
                     outOfStock = !fertilizerInStock,
                     itemType = StoreItem.ZenFertilizer
@@ -260,8 +260,8 @@ namespace PvZA11y.Widgets
             if (zenGarden1Available)
                 zenGarden.Add(new StoreEntry()
                 {
-                    name = (bugSprayInStock ? "" : "Out Of Stock. ") + "5 Bug Spray",
-                    description = "Zen Garden plants require Bug Spray from time to time! It keeps them happy for an entire day!",
+                    name = (bugSprayInStock ? "" : Text.store.NoStock) + Text.store.itemNames.bugSpray,
+                    description = Text.store.itemDescriptions.bugSpray,
                     price = 1000,
                     outOfStock = !bugSprayInStock,
                     itemType = StoreItem.ZenBugSpray
@@ -270,8 +270,8 @@ namespace PvZA11y.Widgets
             if (zenGarden1Available && playerPurchases[(int)StoreItem.ZenPhonograph] == 0)
                 zenGarden.Add(new StoreEntry()
                 {
-                    name = "Phonograph",
-                    description = "This Phonograph lets you play music for your Zen Garden plants! It keeps them happy for an entire day!",
+                    name = Text.store.itemNames.phonograph,
+                    description = Text.store.itemDescriptions.phonograph,
                     price = 15000,
                     itemType = StoreItem.ZenPhonograph
                 });
@@ -279,8 +279,8 @@ namespace PvZA11y.Widgets
             if (zenGarden1Available && playerPurchases[(int)StoreItem.ZenGardeningGlove] == 0)
                 zenGarden.Add(new StoreEntry()
                 {
-                    name = "Gardening Glove",
-                    description = "The Gardening Glove lets you move your Zen Garden plants around!",
+                    name = Text.store.itemNames.gardeningGlove,
+                    description = Text.store.itemDescriptions.gardeningGlove,
                     price = 1000,
                     itemType = StoreItem.ZenGardeningGlove
                 });
@@ -288,8 +288,8 @@ namespace PvZA11y.Widgets
             if (finishedAdventure && playerPurchases[(int)StoreItem.ZenMushroomGarden] == 0)
                 zenGarden.Add(new StoreEntry()
                 {
-                    name = "Mushroom Garden",
-                    description = "This Mushroom Garden is a place you can keep your Zen Garden plants that fall asleep during the day!",
+                    name = Text.store.itemNames.mushroomGarden,
+                    description = Text.store.itemDescriptions.mushroomGarden,
                     price = 30000,
                     itemType = StoreItem.ZenMushroomGarden
                 });
@@ -297,8 +297,8 @@ namespace PvZA11y.Widgets
             if (finishedAdventure && playerPurchases[(int)StoreItem.ZenAquariumGarden] == 0)
                 zenGarden.Add(new StoreEntry()
                 {
-                    name = "Aquarium Garden",
-                    description = "This Aquarium Garden is a place you can keep your aquatic Zen Garden plants!",
+                    name = Text.store.itemNames.aquariumGarden,
+                    description = Text.store.itemDescriptions.aquariumGarden,
                     price = 30000,
                     itemType = StoreItem.ZenAquariumGarden
                 });
@@ -306,8 +306,8 @@ namespace PvZA11y.Widgets
             if (wheelbarrowAvailable)
                 zenGarden.Add(new StoreEntry()
                 {
-                    name = "Wheel Barrow",
-                    description = "You'll need this Wheel Barrow to transport your Zen Garden plants between gardens!",
+                    name = Text.store.itemNames.wheelbarrow,
+                    description = Text.store.itemDescriptions.wheelbarrow,
                     price = 200,
                     itemType = StoreItem.ZenWheelBarrow
                 });
@@ -316,8 +316,8 @@ namespace PvZA11y.Widgets
             if (finishedAdventure && playerPurchases[(int)StoreItem.ZenStinkyTheSnail] == 0)
                 zenGarden.Add(new StoreEntry()
                 {
-                    name = "Stinky The Snail",
-                    description = "Stinky the Snail helps you pick up coins in your Zen Garden!",
+                    name = Text.store.itemNames.stinky,
+                    description = Text.store.itemDescriptions.stinky,
                     price = 3000,
                     itemType = StoreItem.ZenStinkyTheSnail
                 });
@@ -325,8 +325,8 @@ namespace PvZA11y.Widgets
             if (finishedAdventure && playerPurchases[(int)StoreItem.ZenTreeOfWisdom] == 0)
                 zenGarden.Add(new StoreEntry()
                 {
-                    name = "Tree Of Wisdom",
-                    description = "The Tree of Wisdom will tell you valuable tips and secrets if you grow it tall enough!",
+                    name = Text.store.itemNames.treeOfWisdom,
+                    description = Text.store.itemDescriptions.treeOfWisdom,
                     price = 10000,
                     itemType = StoreItem.ZenTreeOfWisdom
                 });
@@ -334,8 +334,8 @@ namespace PvZA11y.Widgets
             if (treeFoodAvailable)
                 zenGarden.Add(new StoreEntry()
                 {
-                    name = (treeFoodInStock ? "" : "Out Of Stock. ") + "Tree Food",
-                    description = "Purchase some tree food to grow your Tree of Wisdom nice and tall!",
+                    name = (treeFoodInStock ? "" : Text.store.NoStock) + Text.store.itemNames.treeFood,
+                    description = Text.store.itemDescriptions.treeFood,
                     price = 2500,
                     outOfStock = !treeFoodInStock,
                     itemType = StoreItem.ZenTreeFood
@@ -345,8 +345,8 @@ namespace PvZA11y.Widgets
             if (finishedAdventure)
                 zenGarden.Add(new StoreEntry()
                 {
-                    name = (marigold1Available ? "" : "Out of stock. ") + "Marigold 1",
-                    description = "This Marigold Sprout goes in your Zen Garden! Grow it to full-size, and it'll reward you nicely!",
+                    name = (marigold1Available ? "" : Text.store.NoStock) + Text.plantNames[(int)SeedType.SEED_MARIGOLD] + " 1",
+                    description = Text.store.itemDescriptions.marigold,
                     price = 2500,
                     outOfStock = !marigold1Available,
                     itemType = StoreItem.ZenMarigold1
@@ -355,8 +355,8 @@ namespace PvZA11y.Widgets
             if (finishedAdventure)
                 zenGarden.Add(new StoreEntry()
                 {
-                    name = (marigold2Available ? "" : "Out of stock. ") + "Marigold 2",
-                    description = "This Marigold Sprout goes in your Zen Garden! Grow it to full-size, and it'll reward you nicely!",
+                    name = (marigold2Available ? "" : Text.store.NoStock) + Text.plantNames[(int)SeedType.SEED_MARIGOLD] + " 2",
+                    description = Text.store.itemDescriptions.marigold,
                     price = 2500,
                     outOfStock = !marigold2Available,
                     itemType = StoreItem.ZenMarigold2
@@ -365,8 +365,8 @@ namespace PvZA11y.Widgets
             if (finishedAdventure)
                 zenGarden.Add(new StoreEntry()
                 {
-                    name = (marigold3Available ? "" : "Out of stock. ") + "Marigold 3",
-                    description = "This Marigold Sprout goes in your Zen Garden! Grow it to full-size, and it'll reward you nicely!",
+                    name = (marigold3Available ? "" : Text.store.NoStock) + Text.plantNames[(int)SeedType.SEED_MARIGOLD] + " 3",
+                    description = Text.store.itemDescriptions.marigold,
                     price = 2500,
                     outOfStock = !marigold3Available,
                     itemType = StoreItem.ZenMarigold3
@@ -637,7 +637,7 @@ namespace PvZA11y.Widgets
 
         protected override string? GetContent()
         {
-            return "Store\r\n" + (Config.current.SayAvailableInputs ? inputDescription : "") + GetContentUpdate();
+            return Text.menus.store + "\r\n" + (Config.current.SayAvailableInputs ? inputDescription : "") + GetContentUpdate();
         }
 
     }

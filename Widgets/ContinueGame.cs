@@ -11,9 +11,9 @@ namespace PvZA11y.Widgets
     {
         static ListItem[] _listItems = new ListItem[]
         {
-            new ListItem(){relativePos = new Vector2(0.15f,0.75f), text = "Continue"},
-            new ListItem(){relativePos = new Vector2(0.6f,0.75f), text = "Restart Level"},
-            new ListItem(){relativePos = new Vector2(0.5f,0.85f), text = "Cancel"},
+            new ListItem(){relativePos = new Vector2(0.15f,0.75f), text = Text.menus.Continue},
+            new ListItem(){relativePos = new Vector2(0.6f,0.75f), text = Text.menus.restartLevel},
+            new ListItem(){relativePos = new Vector2(0.5f,0.85f), text = Text.menus.cancel},
         };
 
         public ContinueGame(MemoryIO memIO, string pointerChain) : base(memIO, pointerChain, _listItems)
@@ -29,7 +29,7 @@ namespace PvZA11y.Widgets
 
         protected override string? GetContent()
         {
-            return "Continue Game?\r\n" + "Do you want to continue your current game, or restart the level?";
+            return Text.menus.continueGame;
         }
 
         public override void Interact(InputIntent intent)

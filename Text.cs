@@ -32,6 +32,107 @@ namespace PvZA11y
 
         public static string[] levelTypes;
 
+        public static Menus menus = new Menus();
+        public class Menus
+        {
+            //Main
+            public string mainMenu = "Main Menu";
+            public string welcomeBack = "Welcome back, ";
+            public string changeUser = "Change User";
+            public string adventureLevel = "Adventure. Level ";
+            public string minigames = "Mini-games";
+            public string puzzle = "Puzzle";
+            public string survival = "Survival";
+            public string achievements = "Achievements";
+            public string zenGarden = "Zen Garden";
+            public string almanac = "Almanac";
+            public string store = "Store";
+            public string options = "Options";
+            public string help = "Help";
+            public string quit = "Quit";
+            public string locked = " (Locked)";
+            public string silverTrophy = "Silver trophy";
+            public string goldTrophy = "Gold trophy";
+
+            public string replayCredits = "Replay credits";
+
+            public string next = "Next";
+            public string repeat = "Repeat";
+
+            public string yes = "Yes";
+            public string no = "No";
+
+            public string continueGame = "Continue Game?\r\nDo you want to continue your current game, or restart the level?";
+            public string Continue = "Continue";
+            public string restartLevel = "Restart Level";
+            public string cancel = "Cancel";
+
+            public string minigameComplete = "Complete";
+            public string minigameNotComplete = "Incomplete";
+
+            public string trophyCount = "[0] of [1] trophies";
+
+            public string gameUpgrades = "Game Upgrades.";
+            public string plantUpgrades = "Plant Upgrades.";
+        }
+
+        public static Store store = new Store();
+        public class Store
+        {
+            public string NoStock;
+            
+            public ItemNames itemNames = new ItemNames();
+            public ItemDescriptions itemDescriptions = new ItemDescriptions();
+            public class ItemNames
+            {
+                public string seedSlot;
+                public string poolCleaners;
+                public string gardenRake;
+                public string roofCleaners;
+                public string wallnutAid;
+                public string goldenCan;
+                public string fertilizer;
+                public string bugSpray;
+                public string phonograph;
+                public string gardeningGlove;
+                public string mushroomGarden;
+                public string aquariumGarden;
+                public string wheelbarrow;
+                public string stinky;
+                public string treeOfWisdom;
+                public string treeFood;
+            }
+
+            public class ItemDescriptions
+            {
+                public string seedSlot;
+                public string poolCleaners;
+                public string gardenRake;
+                public string roofCleaners;
+                public string wallnutAid;
+                public string imitater;
+                public string gatlingPea;
+                public string twinSunflower;
+                public string gloomShroom;
+                public string catTail;
+                public string spikeRock;
+                public string goldMagnet;
+                public string winterMelon;
+                public string cobCannon;
+                public string goldenCan;
+                public string fertilizer;
+                public string bugSpray;
+                public string phonograph;
+                public string gardeningGlove;
+                public string mushroomGarden;
+                public string aquariumGarden;
+                public string wheelbarrow;
+                public string stinky;
+                public string treeOfWisdom;
+                public string treeFood;
+                public string marigold;
+            }
+        }
 
         public static Tutorial tutorial = new Tutorial();
         public class Tutorial
@@ -261,6 +362,7 @@ namespace PvZA11y
                 Accessibility newAccessibility = deserializer.Deserialize<Accessibility>(File.ReadAllText(langDir + "\\" + langName + "\\AccessibilityMenu.yaml"));
                 string[] newMinigames = deserializer.Deserialize<string[]>(File.ReadAllText(langDir + "\\" + langName + "\\Minigames.yaml"));
                 string[] newLevelTypes = deserializer.Deserialize<string[]>(File.ReadAllText(langDir + "\\" + langName + "\\LevelTypes.yaml"));
+                Store newStore = deserializer.Deserialize<Store>(File.ReadAllText(langDir + "\\" + langName + "\\Store.yaml"));
 
                 plantNames = newPlantNames;
                 plantTooltips = newPlantTooltips;
@@ -274,6 +376,7 @@ namespace PvZA11y
                 zombieNames = newZombieNames;
                 minigameNames = newMinigames;
                 levelTypes = newLevelTypes;
+                store = newStore;
                 Console.WriteLine("Language '{0}' loaded successfully!", langName);
                 Config.current.LanguageID = K4os.Hash.xxHash.XXH32.DigestOf(Encoding.Unicode.GetBytes(langName));
                 Config.SaveConfig();
@@ -362,6 +465,7 @@ namespace PvZA11y
             //File.WriteAllText("Language\\English\\AccessibilityMenu.yaml", serializer.Serialize(accessibility), Encoding.Unicode);
             //File.WriteAllText("Language\\English\\Minigames.yaml", serializer.Serialize(minigameNames), Encoding.Unicode);
             //File.WriteAllText("Language\\English\\LevelTypes.yaml", serializer.Serialize(levelTypes), Encoding.Unicode);
+            //File.WriteAllText("Language\\English\\Store.yaml", serializer.Serialize(store), Encoding.Unicode);
 
             //var deserializer = new YamlDotNet.Serialization.Deserializer();
             //var treedial = deserializer.Deserialize<Dictionary<int, string>>(File.ReadAllText("Language\\English\\TreeDialogue.yaml"));

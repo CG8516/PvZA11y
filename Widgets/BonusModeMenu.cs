@@ -41,7 +41,7 @@ namespace PvZA11y.Widgets
                 listItems.Add(listItem);
             }
 
-            listItems.Add(new ListItem() { text = "Back To Menu", relativePos = new Vector2(0.1f, 0.95f) });
+            listItems.Add(new ListItem() { text = Text.menus.mainMenu, relativePos = new Vector2(0.1f, 0.95f) });
 
             return listItems.ToArray();
         }
@@ -61,11 +61,11 @@ namespace PvZA11y.Widgets
             if (listIndex == listItems.Length - 1)
                 return "";
             bool isComplete = memIO.GetChallengeScore(listItems[listIndex].extraData + 1) > 0;
-            string completionString = isComplete ? "Complete" : "";
+            string completionString = isComplete ? Text.menus.minigameComplete : "";
             if(say)
             {
                 if (!isComplete)
-                    completionString = "Incomplete";
+                    completionString = Text.menus.minigameNotComplete;
                 Console.WriteLine(completionString);
                 Program.Say(completionString);
             }
@@ -99,7 +99,9 @@ namespace PvZA11y.Widgets
                     completions++;
             }
 
-            string trophyStr = completions + " of " + maxTrophies + " trophies";
+            string trophyStr = Text.menus.trophyCount;
+            trophyStr = trophyStr.Replace("[0]", completions.ToString());
+            trophyStr = trophyStr.Replace("[1]", maxTrophies.ToString());
             Console.WriteLine(trophyStr);
             Program.Say(trophyStr);
         }

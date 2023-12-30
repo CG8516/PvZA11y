@@ -51,18 +51,18 @@ namespace PvZA11y.Widgets
 
             ListItem[] listItems = new ListItem[]
             {
-                new ListItem(){text = "Change User", relativePos = new Vector2(0.21f,0.25f)},
-                new ListItem(){text = "Adventure. Level " + worldNum.ToString() + ", " + levelNum.ToString(), relativePos = new Vector2(0.7f,0.2f)},
-                new ListItem(){text = "Mini-games" + (minigamesUnlocked? "" : " (Locked)"), relativePos = new Vector2(0.7f,0.4f)},
-                new ListItem(){text = "Puzzle" + (puzzlesUnlocked? "" : " (Locked)"), relativePos = new Vector2(0.7f,0.5f)},
-                new ListItem(){text = "Survival" + (survivalUnlocked? "" : " (Locked)"), relativePos = new Vector2(0.7f,0.65f)},
-                new ListItem(){text = "Achievements" + (trophyState == 1 ? ", Silver trophy" : trophyState == 2 ? ", Gold trophy" : ""), relativePos = new Vector2(0.1f,0.6f)},
-                new ListItem(){text = "Zen Garden" + (zenGardenUnlocked? "" : " (Locked)"), relativePos = new Vector2(0.3f,0.8f)},
-                new ListItem(){text = "Almanac" + (almanacUnlocked? "" : " (Locked)"), relativePos = new Vector2(0.46f,0.78f)},
-                new ListItem(){text = "Store" + (storeUnlocked? "" : " (Locked)"), relativePos = new Vector2(0.58f,0.85f)},                
-                new ListItem(){text = "Options", relativePos = new Vector2(0.75f,0.85f)},
-                new ListItem(){text = "Help", relativePos = new Vector2(0.83f,0.88f)},
-                new ListItem(){text = "Quit", relativePos = new Vector2(0.92f,0.87f)}
+                new ListItem(){text = Text.menus.changeUser, relativePos = new Vector2(0.21f,0.25f)},
+                new ListItem(){text = Text.menus.adventureLevel + worldNum.ToString() + ", " + levelNum.ToString(), relativePos = new Vector2(0.7f,0.2f)},
+                new ListItem(){text = Text.menus.minigames + (minigamesUnlocked? "" : Text.menus.locked), relativePos = new Vector2(0.7f,0.4f)},
+                new ListItem(){text = Text.menus.puzzle + (puzzlesUnlocked? "" : Text.menus.locked), relativePos = new Vector2(0.7f,0.5f)},
+                new ListItem(){text = Text.menus.survival + (survivalUnlocked? "" : Text.menus.locked), relativePos = new Vector2(0.7f,0.65f)},
+                new ListItem(){text = Text.menus.achievements + (trophyState == 1 ? ", " + Text.menus.silverTrophy : trophyState == 2 ? ", " + Text.menus.goldTrophy : ""), relativePos = new Vector2(0.1f,0.6f)},
+                new ListItem(){text = Text.menus.zenGarden + (zenGardenUnlocked? "" : Text.menus.locked), relativePos = new Vector2(0.3f,0.8f)},
+                new ListItem(){text = Text.menus.almanac + (almanacUnlocked? "" : Text.menus.locked), relativePos = new Vector2(0.46f,0.78f)},
+                new ListItem(){text = Text.menus.store + (storeUnlocked? "" : Text.menus.locked), relativePos = new Vector2(0.58f,0.85f)},                
+                new ListItem(){text = Text.menus.options, relativePos = new Vector2(0.75f,0.85f)},
+                new ListItem(){text = Text.menus.help, relativePos = new Vector2(0.83f,0.88f)},
+                new ListItem(){text = Text.menus.quit, relativePos = new Vector2(0.92f,0.87f)}
             };
 
 
@@ -113,10 +113,10 @@ namespace PvZA11y.Widgets
 
         protected override string? GetContent()
         {
-            string titleString = "Main Menu";
-            string bodyString = "\r\nWelcome back, " + memIO.mem.ReadString(memIO.ptr.lawnAppPtr + ",94c,04");  //TODO: Move this to memIO. //lawnapp,playerInfo,name
-            string inputStr = "\r\nInputs: Up and down to scroll, Confirm button to select";
-            return titleString + bodyString + (Config.current.SayAvailableInputs ? inputStr : "");
+            string titleString = Text.menus.mainMenu;
+            string bodyString = Text.menus.welcomeBack + memIO.mem.ReadString(memIO.ptr.lawnAppPtr + ",94c,04");  //TODO: Move this to memIO. //lawnapp,playerInfo,name
+            string inputStr = "Inputs: Up and down to scroll, Confirm button to select";
+            return titleString + "\r\n" + bodyString + (Config.current.SayAvailableInputs ? "\r\n" + inputStr : "");
         }
 
         public override void Interact(InputIntent intent)

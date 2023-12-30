@@ -45,8 +45,8 @@ namespace PvZA11y.Widgets
 
         static ListItem[] defaultList = new ListItem[]
         {
-            new ListItem(){text = "Repeat"},
-            new ListItem(){relativePos = new Vector2(0.5f,0.5f), text = "Next"},
+            new ListItem(){text = Text.menus.repeat},
+            new ListItem(){relativePos = new Vector2(0.5f,0.5f), text = Text.menus.next},
         };
 
         public CrazyDave(MemoryIO memIO, string ptrChain, Widget? prevWidget = null) : base(memIO, ptrChain, defaultList)
@@ -111,17 +111,17 @@ namespace PvZA11y.Widgets
 
                 listItems = new ListItem[]
                 {
-                    new ListItem(){text = "Repeat"},
-                    new ListItem(){text = "Yes", relativePos = (memIO.GetWidgetButton1Pos(pointerChain) / memIO.GetWidgetSize(pointerChain)) + new Vector2(0.1f,0.1f)},
-                    new ListItem(){text = "No", relativePos = (memIO.GetWidgetButton2Pos(pointerChain) / memIO.GetWidgetSize(pointerChain)) + new Vector2(0.1f,0.1f)}
+                    new ListItem(){text = Text.menus.repeat},
+                    new ListItem(){text = Text.menus.yes, relativePos = (memIO.GetWidgetButton1Pos(pointerChain) / memIO.GetWidgetSize(pointerChain)) + new Vector2(0.1f,0.1f)},
+                    new ListItem(){text = Text.menus.no, relativePos = (memIO.GetWidgetButton2Pos(pointerChain) / memIO.GetWidgetSize(pointerChain)) + new Vector2(0.1f,0.1f)}
                 };
             }
             else
             {
                 listItems = new ListItem[]
                 {
-                    new ListItem(){text = "Repeat"},
-                    new ListItem(){text = "Next", relativePos = new Vector2(0.5f,0.5f)}
+                    new ListItem(){text = Text.menus.repeat},
+                    new ListItem(){text = Text.menus.next, relativePos = new Vector2(0.5f,0.5f)}
                 };
             }
         }
@@ -179,15 +179,17 @@ namespace PvZA11y.Widgets
                 
                 listItems = new ListItem[]
                 {
-                    new ListItem(){text = "Yes", relativePos = (memIO.GetWidgetButton1Pos(pointerChain) / memIO.GetWidgetSize(pointerChain)) + new Vector2(0.1f,0.1f)},
-                    new ListItem(){text = "No", relativePos = (memIO.GetWidgetButton2Pos(pointerChain) / memIO.GetWidgetSize(pointerChain)) + new Vector2(0.1f,0.1f)}
+                    new ListItem(){text = Text.menus.repeat},
+                    new ListItem(){text = Text.menus.yes, relativePos = (memIO.GetWidgetButton1Pos(pointerChain) / memIO.GetWidgetSize(pointerChain)) + new Vector2(0.1f,0.1f)},
+                    new ListItem(){text = Text.menus.no, relativePos = (memIO.GetWidgetButton2Pos(pointerChain) / memIO.GetWidgetSize(pointerChain)) + new Vector2(0.1f,0.1f)}
                 };
             }
             else
             {
                 listItems = new ListItem[]
                 {
-                    new ListItem(){text = "Next", relativePos = new Vector2(0.5f,0.5f)}
+                    new ListItem(){text = Text.menus.repeat},
+                    new ListItem(){text = Text.menus.next, relativePos = new Vector2(0.5f,0.5f)}
                 };
             }
 
