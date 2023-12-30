@@ -69,6 +69,16 @@ namespace PvZA11y
             //Replace (cmp dword ptr [ecx+0000091C],02) (check if gameScene is Into/cutscene/seedpicker), with "pop edi; pop esi; ret 0004;" (return)
             mem.WriteMemory(codeAddr3.ToString("X2"), "bytes", "5f 5e c2 04 00 90 90");
 
+            long codeAddr4 = mem.AoBScan(ptr.musicPausePatch).Result.FirstOrDefault();
+            if(codeAddr4 == 0)
+            {
+                if (mem.AoBScan(ptr.musicPausePatched).Result.FirstOrDefault() != 0)
+                    Console.WriteLine("Music sync patch already applied!");
+                else
+                    Console.WriteLine("Failed to find music sync code!");
+            }
+            mem.WriteMemory(codeAddr4.ToString("X2"), "bytes", "90 90");
+
             Console.WriteLine("Finished patching");
         }
 

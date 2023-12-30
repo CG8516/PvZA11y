@@ -457,12 +457,19 @@ namespace PvZA11y
             int parentPid = GetParentProcessId(foundProcs[0]);
             if (parentPid != -1)
             {
-                Process parentProc = Process.GetProcessById(parentPid);
-                if (parentProc != null)
+                try
                 {
-                    Console.WriteLine("Parent process: Pid: {0}, Name: {1}", parentPid, parentProc.ProcessName);
-                    if (parentProc.ProcessName == "steam")
-                        isSteam = true;
+                    Process parentProc = Process.GetProcessById(parentPid);
+                    if (parentProc != null)
+                    {
+                        Console.WriteLine("Parent process: Pid: {0}, Name: {1}", parentPid, parentProc.ProcessName);
+                        if (parentProc.ProcessName == "steam")
+                            isSteam = true;
+                    }
+                }
+                catch
+                {
+                    Console.WriteLine("Parent process exited! Assuming non-steam");
                 }
             }
 
