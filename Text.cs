@@ -28,6 +28,8 @@ namespace PvZA11y
 
         public static string[] achievementDescriptions;
 
+        public static string[] minigameNames;
+
         public static Tutorial tutorial = new Tutorial();
         public class Tutorial
         {
@@ -254,6 +256,7 @@ namespace PvZA11y
                 var newTreeDialoge = deserializer.Deserialize<Dictionary<int, string>>(File.ReadAllText(langDir + "\\" + langName + "\\TreeDialogue.yaml"));
                 Tutorial newTutorials = deserializer.Deserialize<Tutorial>(File.ReadAllText(langDir + "\\" + langName + "\\Tutorials.yaml"));
                 Accessibility newAccessibility = deserializer.Deserialize<Accessibility>(File.ReadAllText(langDir + "\\" + langName + "\\AccessibilityMenu.yaml"));
+                string[] newMinigames = deserializer.Deserialize<string[]>(File.ReadAllText(langDir + "\\" + langName + "\\Minigames.yaml"));
 
                 plantNames = newPlantNames;
                 plantTooltips = newPlantTooltips;
@@ -265,6 +268,7 @@ namespace PvZA11y
                 tutorial = newTutorials;
                 accessibility = newAccessibility;
                 zombieNames = newZombieNames;
+                minigameNames = newMinigames;
                 Console.WriteLine("Language '{0}' loaded successfully!", langName);
                 Config.current.LanguageID = K4os.Hash.xxHash.XXH32.DigestOf(Encoding.Unicode.GetBytes(langName));
                 Config.SaveConfig();
@@ -351,6 +355,7 @@ namespace PvZA11y
             //File.WriteAllText("Language\\English\\AchievementDescriptions.yaml", serializer.Serialize(achievementDescriptions), Encoding.Unicode);
             //File.WriteAllText("Language\\English\\TreeDialogue.yaml", serializer.Serialize(TreeDialogue), Encoding.Unicode);
             //File.WriteAllText("Language\\English\\AccessibilityMenu.yaml", serializer.Serialize(accessibility), Encoding.Unicode);
+            //File.WriteAllText("Language\\English\\Minigames.yaml", serializer.Serialize(minigameNames), Encoding.Unicode);
 
             //var deserializer = new YamlDotNet.Serialization.Deserializer();
             //var treedial = deserializer.Deserialize<Dictionary<int, string>>(File.ReadAllText("Language\\English\\TreeDialogue.yaml"));
