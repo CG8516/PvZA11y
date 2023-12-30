@@ -51,6 +51,7 @@ namespace PvZA11y
             public int BeghouledMatchAssist = 1;
             public bool Beghouled2MatchAssist = true;
             public bool AutoWakeStinky = false;
+            public bool SamplePlantOnSwitch = false;
 
             //Narration
             public bool SayTilePosOnMove = false;

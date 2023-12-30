@@ -2268,6 +2268,15 @@ namespace PvZA11y.Widgets
             }
             else if(cycleInputIntent)
             {
+                if(Config.current.SamplePlantOnSwitch)
+                {
+                    int cursorType = Program.GetCursorType();
+                    if (cursorType == 0 || cursorType == 7)
+                    {
+                        PlacePlant(seedbankSlot, seedbankSize, plants[seedbankSlot].offsetX, true, false, true, true, true); //Pickup and drop plant, triggering sound effect
+                    }
+                }
+                
                 PlacePlant(seedbankSlot, seedbankSize, plants[seedbankSlot].offsetX, false, true, true); //Move mouse cursor to aid sighted players in knowing which seed packet is selected
                 Program.PlaySlotTone(seedbankSlot, seedbankSize);
 
