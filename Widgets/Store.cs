@@ -79,7 +79,7 @@ namespace PvZA11y.Widgets
             //Also only if page2 is unlocked
             bool wheelbarrowAvailable = finishedAdventure && (playerPurchases[(int)StoreItem.ZenAquariumGarden] != 0 || playerPurchases[(int)StoreItem.ZenMushroomGarden] != 0) && playerPurchases[(int)StoreItem.ZenWheelBarrow] == 0;
             bool treeFoodAvailable = finishedAdventure && (playerPurchases[(int)StoreItem.ZenTreeOfWisdom] != 0);
-            int daysSince2000 = (int)(DateTime.UtcNow - new DateTime(2000, 1, 1)).TotalDays;    //Value game uses to determine which day you purchased a marigold.
+            int daysSince2000 = (int)(DateTime.Now - new DateTime(2000, 1, 1)).TotalDays;    //Value game uses to determine which day you purchased a marigold.
 
             //TODO: Add check for zen-garden plant count. Don't allow purcahse if garden is full.
             bool marigold1Available = playerPurchases[(int)StoreItem.ZenMarigold1] != daysSince2000 && finishedAdventure;
@@ -410,7 +410,7 @@ namespace PvZA11y.Widgets
                     }
                     else if (isMarigold)
                     {
-                        int daysSince2000 = (int)(DateTime.UtcNow - new DateTime(2000, 1, 1)).TotalDays;
+                        int daysSince2000 = (int)(DateTime.Now - new DateTime(2000, 1, 1)).TotalDays;
                         memIO.SetPlayerPurchase((int)itemType, daysSince2000);
 
                         //Add marigold to zengarden
