@@ -1395,7 +1395,7 @@ namespace PvZA11y
                     Type = SignalGeneratorType.Sin,
                 }.Take(TimeSpan.FromMilliseconds(startDelay));
 
-                allSamples.Add(sinepause.FollowedBy(beepSignal.ToStereo(tone.leftVolume, tone.rightVolume)));
+                allSamples.Add(sinepause.FollowedBy(beepSignal.ToStereo(tone.leftVolume* Config.current.AudioCueMasterVolume, tone.rightVolume* Config.current.AudioCueMasterVolume)));
             }
 
             MixingSampleProvider mixer = new MixingSampleProvider(allSamples);
@@ -1586,7 +1586,9 @@ namespace PvZA11y
 
         static void Main(string[] args)
         {
-
+            Mutex mutex = new System.Threading.Mutex(false, "PvZ-A11y");
+            if (!mutex.WaitOne(0, false))
+                Environment.Exit(1);
             Console.OutputEncoding = Encoding.Unicode;
             Console.WriteLine("Starting...");
 
@@ -1640,6 +1642,7 @@ namespace PvZA11y
                 Environment.Exit(1); // Close the current process
 
             }
+            mutex.Close();
         }
 
         public static Input input = null;
