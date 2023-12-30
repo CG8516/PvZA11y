@@ -2065,7 +2065,7 @@ namespace PvZA11y
                             {
                                 int cursorType = GetCursorType();
                                 if (gridItem.state == 23 && cursorType == 0)
-                                    Click(gridItem.floatX/800.0f, gridItem.floatY/600.0f);
+                                    Click((gridItem.floatX+32.0f)/800.0f, (gridItem.floatY+32.0f)/600.0f);
                                 break;
                             }
                         }
