@@ -53,6 +53,9 @@
 
 
 	<ItemGroup>
+	  <None Update="Language\English\AccessibilityMenu.yaml">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
 	  <None Update="Language\English\AchievementDescriptions.yaml">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>

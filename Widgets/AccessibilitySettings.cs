@@ -57,13 +57,13 @@ namespace PvZA11y.Widgets
             switch(value)
             {
                 case 1:
-                    return "Full Sonar.";
+                    return Text.accessibility.value.Sonar1;
                 case 2:
-                    return "Beeps only.";
+                    return Text.accessibility.value.Sonar2;
                 case 3:
-                    return "Count only.";
+                    return Text.accessibility.value.Sonar3;
                 default:
-                    return "Off.";
+                    return Text.accessibility.value.Off;
             }
         }
 
@@ -90,13 +90,13 @@ namespace PvZA11y.Widgets
                 case 9:
                     return "I.";
                 default:
-                    return "Off.";
+                    return Text.accessibility.value.Off;
             }
         }
 
         string GetBoolOptionValue(bool value)
         {
-            return value ? "On." : "Off.";
+            return value ? Text.accessibility.value.On : Text.accessibility.value.Off;
         }
 
         void ToggleBool(ref bool value)
@@ -144,10 +144,10 @@ namespace PvZA11y.Widgets
         string GetBeghouledMode(int value)
         {
             if (value == 1)
-                return "Easiest, When current plant can be dragged to make a match.";
+                return Text.accessibility.value.Beghouled1;
             if (value == 2)
-                return "Medium, When current plant can be part of a match, but might not be the one which needs to be dragged.";
-            return "Hardest, None.";
+                return Text.accessibility.value.Beghouled2;
+            return Text.accessibility.value.Beghouled0;
         }
 
         string GetZombieSweepInterval(int value)
@@ -155,23 +155,23 @@ namespace PvZA11y.Widgets
             switch(value)
             {
                 case 1:
-                    return "0.5 seconds.";
+                    return "0.5" + Text.accessibility.value.Seconds;
                 case 2:
-                    return "1 second.";
+                    return "1" + Text.accessibility.value.Seconds;
                 case 3:
-                    return "2 seconds.";
+                    return "2" + Text.accessibility.value.Seconds;
                 case 4:
-                    return "3 seconds.";
+                    return "3" + Text.accessibility.value.Seconds;
                 default:
-                    return "Off.";
+                    return Text.accessibility.value.Off;
             }
         }
 
         string GetZombieCycleMode(int value)
         {
             if (value == 0)
-                return "By ID . Ensures all zombies are cycled through in the same order.";
-            return "By distance. Cycle order will change based on zombie distance.";
+                return Text.accessibility.value.ZombieCycle1;
+            return Text.accessibility.value.ZombieCycle2;
         }
 
         string GetFloatOptionAsPercentage(float value)
@@ -246,11 +246,8 @@ namespace PvZA11y.Widgets
                 Config.current.ScreenReader.StopSpeaking();
             if (selectedScreenreader == availableScreenreaders.Count - 1)
             {
-                string bigWarning = "Warning. This will disable the screenreader. If you are blind or visually impaired, this setting may be difficult to find again.";
-                bigWarning += "\r\nTo Re-enable the screenreader, press the deny button five times while at the main menu.";
-                bigWarning += "\r\nIf you want to disable the screenreader, press the ok button again. Otherwise, press the deny button now.";
-                Console.WriteLine(bigWarning);
-                Program.Say(bigWarning, true);
+                Console.WriteLine(Text.accessibility.value.ScreenreaderWarning);
+                Program.Say(Text.accessibility.value.ScreenreaderWarning, true);
 
                 needsScreenReaderConfirmation = true;
             }
@@ -381,12 +378,12 @@ namespace PvZA11y.Widgets
             AccessibleOutput.SapiOutput sapi = new AccessibleOutput.SapiOutput();
             IAccessibleOutput? auto = Config.AutoScreenReader();
 
-            availableScreenreaders.Add(new ScreenReader() { name = "Automatic.", output = auto, selection = Config.ScreenReaderSelection.Auto });
+            availableScreenreaders.Add(new ScreenReader() { name = Text.accessibility.value.AutomaticScreenReader, output = auto, selection = Config.ScreenReaderSelection.Auto });
             if (Config.current.screenReaderSelection is Config.ScreenReaderSelection.Auto)
                 selectedScreenreader = 0;
 
             if (jaws is not null && jaws.IsAvailable())
-                availableScreenreaders.Add(new ScreenReader() { name = "JAWS (NOT RECOMMENDED).", output = jaws, selection = Config.ScreenReaderSelection.Jaws });
+                availableScreenreaders.Add(new ScreenReader() { name = "JAWS.", output = jaws, selection = Config.ScreenReaderSelection.Jaws });
             if (Config.current.screenReaderSelection is Config.ScreenReaderSelection.Jaws)
                 selectedScreenreader = availableScreenreaders.Count - 1;
 
@@ -400,7 +397,7 @@ namespace PvZA11y.Widgets
             if (Config.current.screenReaderSelection is Config.ScreenReaderSelection.Sapi)
                 selectedScreenreader = availableScreenreaders.Count - 1;
 
-            availableScreenreaders.Add(new ScreenReader() { name = "Deactivate.", output = null, selection = Config.ScreenReaderSelection.Disabled });
+            availableScreenreaders.Add(new ScreenReader() { name = Text.accessibility.value.Off, output = null, selection = Config.ScreenReaderSelection.Disabled });
             if (Config.current.screenReaderSelection is Config.ScreenReaderSelection.Disabled)
                 selectedScreenreader = availableScreenreaders.Count - 1;
             
@@ -437,7 +434,7 @@ namespace PvZA11y.Widgets
         string GetDoubleTapDelay()
         {
             float delayValue = (float)Config.current.DoubleTapDelay / 1000.0f;
-            return delayValue.ToString("0.0") + " seconds.";
+            return delayValue.ToString("0.0") + Text.accessibility.value.Seconds;
         }
 
         void MainAccessibilityMenu()
@@ -448,37 +445,37 @@ namespace PvZA11y.Widgets
             
             //TODO: This could probably be done a lot nicer
             //Input
-            options.Add(new Option() { name = "Menu cursor wrapping", description = "Jump to the opposite end of menus when passing the first or last item", confirmAction = () => ToggleBool(ref Config.current.WrapCursorInMenus), valueGrabber = () => GetBoolOptionValue(Config.current.WrapCursorInMenus), category = OptionCategory.Input });
-            options.Add(new Option() { name = "Grid cursor wrapping", description = "Jump to the opposite side of grids when passing the bounds", confirmAction = () => ToggleBool(ref Config.current.WrapCursorOnGrids), valueGrabber = () => GetBoolOptionValue(Config.current.WrapCursorOnGrids), category = OptionCategory.Input });
-            options.Add(new Option() { name = "Plant selection wrapping", description = "Loop selection when cycling plants and Zen Garden tools", confirmAction = () => ToggleBool(ref Config.current.WrapPlantSelection), valueGrabber = () => GetBoolOptionValue(Config.current.WrapPlantSelection), category = OptionCategory.Input });
-            options.Add(new Option() { name = "Key repetition", description = "Repeat directional inputs when held", confirmAction = () => ToggleBool(ref Config.current.KeyRepetition), valueGrabber = () => GetBoolOptionValue(Config.current.KeyRepetition), category = OptionCategory.Input });
-            options.Add(new Option() { name = "Double tap delay", description = "Higher values will allow more time to perform a double-tap. Lower values will require faster tapping, but may offer a more responsive experience", confirmAction = () => DummyLeftRightAction(InputIntent.None), leftRightAction = SetDoubletapDelay, valueGrabber = GetDoubleTapDelay, category = OptionCategory.Input });
-            options.Add(new Option() { name = "Controller vibration", description = "Whether controller vibration will be used or not", confirmAction = () => ToggleBool(ref Config.current.ControllerVibration), valueGrabber = () => GetBoolOptionValue(Config.current.ControllerVibration), category = OptionCategory.Input });
-            options.Add(new Option() { name = "Rebind inputs", description = "Allows you to rebind all controls.", confirmAction = InputRebindMenu, leftRightAction = DummyLeftRightAction });
+            options.Add(new Option() { name = Text.accessibility.name.WrapCursorInMenus, description = Text.accessibility.description.WrapCursorInMenus, confirmAction = () => ToggleBool(ref Config.current.WrapCursorInMenus), valueGrabber = () => GetBoolOptionValue(Config.current.WrapCursorInMenus), category = OptionCategory.Input });
+            options.Add(new Option() { name = Text.accessibility.name.WrapCursorOnGrids, description = Text.accessibility.description.WrapCursorOnGrids, confirmAction = () => ToggleBool(ref Config.current.WrapCursorOnGrids), valueGrabber = () => GetBoolOptionValue(Config.current.WrapCursorOnGrids), category = OptionCategory.Input });
+            options.Add(new Option() { name = Text.accessibility.name.WrapPlantSelection, description = Text.accessibility.description.WrapPlantSelection, confirmAction = () => ToggleBool(ref Config.current.WrapPlantSelection), valueGrabber = () => GetBoolOptionValue(Config.current.WrapPlantSelection), category = OptionCategory.Input });
+            options.Add(new Option() { name = Text.accessibility.name.KeyRepetition, description = Text.accessibility.description.KeyRepetition, confirmAction = () => ToggleBool(ref Config.current.KeyRepetition), valueGrabber = () => GetBoolOptionValue(Config.current.KeyRepetition), category = OptionCategory.Input });
+            options.Add(new Option() { name = Text.accessibility.name.DoubleTapDelay, description = Text.accessibility.description.DoubleTapDelay, confirmAction = () => DummyLeftRightAction(InputIntent.None), leftRightAction = SetDoubletapDelay, valueGrabber = GetDoubleTapDelay, category = OptionCategory.Input });
+            options.Add(new Option() { name = Text.accessibility.name.ControllerVibration, description = Text.accessibility.description.ControllerVibration, confirmAction = () => ToggleBool(ref Config.current.ControllerVibration), valueGrabber = () => GetBoolOptionValue(Config.current.ControllerVibration), category = OptionCategory.Input });
+            options.Add(new Option() { name = Text.accessibility.name.RebindInputs, description = Text.accessibility.description.RebindInputs, confirmAction = InputRebindMenu, leftRightAction = DummyLeftRightAction });
 
             //Gameplay
-            options.Add(new Option() { name = "Shovel Confirmation", description = "Require the shovel button to be pressed twice, to avoid accidental shoveling", confirmAction = () => ToggleBool(ref Config.current.RequireShovelConfirmation), valueGrabber = () => GetBoolOptionValue(Config.current.RequireShovelConfirmation), category = OptionCategory.Gameplay });
-            options.Add(new Option() { name = "Automatic sun collection", description = "Highly recommended until sun collection has been made accessible. Automatically clicks sun, coins, and end-level rewards.", confirmAction = () => ToggleBool(ref Config.current.AutoCollectItems), valueGrabber = () => GetBoolOptionValue(Config.current.AutoCollectItems), category = OptionCategory.Gameplay });
-            options.Add(new Option() { name = "Gameplay Tutorials", description = "Highly recommended on first playthroughs. Provides helpful gameplay advice.", confirmAction = () => ToggleBool(ref Config.current.GameplayTutorial), valueGrabber = () => GetBoolOptionValue(Config.current.GameplayTutorial), category = OptionCategory.Gameplay });
-            options.Add(new Option() { name = "Automatic sonar interval", description = "How frequently to perform whole-board zombie sonar sweeps.", confirmAction = () => SetIntValue(InputIntent.Right, ref Config.current.ZombieSonarInterval, 5), leftRightAction = (intent) => SetIntValue(intent, ref Config.current.ZombieSonarInterval, 5), valueGrabber = () => GetZombieSweepInterval(Config.current.ZombieSonarInterval), category = OptionCategory.Gameplay });
-            options.Add(new Option() { name = "Zombie Sonar on row change", description = "Which zombie sonar mode to automatically use when changing rows.", leftRightAction = (intent) => SetIntValue(intent, ref Config.current.ZombieSonarOnRowChange, 4), confirmAction = () => SetIntValue(InputIntent.Right, ref Config.current.ZombieSonarOnRowChange, 4), valueGrabber = () => GetZombieSonarValue(Config.current.ZombieSonarOnRowChange), category = OptionCategory.Gameplay });
-            options.Add(new Option() { name = "Zombie tripwire row", description = "When any zombie is on, or to the left of this row, an alarm will play.", leftRightAction = (intent) => SetIntValue(intent, ref Config.current.ZombieTripwireRow, 10), confirmAction = () => SetIntValue(InputIntent.Right, ref Config.current.ZombieTripwireRow, 10), valueGrabber = () => GetZombieTripwireValue(Config.current.ZombieTripwireRow), category = OptionCategory.Gameplay });
-            options.Add(new Option() { name = "Zombie cycle mode", description = "Which mode to use when cycling through zombies on the board.", confirmAction = () => SetIntValue(InputIntent.Right, ref Config.current.ZombieCycleMode, 2), leftRightAction = (intent) => SetIntValue(intent, ref Config.current.ZombieCycleMode, 2), valueGrabber = () => GetZombieCycleMode(Config.current.ZombieCycleMode), category = OptionCategory.Gameplay });
-            options.Add(new Option() { name = "Move when cycling zombies.", description = "Move your cursor to the zombie's position when cycling zombies", confirmAction = () => ToggleBool(ref Config.current.MoveOnZombieCycle), valueGrabber = () => GetBoolOptionValue(Config.current.MoveOnZombieCycle), category = OptionCategory.Gameplay });
-            options.Add(new Option() { name = "Be-ghouled match assistance", description = "Match assistance mode for the be-ghouled minigame.", confirmAction = () => SetIntValue(InputIntent.Right, ref Config.current.BeghouledMatchAssist, 3), leftRightAction = (intent) => SetIntValue(intent, ref Config.current.BeghouledMatchAssist, 3), valueGrabber = () => GetBeghouledMode(Config.current.BeghouledMatchAssist), category = OptionCategory.Gameplay });
-            options.Add(new Option() { name = "Be-ghouled Twist match assistance", description = "Match assistance for the be-ghouled Twist minigame", confirmAction = () => ToggleBool(ref Config.current.Beghouled2MatchAssist), valueGrabber = () => GetBoolOptionValue(Config.current.Beghouled2MatchAssist), category = OptionCategory.Gameplay });
-            options.Add(new Option() { name = "Automatic Snail Bullying", description = "Automatically wake Stinky the Snail, whenever he falls asleep in zen garden mode.", confirmAction = () => ToggleBool(ref Config.current.AutoWakeStinky), valueGrabber = () => GetBoolOptionValue(Config.current.AutoWakeStinky), category = OptionCategory.Gameplay });    //hehe
-            options.Add(new Option() { name = "Click plant when cycled", description = "When cycling plants, automatically pickup and drop the current plant to trigger an in-game sound effect. Causes lag when rapidly cycling through plants", confirmAction = () => ToggleBool(ref Config.current.SamplePlantOnSwitch), valueGrabber = () => GetBoolOptionValue(Config.current.SamplePlantOnSwitch), category = OptionCategory.Gameplay });    
+            options.Add(new Option() { name = Text.accessibility.name.RequireShovelConfirmation, description = Text.accessibility.description.RequireShovelConfirmation, confirmAction = () => ToggleBool(ref Config.current.RequireShovelConfirmation), valueGrabber = () => GetBoolOptionValue(Config.current.RequireShovelConfirmation), category = OptionCategory.Gameplay });
+            options.Add(new Option() { name = Text.accessibility.name.AutoCollectItems, description = Text.accessibility.description.AutoCollectItems, confirmAction = () => ToggleBool(ref Config.current.AutoCollectItems), valueGrabber = () => GetBoolOptionValue(Config.current.AutoCollectItems), category = OptionCategory.Gameplay });
+            options.Add(new Option() { name = Text.accessibility.name.GameplayTutorial, description = Text.accessibility.description.GameplayTutorial, confirmAction = () => ToggleBool(ref Config.current.GameplayTutorial), valueGrabber = () => GetBoolOptionValue(Config.current.GameplayTutorial), category = OptionCategory.Gameplay });
+            options.Add(new Option() { name = Text.accessibility.name.ZombieSonarInterval, description = Text.accessibility.description.ZombieSonarInterval, confirmAction = () => SetIntValue(InputIntent.Right, ref Config.current.ZombieSonarInterval, 5), leftRightAction = (intent) => SetIntValue(intent, ref Config.current.ZombieSonarInterval, 5), valueGrabber = () => GetZombieSweepInterval(Config.current.ZombieSonarInterval), category = OptionCategory.Gameplay });
+            options.Add(new Option() { name = Text.accessibility.name.ZombieSonarOnRowChange, description = Text.accessibility.description.ZombieSonarOnRowChange, leftRightAction = (intent) => SetIntValue(intent, ref Config.current.ZombieSonarOnRowChange, 4), confirmAction = () => SetIntValue(InputIntent.Right, ref Config.current.ZombieSonarOnRowChange, 4), valueGrabber = () => GetZombieSonarValue(Config.current.ZombieSonarOnRowChange), category = OptionCategory.Gameplay });
+            options.Add(new Option() { name = Text.accessibility.name.ZombieTripwireRow, description = Text.accessibility.description.ZombieTripwireRow, leftRightAction = (intent) => SetIntValue(intent, ref Config.current.ZombieTripwireRow, 10), confirmAction = () => SetIntValue(InputIntent.Right, ref Config.current.ZombieTripwireRow, 10), valueGrabber = () => GetZombieTripwireValue(Config.current.ZombieTripwireRow), category = OptionCategory.Gameplay });
+            options.Add(new Option() { name = Text.accessibility.name.ZombieCycleMode, description = Text.accessibility.description.ZombieCycleMode, confirmAction = () => SetIntValue(InputIntent.Right, ref Config.current.ZombieCycleMode, 2), leftRightAction = (intent) => SetIntValue(intent, ref Config.current.ZombieCycleMode, 2), valueGrabber = () => GetZombieCycleMode(Config.current.ZombieCycleMode), category = OptionCategory.Gameplay });
+            options.Add(new Option() { name = Text.accessibility.name.MoveOnZombieCycle, description = Text.accessibility.description.MoveOnZombieCycle, confirmAction = () => ToggleBool(ref Config.current.MoveOnZombieCycle), valueGrabber = () => GetBoolOptionValue(Config.current.MoveOnZombieCycle), category = OptionCategory.Gameplay });
+            options.Add(new Option() { name = Text.accessibility.name.BeghouledMatchAssist, description = Text.accessibility.description.BeghouledMatchAssist, confirmAction = () => SetIntValue(InputIntent.Right, ref Config.current.BeghouledMatchAssist, 3), leftRightAction = (intent) => SetIntValue(intent, ref Config.current.BeghouledMatchAssist, 3), valueGrabber = () => GetBeghouledMode(Config.current.BeghouledMatchAssist), category = OptionCategory.Gameplay });
+            options.Add(new Option() { name = Text.accessibility.name.Beghouled2MatchAssist, description = Text.accessibility.description.Beghouled2MatchAssist, confirmAction = () => ToggleBool(ref Config.current.Beghouled2MatchAssist), valueGrabber = () => GetBoolOptionValue(Config.current.Beghouled2MatchAssist), category = OptionCategory.Gameplay });
+            options.Add(new Option() { name = Text.accessibility.name.AutoWakeStinky, description = Text.accessibility.description.AutoWakeStinky, confirmAction = () => ToggleBool(ref Config.current.AutoWakeStinky), valueGrabber = () => GetBoolOptionValue(Config.current.AutoWakeStinky), category = OptionCategory.Gameplay });    //hehe
+            options.Add(new Option() { name = Text.accessibility.name.SamplePlantOnSwitch, description = Text.accessibility.description.SamplePlantOnSwitch, confirmAction = () => ToggleBool(ref Config.current.SamplePlantOnSwitch), valueGrabber = () => GetBoolOptionValue(Config.current.SamplePlantOnSwitch), category = OptionCategory.Gameplay });    
 
             //Narration
-            options.Add(new Option() { name = "Say board position", description = "Say the current board position when the cursor is moved", confirmAction = () => ToggleBool(ref Config.current.SayTilePosOnMove), valueGrabber = () => GetBoolOptionValue(Config.current.SayTilePosOnMove), category = OptionCategory.Narration });
-            options.Add(new Option() { name = "Say Plant/Object on cursor movement", description = "Say which plant, gravestone, crater or vase is at the current position, whenever you move around the board.", confirmAction = () => ToggleBool(ref Config.current.SayPlantOnTileMove), valueGrabber = () => GetBoolOptionValue(Config.current.SayPlantOnTileMove), category = OptionCategory.Narration });
-            options.Add(new Option() { name = "Say zombies on cursor tile", description = "Says which zombies are on the current tile, when the cursor moves.", confirmAction = () => ToggleBool(ref Config.current.SayZombieOnTileMove), valueGrabber = () => GetBoolOptionValue(Config.current.SayZombieOnTileMove), category = OptionCategory.Narration });
-            options.Add(new Option() { name = "Say when tripwire has been crossed", description = "If zombie tripwire is enabled, say when a zombie has crossed the tripwire.", confirmAction = () => ToggleBool(ref Config.current.SayWhenTripwireCrossed), valueGrabber = () => GetBoolOptionValue(Config.current.SayWhenTripwireCrossed), category = OptionCategory.Narration });
-            options.Add(new Option() { name = "Say sun count when collected", description = "Say your current sun amount when any sun is collected.", confirmAction = () => ToggleBool(ref Config.current.SaySunCountOnCollect), valueGrabber = () => GetBoolOptionValue(Config.current.SaySunCountOnCollect), category = OptionCategory.Narration });
-            options.Add(new Option() { name = "Say coin value when collected", description = "Say the value of each coin/diamond when it's collected.", confirmAction = () => ToggleBool(ref Config.current.SayCoinValueOnCollect), valueGrabber = () => GetBoolOptionValue(Config.current.SayCoinValueOnCollect), category = OptionCategory.Narration });
-            options.Add(new Option() { name = "Say available inputs", description = "Reads the available inputs when a new dialogue has opened.", confirmAction = () => ToggleBool(ref Config.current.SayAvailableInputs), valueGrabber = () => GetBoolOptionValue(Config.current.SayAvailableInputs), category = OptionCategory.Narration });
-            options.Add(new Option() { name = "Screen Reader Engine.", description = "Which screen reader engine to use, Use left and right to select, and press confirm to apply", leftRightAction = ScrollScreenReaders, valueGrabber = GetCurrentScreenreaderSelection, confirmAction = ConfirmScreenReader, category = OptionCategory.Narration });
+            options.Add(new Option() { name = Text.accessibility.name.SayTilePosOnMove, description = Text.accessibility.description.SayTilePosOnMove, confirmAction = () => ToggleBool(ref Config.current.SayTilePosOnMove), valueGrabber = () => GetBoolOptionValue(Config.current.SayTilePosOnMove), category = OptionCategory.Narration });
+            options.Add(new Option() { name = Text.accessibility.name.SayPlantOnTileMove, description = Text.accessibility.description.SayPlantOnTileMove, confirmAction = () => ToggleBool(ref Config.current.SayPlantOnTileMove), valueGrabber = () => GetBoolOptionValue(Config.current.SayPlantOnTileMove), category = OptionCategory.Narration });
+            options.Add(new Option() { name = Text.accessibility.name.SayZombieOnTileMove, description = Text.accessibility.description.SayZombieOnTileMove, confirmAction = () => ToggleBool(ref Config.current.SayZombieOnTileMove), valueGrabber = () => GetBoolOptionValue(Config.current.SayZombieOnTileMove), category = OptionCategory.Narration });
+            options.Add(new Option() { name = Text.accessibility.name.SayWhenTripwireCrossed, description = Text.accessibility.description.SayWhenTripwireCrossed, confirmAction = () => ToggleBool(ref Config.current.SayWhenTripwireCrossed), valueGrabber = () => GetBoolOptionValue(Config.current.SayWhenTripwireCrossed), category = OptionCategory.Narration });
+            options.Add(new Option() { name = Text.accessibility.name.SaySunCountOnCollect, description = Text.accessibility.description.SaySunCountOnCollect, confirmAction = () => ToggleBool(ref Config.current.SaySunCountOnCollect), valueGrabber = () => GetBoolOptionValue(Config.current.SaySunCountOnCollect), category = OptionCategory.Narration });
+            options.Add(new Option() { name = Text.accessibility.name.SayCoinValueOnCollect, description = Text.accessibility.description.SayCoinValueOnCollect, confirmAction = () => ToggleBool(ref Config.current.SayCoinValueOnCollect), valueGrabber = () => GetBoolOptionValue(Config.current.SayCoinValueOnCollect), category = OptionCategory.Narration });
+            options.Add(new Option() { name = Text.accessibility.name.SayAvailableInputs, description = Text.accessibility.description.SayAvailableInputs, confirmAction = () => ToggleBool(ref Config.current.SayAvailableInputs), valueGrabber = () => GetBoolOptionValue(Config.current.SayAvailableInputs), category = OptionCategory.Narration });
+            options.Add(new Option() { name = Text.accessibility.name.ScreenReaderEngine, description = Text.accessibility.description.ScreenReaderEngine, leftRightAction = ScrollScreenReaders, valueGrabber = GetCurrentScreenreaderSelection, confirmAction = ConfirmScreenReader, category = OptionCategory.Narration });
 
             List<ToneProperties> boundaryTone = new List<ToneProperties>() { new ToneProperties() { leftVolume = 1, rightVolume = 1, startFrequency = 70, endFrequency = 70, duration = 50, signalType = SignalGeneratorType.Square, startDelay = 0 } };
             List<ToneProperties> fastAlert =
@@ -554,28 +551,28 @@ namespace PvZA11y.Widgets
 
 
             //Volume
-            options.Add(new Option() { name = "Menu position volume", description = "Indicates where the cursor is located on a menu or list", leftRightAction = (intent) => SetFloat(intent, ref Config.current.MenuPositionCueVolume), valueGrabber = () => GetFloatOptionAsPercentage(Config.current.MenuPositionCueVolume), category = OptionCategory.Volume });
-            options.Add(new Option() { name = "Grid position volume", description = "Indicates where the cursor is located on a grid", leftRightAction = (intent) => SetFloat(intent, ref Config.current.GridPositionCueVolume, gridPos), valueGrabber = () => GetFloatOptionAsPercentage(Config.current.GridPositionCueVolume), category = OptionCategory.Volume });
-            options.Add(new Option() { name = "Boundary hit volume", description = "Indicates when the cursor passes the bounds of an unwrapped grid or list", leftRightAction = (intent) => SetFloat(intent, ref Config.current.HitBoundaryVolume, boundaryTone), valueGrabber = () => GetFloatOptionAsPercentage(Config.current.HitBoundaryVolume), category = OptionCategory.Volume });
-            options.Add(new Option() { name = "Selected slot volume", description = "Indicates which slot is currently selected", leftRightAction = (intent) => SetFloat(intent, ref Config.current.PlantSlotChangeVolume, slotTone), valueGrabber = () => GetFloatOptionAsPercentage(Config.current.PlantSlotChangeVolume), category = OptionCategory.Volume });
-            options.Add(new Option() { name = "Automatic sonar volume", description = "Used for automatic zombie sonar", leftRightAction = (intent) => SetFloat(intent, ref Config.current.AutomaticZombieSonarVolume, autoSonar), valueGrabber = () => GetFloatOptionAsPercentage(Config.current.AutomaticZombieSonarVolume), category = OptionCategory.Volume });
-            options.Add(new Option() { name = "Manual sonar volume", description = "Used when zombie sonar for current row is pressed manually", leftRightAction = (intent) => SetFloat(intent, ref Config.current.ManualZombieSonarVolume, manualSonar), valueGrabber = () => GetFloatOptionAsPercentage(Config.current.ManualZombieSonarVolume), category = OptionCategory.Volume });
-            options.Add(new Option() { name = "Plant ready volume", description = "Plays when the current plant is refreshed, and you have enough sun to place it.", leftRightAction = (intent) => SetFloat(intent, ref Config.current.PlantReadyCueVolume, plantReady), valueGrabber = () => GetFloatOptionAsPercentage(Config.current.PlantReadyCueVolume), category = OptionCategory.Volume });
-            options.Add(new Option() { name = "Plant/Object finder volume", description = "When navigating the board, plays a different tone if a plant, gravestone, crater or vase is on the current tile.", leftRightAction = (intent) => SetFloat(intent, ref Config.current.FoundObjectCueVolume, plantFinder), valueGrabber = () => GetFloatOptionAsPercentage(Config.current.FoundObjectCueVolume), category = OptionCategory.Volume });
-            options.Add(new Option() { name = "Fast zombie alert volume", description = "Plays when a pole-vaulting or football zombie enters the board.", leftRightAction = (intent) => SetFloat(intent, ref Config.current.FastZombieCueVolume, fastAlert), valueGrabber = () => GetFloatOptionAsPercentage(Config.current.FastZombieCueVolume), category = OptionCategory.Volume });
-            options.Add(new Option() { name = "Zombie death indicator volume", description = "Plays when a zombie dies.", leftRightAction = (intent) => SetFloat(intent, ref Config.current.DeadZombieCueVolume, zombieDead), valueGrabber = () => GetFloatOptionAsPercentage(Config.current.DeadZombieCueVolume), category = OptionCategory.Volume });
-            options.Add(new Option() { name = "Zombie on tile alert volume", description = "Plays descending tones to indicate the number of zombies on the current tile, when the cursor moves to it.", leftRightAction = (intent) => SetFloat(intent, ref Config.current.ZombieOnTileVolume, zombieOnTile), valueGrabber = () => GetFloatOptionAsPercentage(Config.current.ZombieOnTileVolume), category = OptionCategory.Volume });
-            options.Add(new Option() { name = "Zombie entry alert volume", description = "Plays pitched tones to indicate when and where any zombies have entered the lawn.", leftRightAction = (intent) => SetFloat(intent, ref Config.current.ZombieEntryVolume, zombieTones), valueGrabber = () => GetFloatOptionAsPercentage(Config.current.ZombieEntryVolume), category = OptionCategory.Volume });
-            options.Add(new Option() { name = "Zombie tripwire volume", description = "Background alarm that plays when any zombie is on the left side of the tripwire.", leftRightAction = (intent) => SetFloat(intent, ref Config.current.ZombieTripwireVolume, tripwire), valueGrabber = () => GetFloatOptionAsPercentage(Config.current.ZombieTripwireVolume), category = OptionCategory.Volume });
-            options.Add(new Option() { name = "Be-ghouled assistance volume", description = "Plays in Be-ghouled minigames, when a match can be found", leftRightAction = (intent) => SetFloat(intent, ref Config.current.BeghouledAssistVolume, beghouled), valueGrabber = () => GetFloatOptionAsPercentage(Config.current.BeghouledAssistVolume), category = OptionCategory.Volume });
-            options.Add(new Option() { name = "Miscellaneous alert volume", description = "Used for various alerts throughout the game.", leftRightAction = (intent) => SetFloat(intent, ref Config.current.MiscAlertCueVolume), valueGrabber = () => GetFloatOptionAsPercentage(Config.current.MiscAlertCueVolume), category = OptionCategory.Volume });
-            options.Add(new Option() { name = "Master Audio Cue Volume", description = "Adjusts the volume of all non-speech audio cues.", leftRightAction = (intent) => SetFloat(intent, ref Config.current.AudioCueMasterVolume), valueGrabber = () => GetFloatOptionAsPercentage(Config.current.AudioCueMasterVolume), category = OptionCategory.Volume });
+            options.Add(new Option() { name = Text.accessibility.name.MenuPositionCueVolume, description = Text.accessibility.description.MenuPositionCueVolume, leftRightAction = (intent) => SetFloat(intent, ref Config.current.MenuPositionCueVolume), valueGrabber = () => GetFloatOptionAsPercentage(Config.current.MenuPositionCueVolume), category = OptionCategory.Volume });
+            options.Add(new Option() { name = Text.accessibility.name.GridPositionCueVolume, description = Text.accessibility.description.GridPositionCueVolume, leftRightAction = (intent) => SetFloat(intent, ref Config.current.GridPositionCueVolume, gridPos), valueGrabber = () => GetFloatOptionAsPercentage(Config.current.GridPositionCueVolume), category = OptionCategory.Volume });
+            options.Add(new Option() { name = Text.accessibility.name.HitBoundaryVolume, description = Text.accessibility.description.HitBoundaryVolume, leftRightAction = (intent) => SetFloat(intent, ref Config.current.HitBoundaryVolume, boundaryTone), valueGrabber = () => GetFloatOptionAsPercentage(Config.current.HitBoundaryVolume), category = OptionCategory.Volume });
+            options.Add(new Option() { name = Text.accessibility.name.PlantSlotChangeVolume, description = Text.accessibility.description.PlantSlotChangeVolume, leftRightAction = (intent) => SetFloat(intent, ref Config.current.PlantSlotChangeVolume, slotTone), valueGrabber = () => GetFloatOptionAsPercentage(Config.current.PlantSlotChangeVolume), category = OptionCategory.Volume });
+            options.Add(new Option() { name = Text.accessibility.name.AutomaticZombieSonarVolume, description = Text.accessibility.description.AutomaticZombieSonarVolume, leftRightAction = (intent) => SetFloat(intent, ref Config.current.AutomaticZombieSonarVolume, autoSonar), valueGrabber = () => GetFloatOptionAsPercentage(Config.current.AutomaticZombieSonarVolume), category = OptionCategory.Volume });
+            options.Add(new Option() { name = Text.accessibility.name.ManualZombieSonarVolume, description = Text.accessibility.description.ManualZombieSonarVolume, leftRightAction = (intent) => SetFloat(intent, ref Config.current.ManualZombieSonarVolume, manualSonar), valueGrabber = () => GetFloatOptionAsPercentage(Config.current.ManualZombieSonarVolume), category = OptionCategory.Volume });
+            options.Add(new Option() { name = Text.accessibility.name.PlantReadyCueVolume, description = Text.accessibility.description.PlantReadyCueVolume, leftRightAction = (intent) => SetFloat(intent, ref Config.current.PlantReadyCueVolume, plantReady), valueGrabber = () => GetFloatOptionAsPercentage(Config.current.PlantReadyCueVolume), category = OptionCategory.Volume });
+            options.Add(new Option() { name = Text.accessibility.name.FoundObjectCueVolume, description = Text.accessibility.description.FoundObjectCueVolume, leftRightAction = (intent) => SetFloat(intent, ref Config.current.FoundObjectCueVolume, plantFinder), valueGrabber = () => GetFloatOptionAsPercentage(Config.current.FoundObjectCueVolume), category = OptionCategory.Volume });
+            options.Add(new Option() { name = Text.accessibility.name.FastZombieCueVolume, description = Text.accessibility.description.FastZombieCueVolume, leftRightAction = (intent) => SetFloat(intent, ref Config.current.FastZombieCueVolume, fastAlert), valueGrabber = () => GetFloatOptionAsPercentage(Config.current.FastZombieCueVolume), category = OptionCategory.Volume });
+            options.Add(new Option() { name = Text.accessibility.name.DeadZombieCueVolume, description = Text.accessibility.description.DeadZombieCueVolume, leftRightAction = (intent) => SetFloat(intent, ref Config.current.DeadZombieCueVolume, zombieDead), valueGrabber = () => GetFloatOptionAsPercentage(Config.current.DeadZombieCueVolume), category = OptionCategory.Volume });
+            options.Add(new Option() { name = Text.accessibility.name.ZombieOnTileVolume, description = Text.accessibility.description.ZombieOnTileVolume, leftRightAction = (intent) => SetFloat(intent, ref Config.current.ZombieOnTileVolume, zombieOnTile), valueGrabber = () => GetFloatOptionAsPercentage(Config.current.ZombieOnTileVolume), category = OptionCategory.Volume });
+            options.Add(new Option() { name = Text.accessibility.name.ZombieEntryVolume, description = Text.accessibility.description.ZombieEntryVolume, leftRightAction = (intent) => SetFloat(intent, ref Config.current.ZombieEntryVolume, zombieTones), valueGrabber = () => GetFloatOptionAsPercentage(Config.current.ZombieEntryVolume), category = OptionCategory.Volume });
+            options.Add(new Option() { name = Text.accessibility.name.ZombieTripwireVolume, description = Text.accessibility.description.ZombieTripwireVolume, leftRightAction = (intent) => SetFloat(intent, ref Config.current.ZombieTripwireVolume, tripwire), valueGrabber = () => GetFloatOptionAsPercentage(Config.current.ZombieTripwireVolume), category = OptionCategory.Volume });
+            options.Add(new Option() { name = Text.accessibility.name.BeghouledAssistVolume, description = Text.accessibility.description.BeghouledAssistVolume, leftRightAction = (intent) => SetFloat(intent, ref Config.current.BeghouledAssistVolume, beghouled), valueGrabber = () => GetFloatOptionAsPercentage(Config.current.BeghouledAssistVolume), category = OptionCategory.Volume });
+            options.Add(new Option() { name = Text.accessibility.name.MiscAlertCueVolume, description = Text.accessibility.description.MiscAlertCueVolume, leftRightAction = (intent) => SetFloat(intent, ref Config.current.MiscAlertCueVolume), valueGrabber = () => GetFloatOptionAsPercentage(Config.current.MiscAlertCueVolume), category = OptionCategory.Volume });
+            options.Add(new Option() { name = Text.accessibility.name.AudioCueMasterVolume, description = Text.accessibility.description.AudioCueMasterVolume, leftRightAction = (intent) => SetFloat(intent, ref Config.current.AudioCueMasterVolume), valueGrabber = () => GetFloatOptionAsPercentage(Config.current.AudioCueMasterVolume), category = OptionCategory.Volume });
 
             //Other
-            options.Add(new Option() { name = "Restart on crash", description = "Automatically attempt to restart the mod if it crashes", confirmAction = () => ToggleBool(ref Config.current.RestartOnCrash), valueGrabber = () => GetBoolOptionValue(Config.current.RestartOnCrash), category = OptionCategory.Other });
-            options.Add(new Option() { name = "Move mouse cursor", description = "Move the mouse cursor to visually indicate where clicks will be performed", confirmAction = () => ToggleBool(ref Config.current.MoveMouseCursor), valueGrabber = () => GetBoolOptionValue(Config.current.MoveMouseCursor), category = OptionCategory.Other });
-            options.Add(new Option() { name = "Automatically launch game", description = "Attempt to load the game process, if it's not already running.", confirmAction = () => ToggleBool(ref Config.current.AutoLaunchGame), valueGrabber = () => GetBoolOptionValue(Config.current.AutoLaunchGame), category = OptionCategory.Other });
-            options.Add(new Option() { name = "Language", description = "Which language to use", leftRightAction = ScrollLanguages, valueGrabber = GetCurrentLanguageSelection, confirmAction = ConfirmLanguage, category = OptionCategory.Other });
+            options.Add(new Option() { name = Text.accessibility.name.RestartOnCrash, description = Text.accessibility.description.RestartOnCrash, confirmAction = () => ToggleBool(ref Config.current.RestartOnCrash), valueGrabber = () => GetBoolOptionValue(Config.current.RestartOnCrash), category = OptionCategory.Other });
+            options.Add(new Option() { name = Text.accessibility.name.MoveMouseCursor, description = Text.accessibility.description.MoveMouseCursor, confirmAction = () => ToggleBool(ref Config.current.MoveMouseCursor), valueGrabber = () => GetBoolOptionValue(Config.current.MoveMouseCursor), category = OptionCategory.Other });
+            options.Add(new Option() { name = Text.accessibility.name.AutoLaunchGame, description = Text.accessibility.description.AutoLaunchGame, confirmAction = () => ToggleBool(ref Config.current.AutoLaunchGame), valueGrabber = () => GetBoolOptionValue(Config.current.AutoLaunchGame), category = OptionCategory.Other });
+            options.Add(new Option() { name = Text.accessibility.name.Language, description = Text.accessibility.description.Language, leftRightAction = ScrollLanguages, valueGrabber = GetCurrentLanguageSelection, confirmAction = ConfirmLanguage, category = OptionCategory.Other });
         }
 
         public AccessibilitySettings(MemoryIO memIO) : base(memIO, "")
