@@ -475,25 +475,25 @@ namespace PvZA11y.Widgets
                 switch(lvlType)
                 {
                     case LevelType.Normal:
-                        typeName = "Front yard, day";
+                        typeName = Text.levelTypes[0];
                         break;
                     case LevelType.Night:
-                        typeName = "Front yard, night";
+                        typeName = Text.levelTypes[1];
                         break;
                     case LevelType.Pool:
-                        typeName = "Back yard, day";
+                        typeName = Text.levelTypes[2];
                         break;
                     case LevelType.PoolNight:
-                        typeName = "Back yard, night";
+                        typeName = Text.levelTypes[3];
                         break;
                     case LevelType.Roof:
-                        typeName = "Rooftop, day";
+                        typeName = Text.levelTypes[4];
                         break;
                     case LevelType.Boss:
-                        typeName = "Rooftop, night";
+                        typeName = Text.levelTypes[5];
                         break;
                     default:
-                        typeName = "Unknown";
+                        typeName = Text.levelTypes[6];
                         break;
                 }
                     
