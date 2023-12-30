@@ -463,7 +463,7 @@ namespace PvZA11y.Widgets
                     inBuyConfirmationDialogue = false;
 
 
-                    text = "Purchase complete!";
+                    text = Text.store.PurchaseComplete;
                     Console.WriteLine(text);
                     Program.Say(text, true);
                     Program.PlayTone(Config.current.MiscAlertCueVolume, Config.current.MiscAlertCueVolume, 800, 800, 200, SignalGeneratorType.Sin);
@@ -475,7 +475,7 @@ namespace PvZA11y.Widgets
                 else if (intent == InputIntent.Deny)
                 {
                     inBuyConfirmationDialogue = false;
-                    text = "Cancelled.";
+                    text = Text.store.PurchaseCancelled;
                     Console.WriteLine(text);
                     Program.Say(text, true);
                     Program.PlayTone(Config.current.MiscAlertCueVolume, Config.current.MiscAlertCueVolume, 333, 333, 100, SignalGeneratorType.Sin);
@@ -555,24 +555,24 @@ namespace PvZA11y.Widgets
             if (shouldReadItem && storeItemIndex != -1)
             {
                 text += storePages[storePage].entries[storeItemIndex].name + ".\r\n";
-                text += Program.FormatNumber(storePages[storePage].entries[storeItemIndex].price) + " coins.\r\n";
+                text += Program.FormatNumber(storePages[storePage].entries[storeItemIndex].price) + " " + Text.store.CurrencyName + ".\r\n";
                 text += storePages[storePage].entries[storeItemIndex].description;
             }
             else if ((shouldReadItem || nullInteraction) && storePage == 2 && !zenGarden1Available)
             {
-                text += "Keep playing adventure mode to unlock this section.";
+                text += Text.store.UnlockMoreUpgrades;
                 if (intent == InputIntent.Confirm)
                     Program.PlayBoundaryTone();
             }
             else if ((shouldReadItem || nullInteraction) && !finishedAdventure)
             {
-                text += "Keep playing adventure mode to unlock more upgrades.";
+                text += Text.store.UnlockMoreUpgrades;
                 if (intent == InputIntent.Confirm)
                     Program.PlayBoundaryTone();
             }
             else if ((shouldReadItem || nullInteraction) && finishedAdventure && storeItemIndex == -1)
             {
-                text += "All plant upgrades have been obtained!";
+                text += Text.store.AllUpgradesObtained;
                 if (intent == InputIntent.Confirm)
                     Program.PlayBoundaryTone();
             }
@@ -582,19 +582,18 @@ namespace PvZA11y.Widgets
                 {
                     if (storePages[storePage].entries[storeItemIndex].outOfStock)
                     {
-                        text = "Item out of stock!";
+                        text = Text.store.NoStockWarning;
                         Program.PlayTone(Config.current.MiscAlertCueVolume, Config.current.MiscAlertCueVolume, 333, 333, 100, SignalGeneratorType.Sin);
                     }
                     else if (playerCoinCount < storePages[storePage].entries[storeItemIndex].price)
                     {
-                        text = "You do not have enough coins for this item.\r\n";
-                        text += "Coins required: " + Program.FormatNumber(storePages[storePage].entries[storeItemIndex].price) + ".\r\n";
-                        text += "Coins owned: " + Program.FormatNumber(playerCoinCount) + ".";
+                        text = Text.store.NotEnoughCoins.Replace("[0]", Program.FormatNumber(storePages[storePage].entries[storeItemIndex].price));
+                        text = text.Replace("[1]", Program.FormatNumber(playerCoinCount));
                     }
                     else
                     {
-                        text = "Purchase confirmation. Press Enter to buy: '" + storePages[storePage].entries[storeItemIndex].name + "' for " + Program.FormatNumber(storePages[storePage].entries[storeItemIndex].price) + " coins.\r\n";
-                        text += "Press Escape to cancel.";
+                        text = Text.store.PurchaseConfirmation.Replace("[0]", storePages[storePage].entries[storeItemIndex].name);
+                        text = text.Replace("[1]", Program.FormatNumber(storePages[storePage].entries[storeItemIndex].price));
                         inBuyConfirmationDialogue = true;
                     }
                 }
@@ -602,7 +601,7 @@ namespace PvZA11y.Widgets
 
             if (intent == InputIntent.Info1)
             {
-                text = "You have " + Program.FormatNumber(playerCoinCount) + " coins.";
+                text = Text.store.CoinCount.Replace("[0]", Program.FormatNumber(playerCoinCount));
             }
 
             if (text.Length > 0)
@@ -622,15 +621,15 @@ namespace PvZA11y.Widgets
             if (storeItemIndex > -1 && storeItemIndex < storePages[storePage].entries.Count)
             {
                 text += storePages[storePage].entries[storeItemIndex].name + ".\r\n";
-                text += storePages[storePage].entries[storeItemIndex].price + " coins.\r\n";
+                text += storePages[storePage].entries[storeItemIndex].price + " " + Text.store.CurrencyName + ".\r\n";
                 text += storePages[storePage].entries[storeItemIndex].description;
             }
             else if (storePage == 2 && !zenGarden1Available)
-                text += "Keep playing adventure mode to unlock this section.";
+                text += Text.store.ZenGardenLocked;
             else if (!finishedAdventure)
-                text += "Keep playing adventure mode to unlock more upgrades.";
+                text += Text.store.UnlockMoreUpgrades;
             else if (finishedAdventure && storeItemIndex == -1)
-                text += "All plant upgrades have been obtained!";
+                text += Text.store.AllUpgradesObtained;
 
             return text;
         }

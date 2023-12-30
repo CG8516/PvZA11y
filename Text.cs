@@ -80,7 +80,18 @@ namespace PvZA11y
         public class Store
         {
             public string NoStock;
-            
+            public string NoStockWarning;
+            public string NotEnoughCoins;
+            public string PurchaseConfirmation;
+            public string CoinCount;
+            public string ZenGardenLocked;
+            public string UnlockMoreUpgrades;
+            public string AllUpgradesObtained;
+            public string PurchaseComplete;
+            public string PurchaseCancelled;
+            public string CurrencyName;
+
+
             public ItemNames itemNames = new ItemNames();
             public ItemDescriptions itemDescriptions = new ItemDescriptions();
             public class ItemNames
