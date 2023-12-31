@@ -1846,6 +1846,21 @@ namespace PvZA11y.Widgets
             bool canAfford = true;
             bool isImitater = plants[seedbankSlot].packetType == (int)SeedType.SEED_IMITATER;
             int sunCost = isImitater ? Consts.plantCosts[plants[seedbankSlot].imitaterType] : Consts.plantCosts[plants[seedbankSlot].packetType];
+
+            GameMode gameMode = (GameMode)memIO.GetGameMode();
+            if (gameMode >= GameMode.SurvivalEndless1 && gameMode <= GameMode.SurvivalEndless5)
+            {
+                if (plants[seedbankSlot].packetType >= (int)SeedType.SEED_GATLINGPEA && plants[seedbankSlot].packetType <= (int)SeedType.SEED_COBCANNON)
+                {
+                    //Add 50 sun for every plant of this type already on the board
+                    int incSun = 0;
+                    var allPlants = Program.GetPlantsOnBoard();
+                    foreach (var plant in allPlants)
+                        incSun += plant.plantType == plants[seedbankSlot].packetType ? 50 : 0;
+                    sunCost += incSun;
+                }
+            }
+
             string sunString = sunCost.ToString();
             if (isConveyor)
                 sunString = "";
@@ -2450,6 +2465,19 @@ namespace PvZA11y.Widgets
                     int sunCost = inIZombie? Consts.iZombieSunCosts[plants[seedbankSlot].packetType - 60] : Consts.plantCosts[plants[seedbankSlot].packetType];
                     if (plants[seedbankSlot].packetType == (int)SeedType.SEED_IMITATER)
                         sunCost = Consts.plantCosts[plants[seedbankSlot].imitaterType];
+
+                    if(gameMode >= GameMode.SurvivalEndless1 && gameMode <= GameMode.SurvivalEndless5)
+                    {
+                        if (plants[seedbankSlot].packetType >= (int)SeedType.SEED_GATLINGPEA && plants[seedbankSlot].packetType <= (int)SeedType.SEED_COBCANNON)
+                        {
+                            //Add 50 sun for every plant of this type already on the board
+                            int incSun = 0;
+                            var allPlants = Program.GetPlantsOnBoard();
+                            foreach (var plant in allPlants)
+                                incSun += plant.plantType == plants[seedbankSlot].packetType ? 50 : 0;
+                            sunCost += incSun;
+                        }
+                    }
 
                     bool notEnoughSun = sunAmount < sunCost;
                     bool refreshing = plants[seedbankSlot].isRefreshing;
