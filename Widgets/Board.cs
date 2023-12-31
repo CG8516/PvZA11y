@@ -1257,6 +1257,14 @@ namespace PvZA11y.Widgets
             else if (zombie.zombieType == (int)ZombieType.Balloon && zombie.phase == 75)
                 infoPrepend += Text.game.grounded;
 
+            if(zombie.zombieType == (int)ZombieType.Gargantuar || zombie.zombieType == (int)ZombieType.RedeyeGargantuar)
+            {
+                if (zombie.health < zombie.maxHealth / 3)
+                    infoPrepend += Text.game.wounded;
+                else if (zombie.health < zombie.maxHealth / 1.5f)
+                    infoPrepend += Text.game.scratched;
+            }
+
             if (zombie.frozen)
                 infoPrepend += Text.game.icy;
             if (zombie.buttered)

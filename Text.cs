@@ -520,6 +520,8 @@ namespace PvZA11y
             public string grounded;
             public string tired;
             public string falling;
+            public string scratched;
+            public string wounded;
             public string icy;
             public string buttered;
             public string hungry;
