@@ -36,7 +36,7 @@ namespace PvZA11y.Widgets
             uint keyInput = 0;
             string prevName = memIO.mem.ReadString(pointerChain + memIO.ptr.usernamePickerNamesOffset + ",a8", "", 12);
 
-            string menuStr = (newUser ? "Create" : "Rename") + " user. Type a username, then press enter to confirm, or press escape to cancel.";
+            string menuStr = newUser ? Text.menus.createUser : Text.menus.renameUser;
             Console.WriteLine(menuStr);
             Program.Say(menuStr);
 

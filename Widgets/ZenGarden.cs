@@ -14,7 +14,7 @@ namespace PvZA11y.Widgets
 {
     class ZenGarden : Widget
     {
-        string inputDescription = "\r\nInputs: Directions to move around garden, Confirm to use tool, Deny or Start to leave, Info1 to say plant on current tile, Info2 to say plant need on current tile, Info3 to say number of needy plants, CycleLeft/CycleRight to change tools, Option to visit the store.";
+        string inputDescription = Text.inputs.zenGarden;
 
         struct ZenTool
         {
@@ -124,41 +124,41 @@ namespace PvZA11y.Widgets
             {
                 int treeFood = memIO.GetPlayerPurchase((int)StoreItem.ZenTreeFood);
                 treeFood -= 1000;
-                ZenTools.Add(new ZenTool() { posX = 0.08f, name = "Tree Food: " + treeFood });
-                ZenTools.Add(new ZenTool() { posX = ZenPageNext_X, name = "Next Garden" });
+                ZenTools.Add(new ZenTool() { posX = 0.08f, name = Text.zenGarden.treeFood + treeFood });
+                ZenTools.Add(new ZenTool() { posX = ZenPageNext_X, name = Text.zenGarden.nextGarden });
                 return;
             }
 
             bool goldWateringCan = memIO.GetPlayerPurchase((int)StoreItem.ZenGoldWateringcan) > 0;
 
-            ZenTools.Add(new ZenTool() { posX = xPos += xInc, name = goldWateringCan ? "Golden Watering Can" : "Watering Can" });
+            ZenTools.Add(new ZenTool() { posX = xPos += xInc, name = goldWateringCan ? Text.zenGarden.goldenCan : Text.zenGarden.wateringCan });
 
             int fertilizerCount = memIO.GetPlayerPurchase((int)StoreItem.ZenFertilizer);
             fertilizerCount -= 1000;
             if (fertilizerCount >= 0)
-                ZenTools.Add(new ZenTool() { posX = xPos += xInc, name = "Fertilizer: " + fertilizerCount.ToString("N0") });
+                ZenTools.Add(new ZenTool() { posX = xPos += xInc, name = Text.zenGarden.fertilizer + fertilizerCount.ToString("N0") });
 
             int bugSprayCount = memIO.GetPlayerPurchase((int)StoreItem.ZenBugSpray);
             bugSprayCount -= 1000;
             if (bugSprayCount >= 0)
-                ZenTools.Add(new ZenTool() { posX = xPos += xInc, name = "Bug Spray: " + bugSprayCount.ToString("N0") });
+                ZenTools.Add(new ZenTool() { posX = xPos += xInc, name = Text.zenGarden.bugSpray + bugSprayCount.ToString("N0") });
 
             bool hasPhonograph = memIO.GetPlayerPurchase((int)StoreItem.ZenPhonograph) > 0;
             if (hasPhonograph)
-                ZenTools.Add(new ZenTool() { posX = xPos += xInc, name = "Phonograph" });
+                ZenTools.Add(new ZenTool() { posX = xPos += xInc, name = Text.zenGarden.phonograph });
 
             int chocolateCount = memIO.GetPlayerPurchase((int)StoreItem.Chocolate);
             chocolateCount -= 1000;
             if (chocolateCount >= 0)
-                ZenTools.Add(new ZenTool() { posX = xPos += xInc, name = "Chocolate: " + chocolateCount.ToString("N0"), isChoc = true });
+                ZenTools.Add(new ZenTool() { posX = xPos += xInc, name = Text.zenGarden.chocolate + chocolateCount.ToString("N0"), isChoc = true });
 
             bool hasGlove = memIO.GetPlayerPurchase((int)StoreItem.ZenGardeningGlove) > 0;
             if (hasGlove)
-                ZenTools.Add(new ZenTool() { posX = xPos += xInc, name = "Glove" });
+                ZenTools.Add(new ZenTool() { posX = xPos += xInc, name = Text.zenGarden.glove });
 
             bool canSell = memIO.GetAdventureCompletions() > 0;    //Finished adventure
             if (canSell)
-                ZenTools.Add(new ZenTool() { posX = xPos += xInc, name = "Sell" });
+                ZenTools.Add(new ZenTool() { posX = xPos += xInc, name = Text.zenGarden.sell });
 
             bool hasWheelbarrow = memIO.GetPlayerPurchase((int)StoreItem.ZenWheelBarrow) > 0;
             if (hasWheelbarrow)
@@ -171,9 +171,9 @@ namespace PvZA11y.Widgets
                     wheelbarrowPlantID = plants[0].id;
 
                 if (wheelbarrowPlantID == -1)
-                    ZenTools.Add(new ZenTool() { posX = xPos += xInc, name = "Wheel Barrow" });
+                    ZenTools.Add(new ZenTool() { posX = xPos += xInc, name = Text.zenGarden.wheelBarrow});
                 else
-                    ZenTools.Add(new ZenTool() { posX = xPos += xInc, name = "Wheel Barrow with " + Text.plantNames[wheelbarrowPlantID] });
+                    ZenTools.Add(new ZenTool() { posX = xPos += xInc, name = Text.zenGarden.wheelBarrowHolding.Replace("[0]", Text.plantNames[wheelbarrowPlantID]) });
             }
 
             bool hasTree = memIO.GetPlayerPurchase((int)StoreItem.ZenTreeOfWisdom) > 0;
@@ -181,7 +181,7 @@ namespace PvZA11y.Widgets
             bool hasAquarium = memIO.GetPlayerPurchase((int)StoreItem.ZenAquariumGarden) > 0;
 
             if (hasTree || hasMushroomGarden || hasAquarium)
-                ZenTools.Add(new ZenTool() { posX = ZenPageNext_X, name = "Next Garden" });
+                ZenTools.Add(new ZenTool() { posX = ZenPageNext_X, name = Text.zenGarden.nextGarden });
 
         }
 
@@ -396,16 +396,32 @@ namespace PvZA11y.Widgets
             if (plant is not null)
             {
                 needInfo = plant.Value.need.ToString();
-                if (plant.Value.need == 0)
-                    needInfo = "Happy";
-                else
-                    needInfo = needInfo + " needed";
-
+                switch(plant.Value.need)
+                {
+                    case ZenPlantNeed.None:
+                        needInfo = Text.zenGarden.happy;
+                        break;
+                    case ZenPlantNeed.Water:
+                        needInfo = Text.zenGarden.waterNeeded;
+                        break;
+                    case ZenPlantNeed.Fertilizer:
+                        needInfo = Text.zenGarden.fertilizerNeeded;
+                        break;
+                    case ZenPlantNeed.BugSpray:
+                        needInfo = Text.zenGarden.bugSprayNeeded;
+                        break;
+                    case ZenPlantNeed.Phonograph:
+                        needInfo = Text.zenGarden.phonographNeeded;
+                        break;
+                    default:
+                        break;
+                }
                 if (plant.Value.mushroomInMain)
-                    needInfo = "Nocturnal. Needs to be moved to mushroom garden";
+                    needInfo = Text.zenGarden.nocturnal;
 
                 if (plant.Value.aquaticInMain)
-                    needInfo = "Aquatic. Needs to be moved to aquarium garden";
+                    needInfo = Text.zenGarden.aquatic;
+
             }
             return needInfo;
         }
@@ -552,7 +568,7 @@ namespace PvZA11y.Widgets
             {
                 if (intent == InputIntent.Info1)
                 {
-                    string plantInfo = "Empty tile";
+                    string plantInfo = Text.zenGarden.emptyTile;
                     if (currentPlant is not null)
                         plantInfo = Text.plantNames[currentPlant.Value.id];
                     Console.WriteLine(plantInfo);
@@ -560,7 +576,7 @@ namespace PvZA11y.Widgets
                 }
                 if (intent == InputIntent.Info2)
                 {
-                    string needInfo = "No plant";
+                    string needInfo = Text.zenGarden.noPlant;
                     if (currentPlant is not null)
                         needInfo = GetNeedString(currentPlant);
                     Console.WriteLine(needInfo);
@@ -569,7 +585,7 @@ namespace PvZA11y.Widgets
                 if (intent == InputIntent.Info3)
                 {
                     int needyPlantCount = GetNeedyPlantCount();
-                    string needyPlantStr = needyPlantCount + (needyPlantCount == 1 ? " plant needs attention" : " plants need attention");
+                    string needyPlantStr = needyPlantCount == 1 ? Text.zenGarden.needyPlant : Text.zenGarden.needyPlants.Replace("[0]", needyPlantCount.ToString());
                     Console.WriteLine(needyPlantStr);
                     Program.Say(needyPlantStr, true);
                 }
@@ -579,7 +595,7 @@ namespace PvZA11y.Widgets
                 if (intent == InputIntent.Info1)
                 {
                     int treeHeight = memIO.GetChallengeScore((int)GameMode.TreeOfWisdom);
-                    string heightStr = Program.FormatNumber(treeHeight) + " Feet Tall.";
+                    string heightStr = Text.zenGarden.treeHeight.Replace("[0]", Program.FormatNumber(treeHeight));
                     Console.WriteLine(heightStr);
                     Program.Say(heightStr, true);
                 }
@@ -641,13 +657,13 @@ namespace PvZA11y.Widgets
             switch (currentPage)
             {
                 case 0:
-                    return "Main garden";
+                    return Text.zenGarden.mainGarden;
                 case 1:
-                    return "Mushroom garden";
+                    return Text.zenGarden.mushroomGarden;
                 case 3:
-                    return "Aquarium";
+                    return Text.zenGarden.aquarium;
                 case 4:
-                    return "Tree Of Wisdom. Press Info1 to say tree height.";
+                    return Text.zenGarden.treeOfWisdom + (Config.current.SayAvailableInputs ? Text.inputs.treeHeight : "");
                 default:
                     return null;
             }
@@ -655,7 +671,7 @@ namespace PvZA11y.Widgets
 
         protected override string? GetContent()
         {
-            return "Zen Garden\r\n" + GetContentUpdate() + (Config.current.SayAvailableInputs ? inputDescription : "");
+            return Text.menus.zenGarden + "\r\n" + GetContentUpdate() + (Config.current.SayAvailableInputs ? "\r\n" + inputDescription : "");
         }
     }
 }

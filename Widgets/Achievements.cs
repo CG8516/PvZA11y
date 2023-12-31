@@ -25,9 +25,9 @@ namespace PvZA11y.Widgets
 
         public override string? SayTitle(bool shouldSay)
         {
-            string prepend = "Achievements.\r\n";
+            string prepend = Text.menus.achievements + ".\r\n";
             if (Config.current.SayAvailableInputs)
-                prepend += "Inputs: Up and Down to scroll, Deny to close.\r\n";
+                prepend += Text.inputs.achievements + "\r\n";
             SayItem(prepend);
             return null;
         }
@@ -59,7 +59,7 @@ namespace PvZA11y.Widgets
 
             string itemText = listItems[listIndex].text;
             if (listItems[listIndex].extraData == 1)
-                itemText = "Completed: " + itemText;
+                itemText = Text.menus.achievementComplete + itemText;
 
             if (prepend != null)
                 itemText = prepend + itemText;

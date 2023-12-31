@@ -37,11 +37,11 @@ namespace PvZA11y.Widgets
                 switch (pageID)
                 {
                     case 0:
-                        return "Almanac Index.";
+                        return Text.almanac.index;
                     case 1:
-                        return "Plants.";
+                        return Text.almanac.plants;
                     case 2:
-                        return "Zombies.";
+                        return Text.almanac.zombies;
                 }
             }
             return null;
@@ -53,10 +53,10 @@ namespace PvZA11y.Widgets
             if(contents != null)
             {
                 if(pageID == 1)
-                    return contents + (Config.current.SayAvailableInputs ? "\r\nInputs: Directions to navigate grid, Deny to return to index.\r\n":"") + GetPlantInfo();
+                    return contents + (Config.current.SayAvailableInputs ? "\r\n" + Text.inputs.almanacGrid + "\r\n" : "") + GetPlantInfo();
                 else if(pageID == 2)
-                    return contents + (Config.current.SayAvailableInputs ? "\r\nInputs: Directions to navigate grid, Deny to return to index.\r\n":"") + GetZombieInfo();
-                return contents + (Config.current.SayAvailableInputs ? "\r\nInputs: Directions to change option, Confirm to select, Deny to close." : "");
+                    return contents + (Config.current.SayAvailableInputs ? "\r\n" + Text.inputs.almanacGrid + "\r\n":"") + GetZombieInfo();
+                return contents + (Config.current.SayAvailableInputs ? "\r\n" + Text.inputs.almanacIndex : "");
             }
             return null;
         }
@@ -79,9 +79,9 @@ namespace PvZA11y.Widgets
                 bool storeUnlocked = finishedAdventure > 0 || memIO.GetPlayerLevel() > 24;
 
                 if (PlantPage.cursorY == 5)
-                    plantInfo = "Unavailable." + (storeUnlocked ? " Buy it from the store." : "");
+                    plantInfo = Text.menus.plantUnavailable + (storeUnlocked ? Text.menus.purchasablePlantUnavailable : "");
                 else
-                    plantInfo = "Locked. Keep playing adventure mode to unlock more plants.";
+                    plantInfo = Text.menus.plantLocked;
 
                 Program.MoveMouse(clickX, clickY);  //Move cursor for sighted players
             }
@@ -95,9 +95,9 @@ namespace PvZA11y.Widgets
 
                 int rechargeTime = Consts.plantCooldowns[pickerIndex];
 
-                string rechargeText = rechargeTime == 750 ? "Fast.\r\n" : rechargeTime == 3000 ? "Slow.\r\n" : "Very Slow.\r\n";
+                string rechargeText = rechargeTime == 750 ? Text.almanac.fast + "\r\n" : rechargeTime == 3000 ? Text.almanac.slow + "\r\n" : Text.almanac.verySlow + "\r\n";
 
-                plantInfo = Text.plantNames[pickerIndex] + ": " + sunCost + " sun.\r\nRecharge time: " + rechargeText + Text.plantAlmanacDescriptions[pickerIndex];
+                plantInfo = Text.plantNames[pickerIndex] + ": " + sunCost + Text.almanac.sun + "\r\n" + Text.almanac.rechargeTime + rechargeText + Text.plantAlmanacDescriptions[pickerIndex];
             }
 
             return plantInfo;
@@ -118,10 +118,10 @@ namespace PvZA11y.Widgets
             if (zombieIndex == (int)ZombieType.Yeti)
             {
                 if (adventureCompletions == 0 || playerLevel < zombieLevels[zombieIndex])
-                    zombieString = "Mystery Zombie. Not encountered yet.";
+                    zombieString = Text.almanac.mysteryZombie;
             }
             if (adventureCompletions == 0 && playerLevel < zombieLevels[zombieIndex])
-                zombieString = "Mystery Zombie. Not encountered yet.";
+                zombieString = Text.almanac.mysteryZombie;
 
             return zombieString;
         }
@@ -177,9 +177,7 @@ namespace PvZA11y.Widgets
                     if(intent is InputIntent.Up or InputIntent.Down or InputIntent.Left or InputIntent.Right)
                     {
                         plantsSelected = !plantsSelected;
-                        string inputText = "";
-                        string text = plantsSelected ? "Plants" : "Zombies";
-                        text += inputText;
+                        string text = plantsSelected ? Text.almanac.plants : Text.almanac.zombies;
                         Console.WriteLine(text);
                         Program.Say(text, true);
 

@@ -616,7 +616,7 @@ namespace PvZA11y.Widgets
 
         protected override string? GetContent()
         {
-            string inputStr = "Inputs: Up and Down to scroll list, CycleLeft and CycleRight to jump to categories, Confirm to toggle, Left and Right to toggle or change values, Deny to go back, Info1 to repeat description.\r\n";
+            string inputStr = Text.inputs.accessibility + "\r\n";
             if (!Config.current.SayAvailableInputs)
                 inputStr = "";
             ReadOptionText(false, inputStr);

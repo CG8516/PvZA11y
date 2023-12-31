@@ -25,8 +25,8 @@ namespace PvZA11y.Widgets
 
             var listItems = new ListItem[]
             {
-                new ListItem(){text = "Repeat"},
-                new ListItem(){text = "Continue", relativePos = new Vector2(continueX/800.0f, continueY/600.0f)}
+                new ListItem(){text = Text.menus.repeat},
+                new ListItem(){text = Text.menus.Continue, relativePos = new Vector2(continueX/800.0f, continueY/600.0f)}
             };
 
 
@@ -71,12 +71,12 @@ namespace PvZA11y.Widgets
             int playerLevel = memIO.GetPlayerLevel();
             int plant = Program.MaxOwnedSeedIndex(playerLevel);
 
-            string awardTitle = "You got a new plant!";
+            string awardTitle = Text.awards.newPlant;
             string awardBody = Text.plantNames[plant] + ": " + Text.plantTooltips[plant]; //TODO: Move plantNames and plantDescriptions somewhere better
 
             bool adventureMode = memIO.GetGameMode() == 0;
             awardType = memIO.GetAwardType();
-            Console.WriteLine("Award Type: " + awardType);
+            //Console.WriteLine("Award Type: " + awardType);
             //Level resets to 1 after beating zomboss
             if (awardType == 1 && playerLevel == 1)
             {
@@ -87,51 +87,51 @@ namespace PvZA11y.Widgets
             {
                 if(playerLevel == 1)
                 {
-                    awardTitle = "You have defeated the Boss Zombie!";
-                    awardBody = "Congratulations!  You have most triumphantly fended off the zombie attack!  Your lawn is safe... for now!";
+                    awardTitle = Text.awards.bossTitle;
+                    awardBody = Text.awards.bossMessage;
                 }
                 
                 if (playerLevel % 10 == 0)
                 {
-                    awardTitle = "You found a note";
+                    awardTitle = Text.awards.noteTitle;
                     if (playerLevel == 10)
-                        awardBody = "Hello, we are about to launch an all-out attack on your houze. Sincerely, the Zombies";
+                        awardBody = Text.awards.note1;
                     if (playerLevel == 20)
-                        awardBody = "Hello, We wood like to visit for a midnight znack. How does icecream and brains zound? Sincerely, the Zombies";
+                        awardBody = Text.awards.note2;
                     if (playerLevel == 30)
-                        awardBody = "Hello, We herd you were having a pool party. We think that iz fun. Well be rite over. Sincerely, the Zombies";
+                        awardBody = Text.awards.note3;
                     if (playerLevel == 40)
-                        awardBody = "Hello, This iz your muther. Please come over to my house for 'meatloaf'. Leave your front door open and your lawn unguarded. Sincerely, mom (not the Zombies)";
+                        awardBody = Text.awards.note4;
                     if (playerLevel == 50)
-                        awardBody = "Homeowner, you have failed to submit to our rightful claim. Be advised that unless you comply, we will be forced to take extreme action. Please remit your home and brains to us forthwith. Sincerely, Dr. Edgar Zomboss";
+                        awardBody = Text.awards.note5;
                     if (playerLevel > 50)
-                        awardBody = "Ok, you win. No more eatin brains for us. We just want to make music video with you now. Sincerely, the Zombies";
+                        awardBody = Text.awards.note6;
                 }
 
                 if (playerLevel == 5)
                 {
-                    awardTitle = "You got the shovel!";
-                    awardBody = "Lets you dig up a plant to make room for another plant";
+                    awardTitle = Text.awards.shovelTitle;
+                    awardBody = Text.awards.shovelMessage;
                 }
                 if (playerLevel == 15)
                 {
-                    awardTitle = "You found a suburban almanac!";
-                    awardBody = "Keeps track of all plants and zombies you encounter";
+                    awardTitle = Text.awards.almanacTitle;
+                    awardBody = Text.awards.almanacMessage;
                 }
                 if (playerLevel == 25)
                 {
-                    awardTitle = "You found Crazy Dave's car key!";
-                    awardBody = "Now you can visit Crazy Dave's shop!";
+                    awardTitle = Text.awards.shopTitle;
+                    awardBody = Text.awards.shopMessage;
                 }
                 if (playerLevel == 35)
                 {
-                    awardTitle = "You found a taco!";
-                    awardBody = "What are you going to do with a taco?";
+                    awardTitle = Text.awards.tacoTitle;
+                    awardBody = Text.awards.tacoMessage;
                 }
                 if (playerLevel == 45)
                 {
-                    awardTitle = "You found a watering can!";
-                    awardBody = "Now you can play Zen Garden Mode!";
+                    awardTitle = Text.awards.zenGardenTitle;
+                    awardBody = Text.awards.zenGardenMessage;
                 }
             }
             else
@@ -139,25 +139,25 @@ namespace PvZA11y.Widgets
                 int gameMode = memIO.GetGameMode();
                 bool isVaseBreaker = (gameMode >= (int)GameMode.VaseBreaker1 && gameMode <= (int)GameMode.VaseBreakerEndless);
                 bool isIZombie = gameMode >= (int)GameMode.IZombie1 && gameMode <= (int)GameMode.IZombieEndless;
-                awardTitle = "You got a trophy!";
+                awardTitle = Text.awards.trophyTitle;
                 //TODO: Make sure player actually 'has' unlocked a new level (I think it's capped to the first three of each mode, before adventure mode is complete)
                 if (isVaseBreaker)
-                    awardBody = "You've unlocked a new Vasebreaker level!";
+                    awardBody = Text.awards.vaseBreaker;
                 if (isIZombie)
-                    awardBody = "You've unlocked a new 'I, Zombie' level!";
+                    awardBody = Text.awards.iZombie;
 
                 if (gameMode >= (int)GameMode.ZomBotany && gameMode <= (int)GameMode.LimboIntro)
-                    awardBody = "You've unlocked a new mini-game!";
+                    awardBody = Text.awards.minigame;
 
                 if (gameMode >= (int)GameMode.SurvivalDay && gameMode <= (int)GameMode.SurvivalEndless5)
-                    awardBody = "You've unlocked a new survival level!";
+                    awardBody = Text.awards.survival;
 
             }
 
             if (awardType == 2)
             {
-                awardTitle = "Help for Plants and Zombies Game";
-                awardBody = "When the Zombies show up. just sit there and don't do anything. You win the game when the Zombies get to your houze. -this help section brought to you by the Zombies";
+                awardTitle = Text.awards.badHelpTitle;
+                awardBody = Text.awards.badHelpMessage;
             }
 
             string completeString = awardTitle + "\r\n" + awardBody;

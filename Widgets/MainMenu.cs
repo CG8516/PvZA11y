@@ -115,7 +115,7 @@ namespace PvZA11y.Widgets
         {
             string titleString = Text.menus.mainMenu;
             string bodyString = Text.menus.welcomeBack + memIO.mem.ReadString(memIO.ptr.lawnAppPtr + ",94c,04");  //TODO: Move this to memIO. //lawnapp,playerInfo,name
-            string inputStr = "Inputs: Up and down to scroll, Confirm button to select";
+            string inputStr = Text.inputs.mainMenu ;
             return titleString + "\r\n" + bodyString + (Config.current.SayAvailableInputs ? "\r\n" + inputStr : "");
         }
 

@@ -566,15 +566,15 @@ namespace PvZA11y.Widgets
 
             int completedFlags = currentWave / wavesPerFlag;
 
-            string percentageStr = (((float)currentWave / (float)numWaves) * 100.0f).ToString("0") + "% complete";
+            string percentageStr = Text.game.completion.Replace("[0]", (((float)currentWave / (float)numWaves) * 100.0f).ToString("0"));
 
             string waveInfo = "";
 
             if (numFlags >= 1)
-                waveInfo = "Wave " + completedFlags + " of " + numFlags;
+                waveInfo = Text.game.waveStatus.Replace("[0]", completedFlags.ToString()).Replace("[1]", numFlags.ToString());
 
             if (currentWave == numWaves)
-                waveInfo = "Final Wave";
+                waveInfo = Text.game.finalWave;
 
             string info = "";
 
@@ -986,39 +986,39 @@ namespace PvZA11y.Widgets
 
                 string typeString = "";
 
-                typeString = rowType == 0 ? "dirt" : rowType == 1 ? "grass" : rowType == 2 ? "water" : "";
+                typeString = rowType == 0 ? Text.game.dirt : rowType == 1 ? Text.game.grass : rowType == 2 ? Text.game.water : "";
                 if (levelType == LevelType.Roof || levelType == LevelType.Boss)
-                    typeString = "roof";
+                    typeString = Text.game.roof;
 
                 bool inBeghouled = memIO.GetGameMode() == (int)GameMode.Beghouled;
                 if (inBeghouled && gridInput.cursorX < 8)
                     hasCrater = true;
 
                 if (hasCrater)
-                    plantInfoString = "Crater";
+                    plantInfoString = Text.game.crater;
                 else if (hasGravestone)
-                    plantInfoString = "Gravestone";
+                    plantInfoString = Text.game.graveStone;
                 else if (vaseType != -1)
                 {
                     if (vasePlant != -1 && transparent > 0)
-                        plantInfoString = Text.plantNames[vasePlant] + " in vase";
+                        plantInfoString = Text.game.plantInVase.Replace("[0]", Text.plantNames[vasePlant]);
                     else if (vaseZombie != -1 && transparent > 0)
-                        plantInfoString = Text.zombieNames[vaseZombie] + " zombie in vase";
+                        plantInfoString = Text.game.zombieInVase.Replace("[0]", Text.zombieNames[vaseZombie]);
                     else
-                        plantInfoString = vaseType == 3 ? "Vase" : vaseType == 4 ? "Plant vase" : "Zombie vase";
+                        plantInfoString = vaseType == 3 ? Text.game.vase : vaseType == 4 ? Text.game.plantVase : Text.game.zombieVase;
                 }
                 else if (hasIce)
-                    plantInfoString = "Ice";
+                    plantInfoString = Text.game.ice;
                 else if (starfruitTemplate)
-                    plantInfoString = "Starfruit guide";
+                    plantInfoString = Text.game.starGuide;
                 else if (hasCirclePortal)
-                    plantInfoString = "Round portal";
+                    plantInfoString = Text.game.roundPortal;
                 else if (hasSquarePortal)
-                    plantInfoString = "Square portal";
+                    plantInfoString = Text.game.squarePortal;
                 else
                 {
                     if (informEmptyTiles)
-                        plantInfoString = "Empty " + typeString + " tile";
+                        plantInfoString = Text.game.emptyTileString.Replace("[0]", typeString);
                     else
                         plantInfoString = null;
                 }
@@ -1034,70 +1034,70 @@ namespace PvZA11y.Widgets
             else
             {
                 if (plant.squished)
-                    plantInfoString = "Squished ";
+                    plantInfoString = Text.game.squished;
                 if (plant.sleeping)
-                    plantInfoString += "Sleeping ";
+                    plantInfoString += Text.game.sleeping;
                 if (plant.plantType == (int)SeedType.SEED_POTATOMINE)
                 {
                     if (plant.state == 0)
-                        plantInfoString = "Buried ";
+                        plantInfoString = Text.game.buried;
                     else
-                        plantInfoString = "Armed ";
+                        plantInfoString = Text.game.armed;
                 }
                 if(plant.plantType == (int)SeedType.SEED_CHOMPER)
                 {
                     if (plant.state == 13)
-                        plantInfoString = "Chewing ";
+                        plantInfoString = Text.game.chewing;
                 }
                 if (plant.plantType == (int)SeedType.SEED_SCAREDYSHROOM)
                 {
                     if (plant.state == 20 || plant.state == 21)
-                        plantInfoString = "Buried ";
+                        plantInfoString = Text.game.buried;
                 }
                 if (plant.plantType == (int)SeedType.SEED_SUNSHROOM)
                 {
                     if (plant.state == 23)
-                        plantInfoString = "Small ";
+                        plantInfoString = Text.game.small;
                 }
                 if(plant.plantType == (int)SeedType.SEED_MAGNETSHROOM)
                 {
                     if (plant.state == 27)
-                        plantInfoString = "Filled ";
+                        plantInfoString = Text.game.magnetFilled;
                 }
                 if(plant.hasLadder)
                 {
-                    plantInfoString += "Laddered ";
+                    plantInfoString += Text.game.laddered;
                 }
                 if(plant.plantType == (int)SeedType.SEED_COBCANNON)
                 {
                     if (plant.state != 37)
-                        plantInfoString = "Charging ";
+                        plantInfoString = Text.game.cobCharging;
                     else
-                        plantInfoString = "Ready ";
+                        plantInfoString = Text.game.cobReady;
                 }
                 if(plant.plantType == (int)SeedType.SEED_WALLNUT || plant.plantType == (int)SeedType.SEED_PUMPKINSHELL)
                 {
-                    string healthState = "Damaged ";
+                    string healthState = Text.game.nutDamaged;
                     if (plant.health > 1333)
-                        healthState = "Chipped ";
+                        healthState = Text.game.nutChipped;
                     if (plant.health > 2666)
                         healthState = "";
                     plantInfoString += healthState;
                 }
                 if(plant.plantType == (int)SeedType.SEED_TALLNUT)
                 {
-                    string healthState = "Crying ";
+                    string healthState = Text.game.tallnutCrying;
                     if (plant.health > 2666)
-                        healthState = "Chipped ";
+                        healthState = Text.game.nutChipped;
                     if (plant.health > 5333)
                         healthState = "";
                     plantInfoString += healthState;
                 }
                 if(plant.plantType == (int)SeedType.SEED_GARLIC)
                 {
-                    string healthState = "Sad ";
+                    string healthState = Text.game.garlicSad;
                     if (plant.health > 133)
-                        healthState = "Nibbled ";
+                        healthState = Text.game.garlicNibbled;
                     if (plant.health > 266)
                         healthState = "";
                     plantInfoString += healthState;
@@ -1105,12 +1105,12 @@ namespace PvZA11y.Widgets
                 plantInfoString += Text.plantNames[plant.plantType];
                 if (plant.plantType != (int)SeedType.SEED_PUMPKINSHELL && plant.hasPumpkin)
                 {
-                    string pumpkinState = " damaged ";
+                    string pumpkinState = Text.game.nutDamaged;
                     if (plant.pumpkinHealth > 1333)
-                        pumpkinState = " chipped ";
+                        pumpkinState = Text.game.nutChipped;
                     if (plant.pumpkinHealth > 2666)
                         pumpkinState = " ";
-                    plantInfoString += " with" + pumpkinState + "pumpkin shield";
+                    plantInfoString += Text.game.pumpkinShield.Replace("[0]", pumpkinState);
                 }
 
                 if (plant.plantType == (int)SeedType.SEED_MAGNETSHROOM && plant.magItem != 0)
@@ -1120,42 +1120,42 @@ namespace PvZA11y.Widgets
                         case 1:
                         case 2:
                         case 3:
-                            plantInfoString += " holding bucket";
+                            plantInfoString += Text.game.magBucket;
                             break;
                         case 4:
                         case 5:
                         case 6:
-                            plantInfoString += " holding football helmet";
+                            plantInfoString += Text.game.magHelmet;
                             break;
                         case 7:
                         case 8:
                         case 9:
-                            plantInfoString += " holding screen door";
+                            plantInfoString += Text.game.magDoor;
                             break;
                         case 10:
                         case 11:
                         case 12:
-                            plantInfoString += " holding pogo stick";
+                            plantInfoString += Text.game.magPogo;
                             break;
                         case 13:
-                            plantInfoString += " holding Jack-in-the-box";
+                            plantInfoString += Text.game.magJack;
                             break;
                         case 14:
                         case 15:
                         case 16:
                         case 17:
-                            plantInfoString += " holding ladder";
+                            plantInfoString += Text.game.magLadder;
                             break;
                         case 21:
-                            plantInfoString += " holding pickaxe";
+                            plantInfoString += Text.game.magPickaxe;
                             break;
                     }
                 }
 
                 if (hasCirclePortal)
-                    plantInfoString += " and Round portal";
+                    Text.game.hasRoundPortal.Replace("[0]", plantInfoString);
                 else if (hasSquarePortal)
-                    plantInfoString += " and Square portal";
+                    Text.game.hasSquarePortal.Replace("[0]", plantInfoString);
 
                 if (beepOnFound)
                 {
@@ -1197,7 +1197,7 @@ namespace PvZA11y.Widgets
             int zombieColumn = GetZombieColumn(zombie.posX);
 
             if (zombie.zombieType == (int)ZombieType.DrZomBoss && zombossVulnerable)
-                zombieName = "Zomboss Head";
+                zombieName = Text.game.bossHead;
 
             if (zombieColumn > prevColumn)
             {
@@ -1206,65 +1206,65 @@ namespace PvZA11y.Widgets
                 {
                     string tileName = ((char)('A' + zombieColumn)).ToString();
                     if (zombieColumn > 8)
-                        tileName = "Off-Board";
+                        tileName = Text.game.offBoard;
                     infoPrepend += " " + tileName + ": ";
                 }
             }
 
             if (zombie.hypnotized)
-                infoPrepend += "Hypnotized ";
+                infoPrepend += Text.game.hypnotized;
 
             string addonDescriptor = "";
 
             if (zombie.helmetState == 1 || zombie.shieldState == 1)
-                addonDescriptor = "Dinted ";
+                addonDescriptor = Text.game.dinted;
             else if (zombie.helmetState == 2 || zombie.shieldState == 2)
-                addonDescriptor = "Damaged ";
+                addonDescriptor = Text.game.damaged;
             else if (zombie.helmetState == 3 || zombie.shieldState == 3)
-                addonDescriptor = "Exposed ";
+                addonDescriptor = Text.game.exposed;
 
             if (zombie.zombieType == (int)ZombieType.Newspaper)
             {
                 if (zombie.shieldState == 1)
-                    addonDescriptor = "Ripped ";
+                    addonDescriptor = Text.game.ripped;
                 else if (zombie.shieldState == 2)
-                    addonDescriptor = "Shredded ";
+                    addonDescriptor = Text.game.shredded;
                 else if (zombie.shieldState == 3)
-                    addonDescriptor = "Angry ";
+                    addonDescriptor = Text.game.angry;
             }
 
             if (zombie.zombieType == (int)ZombieType.WallnutHead || zombie.zombieType == (int)ZombieType.TallnutHead)
             {
                 if (zombie.helmetState == 1)
-                    addonDescriptor = "Chipped ";
+                    addonDescriptor = Text.game.nutChipped;
                 else if (zombie.helmetState == 2 || zombie.helmetState == 3)
-                    addonDescriptor = "Damaged ";
+                    addonDescriptor = Text.game.nutDamaged;
             }
 
             if (zombie.armless)
-                addonDescriptor = "Armless ";
+                addonDescriptor = Text.game.armless;
             if (zombie.headless)
-                addonDescriptor = "Headless ";
+                addonDescriptor = Text.game.headless;
 
             if (zombie.zombieType == (int)ZombieType.Digger && zombie.phase == 32)
-                infoPrepend += "Underground  ";
+                infoPrepend += Text.game.underground;
             else if (zombie.zombieType == (int)ZombieType.Pogo && !zombie.holdingSomething)
-                infoPrepend += "Grounded ";
+                infoPrepend += Text.game.grounded;
             else if (zombie.zombieType == (int)ZombieType.PoleVaulting && !zombie.holdingSomething)
-                infoPrepend += "Tired ";
+                infoPrepend += Text.game.tired;
             else if (zombie.zombieType == (int)ZombieType.Balloon && zombie.phase == 74)
-                infoPrepend += "Falling ";
+                infoPrepend += Text.game.falling;
             else if (zombie.zombieType == (int)ZombieType.Balloon && zombie.phase == 75)
-                infoPrepend += "Grounded ";
+                infoPrepend += Text.game.grounded;
 
             if (zombie.frozen)
-                infoPrepend += "Icy ";
+                infoPrepend += Text.game.icy;
             if (zombie.buttered)
-                infoPrepend += "Buttered ";
+                infoPrepend += Text.game.buttered;
 
             bool zombiquarium = memIO.GetGameMode() == (int)GameMode.Zombiquarium;
             if (zombiquarium && zombie.health <= 150 && zombie.zombieType == (int)ZombieType.Snorkel)
-                infoPrepend += "Hungry ";
+                infoPrepend += Text.game.hungry;
 
 
             return infoPrepend + addonDescriptor + zombieName;
@@ -1321,7 +1321,7 @@ namespace PvZA11y.Widgets
             {
                 if (needToAddFireball && zombiesThisRow[i].posX > fireball.Value.x)
                 {
-                    string name = fireball.Value.isIce ? "Ice Ball." : "Fire Ball.";
+                    string name = fireball.Value.isIce ? Text.game.iceBall :Text.game.fireBall;
 
                     int ballColumn = (int)((fireball.Value.x + 100.0f) / 100.0f);
                     ballColumn = ballColumn < 0 ? 0 : ballColumn;
@@ -1429,7 +1429,7 @@ namespace PvZA11y.Widgets
 
         void SunWarning(int sunAmount, int sunCost)
         {
-            string warning = "Not enough sun! " + sunAmount + " out of " + sunCost;
+            string warning = Text.game.notEnoughSun.Replace("[0]", sunAmount.ToString()).Replace("[1]", sunCost.ToString());
             Console.WriteLine(warning);
             Program.PlayTone(Config.current.MiscAlertCueVolume, Config.current.MiscAlertCueVolume, 300, 300, 50, SignalGeneratorType.Square);
             Program.PlayTone(Config.current.MiscAlertCueVolume, Config.current.MiscAlertCueVolume, 275, 275, 50, SignalGeneratorType.Square, 50);
@@ -1850,19 +1850,19 @@ namespace PvZA11y.Widgets
             if (isConveyor)
                 sunString = "";
             if (isImitater)
-                plantName = "Imitation " + Text.plantNames[plants[seedbankSlot].imitaterType];
+                plantName = Text.game.imitation.Replace("[0]",Text.plantNames[plants[seedbankSlot].imitaterType]);
             if (ready && !isConveyor)
-                plantState = "Ready";
+                plantState = Text.game.plantReady;
             else if (!isConveyor)
             {
                 bool refreshing = plants[seedbankSlot].isRefreshing;
                 int sunAmount = memIO.mem.ReadInt(memIO.ptr.boardChain + ",5578");
                 sunAmount += animatingSunAmount;
                 if (refreshing)
-                    plantState = "Refreshing";
+                    plantState = Text.game.plantRefreshing;
                 else
                 {
-                    plantState = sunAmount + " of " + sunCost.ToString() + " sun";
+                    plantState = Text.game.plantSun.Replace("[0]", sunAmount.ToString()).Replace("[1]", sunCost.ToString());
                     canAfford = false;
                 }
             }
@@ -1919,13 +1919,13 @@ namespace PvZA11y.Widgets
 
                 if (mPaused)
                 {
-                    Console.WriteLine("Frozen");
-                    Program.Say("Frozen", true);
+                    Console.WriteLine(Text.game.frozen);
+                    Program.Say(Text.game.frozen, true);
                 }
                 else
                 {
-                    Console.WriteLine("UnFrozen");
-                    Program.Say("UnFrozen", true);
+                    Console.WriteLine(Text.game.unfrozen);
+                    Program.Say(Text.game.unfrozen, true);
                 }
 
             }
@@ -1969,10 +1969,22 @@ namespace PvZA11y.Widgets
                     var lawnMowers = GetLawnMowers(true);
 
                     float freq = 1000.0f - ((gridInput.cursorY * 500.0f) / (float)gridInput.height);
-                    string infoString = "Unprotected";
+                    string infoString = Text.game.noLawnmower;
                     if (lawnMowers.Count > 0)
                     {
-                        infoString = lawnMowers[0].mowerType.ToString();
+                        switch(lawnMowers[0].mowerType)
+                        {
+                            case MowerType.LawnMower:
+                            case MowerType.TrickedOut:
+                                infoString = Text.game.lawnMower;
+                                break;
+                            case MowerType.PoolCleaner:
+                                infoString = Text.game.poolCleaner;
+                                break;
+                            case MowerType.RoofSweeper:
+                                infoString = Text.game.roofSweeper;
+                                break;
+                        }
                         Program.PlayTone(Config.current.MiscAlertCueVolume, 0, freq, freq, 100, SignalGeneratorType.Square, 0);
                     }
                     
@@ -1980,11 +1992,11 @@ namespace PvZA11y.Widgets
                     {
                         if (getIzombieBrainCount(true) > 0)
                         {
-                            infoString = "Brain remaining";
+                            infoString = Text.game.hasBrain;
                             Program.PlayTone(Config.current.MiscAlertCueVolume, 0, freq, freq, 100, SignalGeneratorType.Square, 0);
                         }
                         else
-                            infoString = "No brain";
+                            infoString = Text.game.noBrain;
 
                         
                     }
@@ -1999,7 +2011,7 @@ namespace PvZA11y.Widgets
                 {
                     string? zombiesThisRow = GetZombieInfo();
                     if (zombiesThisRow == null)
-                        zombiesThisRow = "No Zombies";
+                        zombiesThisRow = Text.game.noZombies;
 
                     Console.WriteLine(zombiesThisRow);
                     Program.Say(zombiesThisRow);
@@ -2020,9 +2032,7 @@ namespace PvZA11y.Widgets
                 {
                     if (!doneBowlingTutorial && Config.current.GameplayTutorial && gameMode != GameMode.WallnutBowling2)
                     {
-                        Program.GameplayTutorial(new string[] { "This is wall-nut bowling.", "Your deck at the top has been replaced with a conveyor belt.", "As you play, plants will arrive and build up on the conveyor belt.", "When you place a plant, it will be removed from the belt." });
-                        Program.GameplayTutorial(new string[] { "You will be confined to the left three columns, and you will start receiving wall-nuts on the conveyor belt.", "When you place a wall-nut, it will roll from where you place it, to the right of the screen.", "Zombies will arrive as normal, and you must bowl them over to defend your house." });
-                        Program.GameplayTutorial(new string[] { "When a wallnut rolls into a zombie, it will ricochet and begin moving diagonally up-right or down-right.", "You will also occasionally receive explode-o-nuts, which will also roll, but will explode like a cherry bomb when they hit a zombie." });
+                        Program.GameplayTutorial(Text.tutorial.WallnutBowling);
                         doneBowlingTutorial = true;
                     }
                     maxX = 2;
@@ -2110,7 +2120,7 @@ namespace PvZA11y.Widgets
                     {
                         string? zombiesThisRow = GetZombieInfo(false, (Config.current.ZombieSonarOnRowChange == 1 || Config.current.ZombieSonarOnRowChange == 2), Config.current.ZombieSonarOnRowChange == 1 || Config.current.ZombieSonarOnRowChange == 2, Config.current.ZombieSonarOnRowChange == 1, Config.current.ZombieSonarOnRowChange == 3);
                         if (zombiesThisRow == null)
-                            zombiesThisRow = "No Zombies";
+                            zombiesThisRow = Text.game.noZombies;
 
                         if (Config.current.ZombieSonarOnRowChange == 1 || Config.current.ZombieSonarOnRowChange == 3)
                             totalTileInfoStr += " " + zombiesThisRow;
@@ -2220,7 +2230,7 @@ namespace PvZA11y.Widgets
                     int zombieColumn = GetZombieColumn(cycleZombie.posX);
                     string tileName = ((char)('A' + zombieColumn)).ToString();
                     if (zombieColumn > 8)
-                        tileName = "Off-Board";
+                        tileName = Text.game.offBoard;
 
                     tileName += " " + (cycleZombie.row + 1) + ", ";
 
@@ -2286,13 +2296,13 @@ namespace PvZA11y.Widgets
                     switch (seedbankSlot)
                     {
                         case 0:
-                            functionString = "Buy snorkel zombie.";
+                            functionString = Text.game.buySnorkel;
                             break;
                         case 1:
-                            functionString = "Buy trophy.";
+                            functionString = Text.game.buyTrophy;
                             break;
                         case 2:
-                            functionString = "Brain food.";
+                            functionString = Text.game.buyBrain;
                             break;
                     }
 
@@ -2303,28 +2313,28 @@ namespace PvZA11y.Widgets
                 {
                     string functionString = "";
                     if (!plants[seedbankSlot].active)
-                        functionString = "Purchased. ";
+                        functionString = Text.game.purchased;
                     switch (seedbankSlot)
                     {
                         
                         case 0:
-                            functionString += " Upgrade peashooters to repeaters.";
+                            functionString += Text.game.upgradePeashooters;
                             break;
                         case 1:
-                            functionString = " Upgrade puff-shrooms to fume-shrooms.";
+                            functionString = Text.game.upgradeShrooms;
                             break;
                         case 2:
-                            functionString = " Upgrade wall-nuts to tall-nuts.";
+                            functionString = Text.game.upgradeNuts;
                             break;
                         case 3:
-                            functionString = " Shuffle plants.";
+                            functionString = Text.game.shufflePlants;
                             break;
                         case 4:
-                            functionString = " Repair crater.";
+                            functionString = Text.game.repairCrater;
                             break;
                     }
                     if (seedbankSlot == 0 && plants[0].packetType == -1)
-                        functionString = "Collect sun to unlock options";
+                        functionString = Text.game.collectSun;
 
                     Console.WriteLine(functionString);
                     Program.Say(functionString);
@@ -2341,7 +2351,7 @@ namespace PvZA11y.Widgets
                         else if (packetType >= 60 && packetType <= 74)
                         {
                             //iZombie levels
-                            string zombieInfo = Text.zombieNames[Consts.iZombieNameIndex[packetType - 60]] + " : " + Consts.iZombieSunCosts[packetType - 60] + " sun";
+                            string zombieInfo = Text.zombieNames[Consts.iZombieNameIndex[packetType - 60]] + " : " + Consts.iZombieSunCosts[packetType - 60] + Text.almanac.sun;
                             Console.WriteLine(zombieInfo);
                             Program.Say(zombieInfo, true);
                         }
@@ -2384,7 +2394,7 @@ namespace PvZA11y.Widgets
                             SunWarning(sunAmount, sunCost);
                         else if (refreshing)
                         {
-                            string warning = (((float)plants[seedbankSlot].refreshCounter / (float)plants[seedbankSlot].refreshTime) * 99.9f).ToString("0.") + "% refreshed";
+                            string warning = Text.game.refreshPercent.Replace("[0]", (((float)plants[seedbankSlot].refreshCounter / (float)plants[seedbankSlot].refreshTime) * 99.9f).ToString("0."));
                             Console.WriteLine(warning);
                             Program.PlayTone(Config.current.MiscAlertCueVolume, Config.current.MiscAlertCueVolume, 250, 250, 50, SignalGeneratorType.Square);
                             Program.PlayTone(Config.current.MiscAlertCueVolume, Config.current.MiscAlertCueVolume, 275, 275, 50, SignalGeneratorType.Square, 50);
@@ -2425,7 +2435,7 @@ namespace PvZA11y.Widgets
                     {
                         Program.PlayTone(Config.current.MiscAlertCueVolume, Config.current.MiscAlertCueVolume, 200, 200, 50, SignalGeneratorType.Square);
                         Program.PlayTone(Config.current.MiscAlertCueVolume, Config.current.MiscAlertCueVolume, 200, 200, 50, SignalGeneratorType.Square, 100);
-                        string info = "Already purchased.";
+                        string info = Text.game.alreadyPurchased;
                         Console.WriteLine(info);
                         Program.Say(info);
                     }
@@ -2450,7 +2460,7 @@ namespace PvZA11y.Widgets
                         SunWarning(sunAmount, sunCost);
                     else if (refreshing)
                     {
-                        string warning = (((float)plants[seedbankSlot].refreshCounter / (float)plants[seedbankSlot].refreshTime) * 99.9f).ToString("0.") + "% refreshed";
+                        string warning = Text.game.refreshPercent.Replace("[0]",(((float)plants[seedbankSlot].refreshCounter / (float)plants[seedbankSlot].refreshTime) * 99.9f).ToString("0."));
                         Console.WriteLine(warning);
                         Program.PlayTone(Config.current.MiscAlertCueVolume, Config.current.MiscAlertCueVolume, 250, 250, 50, SignalGeneratorType.Square);
                         Program.PlayTone(Config.current.MiscAlertCueVolume, Config.current.MiscAlertCueVolume, 275, 275, 50, SignalGeneratorType.Square, 50);
@@ -2458,7 +2468,7 @@ namespace PvZA11y.Widgets
                     }
                     else if (isConveyorLevel && !hasSeeds)
                     {
-                        string warning = "Waiting for plants to arrive";
+                        string warning = Text.game.waitingForPlants;
                         Console.WriteLine(warning);
                         Program.Say(warning, true);
                     }
@@ -2533,64 +2543,68 @@ namespace PvZA11y.Widgets
                     float percentage = (float)zombossHealth / (zomBossMinigame ? 60000.0f : 40000.0f);
                     percentage = 1.0f - percentage;
                     percentage *= 100.0f;
-                    string percentStr = percentage.ToString("0") + "% complete.";
+                    string percentStr = Text.game.completion.Replace("[0]", percentage.ToString("0"));
                     info4String += " " + percentStr;
                 }
-                else if(inIZombie)
+                else if (inIZombie)
                 {
-                    info4String += 5-getIzombieBrainCount() + " of 5 brains eaten";
+                    info4String += Text.game.brainStatus.Replace("[0]", (5 - getIzombieBrainCount()).ToString());
                 }
-                else if(inSlotMachine)
+                else if (inSlotMachine)
                 {
                     int sunAmount = memIO.mem.ReadInt(memIO.ptr.boardChain + ",5578");
                     sunAmount += animatingSunAmount;
-                    info4String += " " + Program.FormatNumber(sunAmount) + " of 2,000 sun";
+                    info4String += " " + Text.game.slotStatus.Replace("[0]", Program.FormatNumber(sunAmount));
                 }
                 else if (inBeghouled || inBeghouled2)
                 {
                     int matches = memIO.mem.ReadInt(memIO.ptr.boardChain + ",178,60");
-                    info4String += " " + matches + " of 75 matches.";
+                    info4String += " " + Text.game.beghouledStatus.Replace("[0]", matches.ToString());
                 }
                 else if (gameMode == GameMode.SeeingStars)
                 {
                     var boardPlants = Program.GetPlantsOnBoard();
                     bool[] placedStars = Consts.SeeingStars.ToArray();
-                    foreach(var boardPlant in boardPlants)
+                    foreach (var boardPlant in boardPlants)
                     {
-                        if(boardPlant.plantType == (int)SeedType.SEED_STARFRUIT)
+                        if (boardPlant.plantType == (int)SeedType.SEED_STARFRUIT)
                             placedStars[boardPlant.row * 9 + boardPlant.column] = false;
                     }
                     int remainingStars = 0;
-                    foreach(bool b in placedStars)
+                    foreach (bool b in placedStars)
                     {
                         if (b)
                             remainingStars++;
                     }
 
-                    info4String = 14 - remainingStars + " of 14 required stars";
+                    info4String = Text.game.starStatus.Replace("[0]", (14 - remainingStars).ToString());
 
                 }
                 else if (inVaseBreaker)
                 {
                     int vaseCount = GetVaseCount();
-                    info4String = (vaseCount > 0 ? vaseCount : "no") + " vase" + (vaseCount != 1 ? "s" : "") + " remaining";
+                    if (vaseCount == 0)
+                        info4String = Text.game.noVases;
+                    else if (vaseCount == 1)
+                        info4String = Text.game.vaseRemaining;
+                    else
+                        info4String = Text.game.vasesRemaining.Replace("[0]", vaseCount.ToString());
                 }
-                else if(gameMode == GameMode.LastStand || IsSurvival())
+                else if (gameMode == GameMode.LastStand || IsSurvival())
                 {
                     int stageCount = memIO.mem.ReadInt(memIO.ptr.boardChain + ",178,6c");
-                    int maxStages = 0;
-                    if (gameMode == GameMode.LastStand || (gameMode >= GameMode.SurvivalDay && gameMode <= GameMode.SurvivalHardRoof))
-                        maxStages = 5;
+                    bool isEndless = gameMode >= GameMode.SurvivalEndless1 && gameMode <= GameMode.SurvivalEndless5;
+
 
                     string roundCountString = "";
-                    if (maxStages == 0)
-                        roundCountString = stageCount + " stages completed";
+                    if (isEndless)
+                        roundCountString = Text.game.survivalEndlessStage.Replace("[0]", stageCount.ToString());
                     else
-                        roundCountString = stageCount + " of " + maxStages + " stages completed";
+                        roundCountString = Text.game.survivalStage.Replace("[0]", stageCount.ToString());
                     info4String = GetWaveInfo() + ", " + roundCountString;
                 }
                 else if (gameMode == GameMode.Zombiquarium)
-                    info4String = "Save up 1000 sun to purchase the level trophy";
+                    info4String = Text.game.zombiquariumGoal;
                 else
                 {
                     string waveInfo = GetWaveInfo();
@@ -2618,7 +2632,7 @@ namespace PvZA11y.Widgets
                 if (inputRepeatCount == 1)
                 {
                     int coinCount = memIO.GetPlayerCoinCount();
-                    string coinString = Program.FormatNumber(coinCount*10) + " coins.";
+                    string coinString = Text.game.coinCount.Replace("[0]", Program.FormatNumber(coinCount * 10));
                     Console.WriteLine(coinString);
                     Program.Say(coinString);
                 }
@@ -2633,7 +2647,7 @@ namespace PvZA11y.Widgets
                     }
                     int sunAmount = memIO.mem.ReadInt(memIO.ptr.boardChain + ",5578");
                     sunAmount += animatingSunAmount;
-                    string sunString = Program.FormatNumber(sunAmount) + " sun.";
+                    string sunString = Text.game.sunCount.Replace("[0]", Program.FormatNumber(sunAmount));
                     Console.WriteLine(sunString);
                     Program.Say(sunString, true);
                 }

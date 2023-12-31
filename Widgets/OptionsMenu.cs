@@ -47,28 +47,28 @@ namespace PvZA11y.Widgets
 
             ListItem[] listItems = new ListItem[itemCount];
 
-            listItems[0] = new ListItem() { text = "Music Volume Slider", relativePos = musicSliderPos };
+            listItems[0] = new ListItem() { text = Text.menus.musicSlider, relativePos = musicSliderPos };
             
-            listItems[1] = new ListItem() { text = "SFX Volume Slider", relativePos = sfxSliderPos };
+            listItems[1] = new ListItem() { text = Text.menus.sfxSlider, relativePos = sfxSliderPos };
 
-            listItems[2] = new ListItem() { text = "3D Acceleration Checkbox", relativePos = accelButtonPos };
+            listItems[2] = new ListItem() { text = Text.menus.accelCheckbox, relativePos = accelButtonPos };
 
-            listItems[3] = new ListItem() { text = "Fullscreen Checkbox", relativePos = fullscreenButtonPos };
+            listItems[3] = new ListItem() { text = Text.menus.fullscreenCheckbox, relativePos = fullscreenButtonPos };
 
             int itemIndex = 4;
             if (almanacVisible)
-                listItems[itemIndex++] = new ListItem() { text = "View Almanac", relativePos = almanacPos };
+                listItems[itemIndex++] = new ListItem() { text = Text.menus.viewAlmanac, relativePos = almanacPos };
             if (restartVisible)
-                listItems[itemIndex++] = new ListItem() { text = "Restart Level", relativePos = restartPos };
+                listItems[itemIndex++] = new ListItem() { text = Text.menus.restartLevel, relativePos = restartPos };
             if (mainMenuVisible)
             {
                 if (prevWidget != null && prevWidget is Widgets.MainMenu)
-                    listItems[itemIndex++] = new ListItem() { text = "Credits", relativePos = mainMenuPos };
+                    listItems[itemIndex++] = new ListItem() { text = Text.menus.credits, relativePos = mainMenuPos };
                 else
-                    listItems[itemIndex++] = new ListItem() { text = "Main Menu", relativePos = mainMenuPos };
+                    listItems[itemIndex++] = new ListItem() { text = Text.menus.mainMenu, relativePos = mainMenuPos };
             }
 
-            listItems[itemIndex++] = new ListItem() { text = "Accessibility Settings", relativePos = Vector2.Zero };
+            listItems[itemIndex++] = new ListItem() { text = Text.menus.accessibilitySettings, relativePos = Vector2.Zero };
 
             listItems[itemIndex] = new ListItem() { text = continueString, relativePos = continuePos };
 
@@ -187,16 +187,14 @@ namespace PvZA11y.Widgets
             bool fullscreenChecked = memIO.mem.ReadByte(pointerChain + memIO.ptr.optionsMenuFullscreenOffset + ",a8") == 1;
 
             //Cleanup previous text to remove "Checked: " / "Unchecked: " portion, before we re-insert that in the string (yucky, I know)
-            int colonIndex = listItems[2].text.IndexOf("d: ");
-            if(colonIndex != -1)
-                listItems[2].text = listItems[2].text.Substring(colonIndex+3, listItems[2].text.Length - (colonIndex+3));
+            listItems[2].text = listItems[2].text.Replace(Text.menus.boxChecked, "");
+            listItems[2].text = listItems[2].text.Replace(Text.menus.boxUnchecked, "");
 
-            colonIndex = listItems[3].text.IndexOf("d: ");
-            if (colonIndex != -1)
-                listItems[3].text = listItems[3].text.Substring(colonIndex+3, listItems[3].text.Length - (colonIndex+3));
+            listItems[3].text = listItems[3].text.Replace(Text.menus.boxChecked, "");
+            listItems[3].text = listItems[3].text.Replace(Text.menus.boxUnchecked, "");
 
-            string accelText = (accelChecked ? "Checked: " : "Unchecked: ") + listItems[2].text;
-            string fullscreenText = (fullscreenChecked ? "Checked: " : "Unchecked: ") + listItems[3].text;
+            string accelText = (accelChecked ? Text.menus.boxChecked : Text.menus.boxUnchecked) + listItems[2].text;
+            string fullscreenText = (fullscreenChecked ? Text.menus.boxChecked : Text.menus.boxUnchecked) + listItems[3].text;
 
             listItems[2].text = accelText;
             listItems[3].text = fullscreenText;
@@ -212,7 +210,7 @@ namespace PvZA11y.Widgets
             else
                 titleString = memIO.mem.ReadString(pointerChain + memIO.ptr.dialogTitleStrOffset + ",0");
 
-            titleString += (Config.current.SayAvailableInputs ? "\r\nInputs: Up and Down to scroll list, Confirm to select, Left and Right to adjust sliders, Deny to close." : "");
+            titleString += (Config.current.SayAvailableInputs ? "\r\n" + Text.inputs.optionsMenu : "");
 
             return titleString + "\r\n" + listItems[0].text;
         }

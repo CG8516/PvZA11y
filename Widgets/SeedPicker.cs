@@ -11,7 +11,7 @@ namespace PvZA11y.Widgets
 {
     class SeedPicker : Widget
     {
-        string inputDescription = "\r\nInputs: Directional input to Navigate grid, Confirm to select/deselect plant, Deny to pause, Start to start level, Info1 to list zombies in level, Info2 to say level type, CycleLeft/CycleRight to list selected plants, Info3 to add or remove imitater clone of current plant.\r\n";
+        string inputDescription = Text.inputs.seedPicker;
 
         GridInput gridInput;
         int pickedPlantIndex;   //Currently selected slot of the picked plants row (at the top of the screen)
@@ -302,24 +302,24 @@ namespace PvZA11y.Widgets
                 switch (issue)
                 {
                     case PlantIssue.Aquatic:
-                        plantInfo = "Aquatic. Not recommended. ";
+                        plantInfo = Text.menus.aquatic + Text.menus.notRecommended;
                         break;
                     case PlantIssue.NoFog:
                     case PlantIssue.HasGround:
                     case PlantIssue.NoGround:
                     case PlantIssue.NoGraves:
                     case PlantIssue.CoffeeNight:
-                        plantInfo = "Not recommended. ";
+                        plantInfo = Text.menus.notRecommended;
                         break;
                     case PlantIssue.Nocturnal:
-                        plantInfo = "Nocturnal. ";
+                        plantInfo = Text.menus.nocturnal;
                         break;
                     case PlantIssue.NotAllowed:
-                        plantInfo = "Not allowed. ";
+                        plantInfo = Text.menus.notAllowed;
                         break;
                 }
                 
-                plantInfo += (isPicked ? "Picked. " : "") + Text.plantNames[pickerIndex] + ": " + sunCost + ": " + Text.plantTooltips[pickerIndex];
+                plantInfo += (isPicked ? Text.menus.plantPicked : "") + Text.plantNames[pickerIndex] + ": " + sunCost + ": " + Text.plantTooltips[pickerIndex];
 
                 bool plantUnlocked = Program.CheckOwnedPlant(pickerIndex);
 
@@ -329,9 +329,9 @@ namespace PvZA11y.Widgets
                     bool storeUnlocked = finishedAdventure > 0 || memIO.GetPlayerLevel() > 24;
 
                     if (gridInput.cursorY == 5)
-                        plantInfo = "Unavailable." + (storeUnlocked ? " Buy it from the store." : "");
+                        plantInfo = Text.menus.plantUnavailable + (storeUnlocked ? Text.menus.purchasablePlantUnavailable : "");
                     else
-                        plantInfo = "Locked. Keep playing adventure mode to unlock more plants.";
+                        plantInfo = Text.menus.plantLocked;
                 }
 
                 Console.WriteLine(plantInfo);
@@ -375,13 +375,13 @@ namespace PvZA11y.Widgets
 
                 int friendlySlotNumber = pickedPlantIndex + 1;
 
-                string plantName = friendlySlotNumber + ": Empty Slot";
+                string plantName = friendlySlotNumber + ": " + Text.menus.emptySlot;
                 if (pickedPlantIndex >= 0 && pickedPlantIndex < pickedPlants.Length)
                 {
                     bool isImitater = pickedPlants[pickedPlantIndex].seedType == SeedType.SEED_IMITATER;
                     plantName = friendlySlotNumber + ": ";
                     if(isImitater)
-                        plantName += "Imitation " + Text.plantNames[(int)pickedPlants[pickedPlantIndex].imitaterType];
+                        plantName += Text.menus.imitation + Text.plantNames[(int)pickedPlants[pickedPlantIndex].imitaterType];
                     else
                         plantName += Text.plantNames[(int)pickedPlants[pickedPlantIndex].seedType];
                 }
@@ -402,7 +402,7 @@ namespace PvZA11y.Widgets
                 if(issue is PlantIssue.NotAllowed)
                 {
                     Program.PlayTone(Config.current.MiscAlertCueVolume, Config.current.MiscAlertCueVolume, 300, 300, 100, SignalGeneratorType.Triangle);
-                    string alertStr = "That plant is not allowed on this level.";
+                    string alertStr = Text.menus.plantNotAllowed;
                     Console.WriteLine(alertStr);
                     Program.Say(alertStr);
                     return;
@@ -438,7 +438,11 @@ namespace PvZA11y.Widgets
                 }
 
                 Program.PlayTone(Config.current.MiscAlertCueVolume, Config.current.MiscAlertCueVolume, 300, 300, 100, SignalGeneratorType.Triangle);
-                string errorString = "Please select " + (seedBankSize - pickedCount) + " more plant" + (seedBankSize - pickedCount > 1 ? "s" : "") + " to begin";
+                string errorString;
+                if (seedBankSize - pickedCount > 1)
+                    errorString = Text.menus.pickMorePlants.Replace("[0]", (seedBankSize - pickedCount).ToString());
+                else
+                    errorString = Text.menus.pickLastPlant;
                 Console.WriteLine(errorString);
                 Program.Say(errorString, true);
             }
@@ -513,12 +517,12 @@ namespace PvZA11y.Widgets
                 return null;
             }
 
-            string info = "Choose your Plants!";
+            string info = Text.menus.choosePlants;
 
             int sunCost = Consts.plantCosts[0];
             string plantInfo = Text.plantNames[0] + ": " + sunCost + ": " + Text.plantTooltips[0];
 
-            return info += (Config.current.SayAvailableInputs ? inputDescription : "") + plantInfo;
+            return info += (Config.current.SayAvailableInputs ? "\r\n" + inputDescription + "\r\n" : "") + plantInfo;
         }
     }
 }

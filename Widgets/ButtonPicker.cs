@@ -75,7 +75,7 @@ namespace PvZA11y.Widgets
             if (startContent is null)
                 return null;
 
-            return startContent + "\r\n" + listItems[0].text + (Config.current.SayAvailableInputs ? "\r\nInputs: Confirm to select, Deny to reject, Info1 to repeat, Up and Down to scroll options." : "");
+            return startContent + "\r\n" + listItems[0].text + (Config.current.SayAvailableInputs ? "\r\n" + Text.inputs.buttonPicker : "");
         }
 
         protected override string? GetContentUpdate()

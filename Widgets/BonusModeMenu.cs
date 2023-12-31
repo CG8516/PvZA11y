@@ -52,7 +52,7 @@ namespace PvZA11y.Widgets
 
         protected override string? GetContent()
         {
-            string inputDesc = "Inputs: Up and down to scroll, Confirm to select, Deny to close.\r\n";
+            string inputDesc = Text.inputs.minigameSelector + "\r\n";
             return (Config.current.SayAvailableInputs ? inputDesc : "") + listItems[listIndex].text + GetCompletionString();
         }
 
