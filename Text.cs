@@ -36,119 +36,102 @@ namespace PvZA11y
         public class Menus
         {
             //Main
-            public string mainMenu = "Main Menu";
-            public string welcomeBack = "Welcome back, ";
-            public string changeUser = "Change User";
-            public string adventureLevel = "Adventure. Level ";
-            public string minigames = "Mini-games";
-            public string puzzle = "Puzzle";
-            public string survival = "Survival";
-            public string achievements = "Achievements";
-            public string zenGarden = "Zen Garden";
-            public string almanac = "Almanac";
-            public string store = "Store";
-            public string options = "Options";
-            public string help = "Help";
-            public string quit = "Quit";
-            public string locked = " (Locked)";
-            public string silverTrophy = "Silver trophy";
-            public string goldTrophy = "Gold trophy";
-
-            public string replayCredits = "Replay credits";
-
-            public string next = "Next";
-            public string repeat = "Repeat";
-
-            public string yes = "Yes";
-            public string no = "No";
-
-            public string continueGame = "Continue Game?\r\nDo you want to continue your current game, or restart the level?";
-            public string Continue = "Continue";
-            public string restartLevel = "Restart Level";
-            public string cancel = "Cancel";
-
-            public string achievementComplete = "Completed: ";
-
-            public string minigameComplete = "Complete";
-            public string minigameNotComplete = "Incomplete";
-
-            public string trophyCount = "[0] of [1] trophies";
-
-            public string gameUpgrades = "Game Upgrades.";
-            public string plantUpgrades = "Plant Upgrades.";
-
-            public string plantUnavailable = "Unavailable.";
-            public string purchasablePlantUnavailable = " Buy it from the store.";
-            public string plantLocked = "Locked. Keep playing adventure mode to unlock more plants.";
-
-            public string plantPicked = "Picked. ";
-            public string imitation = "Imitation ";
-            public string plantNotAllowed = "That plant is not allowed on this level.";
-            public string emptySlot = "Empty Slot";
-
-            public string pickMorePlants = "Please select [0] more plants to begin";
-            public string pickLastPlant = "Please select 1 more plant to begin";
-
-            public string choosePlants = "Choose your plants!";
-            public string notRecommended = "Not recommended. ";
-            public string aquatic = "Aquatic. ";
-            public string nocturnal = "Nocturnal. ";
-            public string notAllowed = "Not allowed. ";
-
-            public string steamCloudMessage = "Steam Cloud Saving Active.\r\nWe have detected that you have a steam cloud save for this game, as well as a save stored on this machine.\r\nWhich save would you like to use?\r\nChoosing cancel will disable Steam Cloud for this session.";
-            public string localSave = "Local Save";
-            public string steamSave = "Steam Save";
-
-            public string boxChecked = "Checked: ";
-            public string boxUnchecked = "Unchecked: ";
-
-            public string musicSlider = "Music Volume Slider";
-            public string sfxSlider = "SFX Volume Slider";
-            public string accelCheckbox = "3D Acceleration Checkbox";
-            public string fullscreenCheckbox = "Fullscreen Checkbox";
-            public string viewAlmanac = "View Almanac";
-            public string credits = "Credits";
-            public string accessibilitySettings = "Accessibility Settings";
-
-            public string createUser = "Create user. Type a username, then press enter to confirm, or press escape to cancel.";
-            public string renameUser = "Rename user. Type a username, then press enter to confirm, or press escape to cancel.";
+            public string mainMenu;
+            public string welcomeBack;
+            public string changeUser;
+            public string adventureLevel;
+            public string minigames;
+            public string puzzle;
+            public string survival;
+            public string achievements;
+            public string zenGarden;
+            public string almanac;
+            public string store;
+            public string options;
+            public string help;
+            public string quit;
+            public string locked;
+            public string silverTrophy;
+            public string goldTrophy;
+            public string replayCredits;
+            public string next;
+            public string repeat;
+            public string yes;
+            public string no;
+            public string continueGame;
+            public string Continue;
+            public string restartLevel;
+            public string cancel;
+            public string achievementComplete;
+            public string minigameComplete;
+            public string minigameNotComplete;
+            public string trophyCount;
+            public string gameUpgrades;
+            public string plantUpgrades;
+            public string plantUnavailable;
+            public string purchasablePlantUnavailable;
+            public string plantLocked;
+            public string plantPicked;
+            public string imitation;
+            public string plantNotAllowed;
+            public string emptySlot;
+            public string pickMorePlants;
+            public string pickLastPlant;
+            public string choosePlants;
+            public string notRecommended;
+            public string aquatic;
+            public string nocturnal;
+            public string notAllowed;
+            public string steamCloudMessage;
+            public string localSave;
+            public string steamSave;
+            public string boxChecked;
+            public string boxUnchecked;
+            public string musicSlider;
+            public string sfxSlider;
+            public string accelCheckbox;
+            public string fullscreenCheckbox;
+            public string viewAlmanac;
+            public string credits;
+            public string accessibilitySettings;
+            public string createUser;
+            public string renameUser;
         }
 
         public static ZenGarden zenGarden = new ZenGarden();
+
         public class ZenGarden
         {
-            public string emptyTile = "Empty tile";
-            public string noPlant = "No plant";
-            public string needyPlants = "[0] plants need attention";
-            public string needyPlant = "1 plant needs attention";
-            public string treeHeight = "[0] Feet Tall.";
-            public string mainGarden = "Main garden";
-            public string mushroomGarden = "Mushroom garden";
-            public string aquarium = "Aquarium";
-            public string treeOfWisdom = "Tree Of Wisdom.";
-
-            public string happy = "Happy";
-            public string nocturnal = "Nocturnal. Needs to be moved to mushroom garden";
-            public string aquatic = "Aquatic. Needs to be moved to aquarium garden";
-            public string waterNeeded = "Water needed";
-            public string fertilizerNeeded = "Fertilizer needed";
-            public string bugSprayNeeded = "Bug Spray needed";
-            public string phonographNeeded = "Phonograph needed";
-
-            public string wheelBarrow = "WheelBarrow";
-            public string wheelBarrowHolding = "WheelBarrow with [0]";
-            public string nextGarden = "Next Garden";
-            public string chocolate = "Chocolate: ";
-            public string glove = "Glove";
-            public string sell = "Sell";
-
-            public string phonograph = "Phonograph";
-            public string bugSpray = "Bug Spray: ";
-            public string fertilizer = "Fertilizer: ";
-            public string wateringCan = "Watering Can";
-            public string goldenCan = "Golden Watering Can";
-            public string treeFood = "Tree Food: ";
+            public string emptyTile;
+            public string noPlant;
+            public string needyPlants;
+            public string needyPlant;
+            public string treeHeight;
+            public string mainGarden;
+            public string mushroomGarden;
+            public string aquarium;
+            public string treeOfWisdom;
+            public string happy;
+            public string nocturnal;
+            public string aquatic;
+            public string waterNeeded;
+            public string fertilizerNeeded;
+            public string bugSprayNeeded;
+            public string phonographNeeded;
+            public string wheelBarrow;
+            public string wheelBarrowHolding;
+            public string nextGarden;
+            public string chocolate;
+            public string glove;
+            public string sell;
+            public string phonograph;
+            public string bugSpray;
+            public string fertilizer;
+            public string wateringCan;
+            public string goldenCan;
+            public string treeFood;
         }
+
 
 
         public static Store store = new Store();
@@ -428,202 +411,173 @@ namespace PvZA11y
         public static Inputs inputs = new Inputs();
         public class Inputs
         {
-            public string treeHeight = "Press Info1 to say tree height.";
-            public string zenGarden = "Inputs: Directions to move around garden, Confirm to use tool, Deny or Start to leave, Info1 to say plant on current tile, Info2 to say plant need on current tile, Info3 to say number of needy plants, CycleLeft/CycleRight to change tools, Option to visit the store.";
-            public string userPicker = "Inputs: Up and Down to scroll, Confirm to select, Deny to close, Info1 to rename, Info2 to delete.";
-            public string store = "Inputs: Confirm to buy, Deny to close, Info1 to say coin balance, Horizontal directions and Cycle buttons to switch categories, Vertical directions to scroll items.";
-            public string seedPicker = "Inputs: Directional input to Navigate grid, Confirm to select/deselect plant, Deny to pause, Start to start level, Info1 to list zombies in level, Info2 to say level type, CycleLeft/CycleRight to list selected plants, Info3 to add or remove imitater clone of current plant.";
-            public string optionsMenu = "Inputs: Up and Down to scroll list, Confirm to select, Left and Right to adjust sliders, Deny to close.";
-            public string mainMenu = "Inputs: Up and down to scroll, Confirm button to select";
-            public string buttonPicker = "Inputs: Confirm to select, Deny to reject, Info1 to repeat, Up and Down to scroll options.";
-            public string minigameSelector = "Inputs: Up and down to scroll, Confirm to select, Deny to close.";
-            public string almanacIndex = "Inputs: Directions to change option, Confirm to select, Deny to close.";
-            public string almanacGrid = "Inputs: Directions to navigate grid, Deny to return to index.";
-            public string achievements = "Inputs: Up and Down to scroll, Deny to close.";
-            public string accessibility = "Inputs: Up and Down to scroll list, CycleLeft and CycleRight to jump to categories, Confirm to toggle, Left and Right to toggle or change values, Deny to go back, Info1 to repeat description.";
+            public string treeHeight;
+            public string zenGarden;
+            public string userPicker;
+            public string store;
+            public string seedPicker;
+            public string optionsMenu;
+            public string mainMenu;
+            public string buttonPicker;
+            public string minigameSelector;
+            public string almanacIndex;
+            public string almanacGrid;
+            public string achievements;
+            public string accessibility;
         }
 
         public static Awards awards = new Awards();
         public class Awards
         {
-            public string newPlant = "You got a new plant!";
-            public string bossTitle = "You have defeated the Boss Zombie!";
-            public string bossMessage = "Congratulations!  You have most triumphantly fended off the zombie attack!  Your lawn is safe... for now!";
-
-            public string noteTitle = "You found a note!";
-            public string note1 = "Hello, we are about to launch an all-out attack on your houze. Sincerely, the Zombies";
-            public string note2 = "Hello, We wood like to visit for a midnight znack. How does icecream and brains zound? Sincerely, the Zombies";
-            public string note3 = "Hello, We herd you were having a pool party. We think that iz fun. Well be rite over. Sincerely, the Zombies";
-            public string note4 = "Hello, This iz your muther. Please come over to my house for 'meatloaf'. Leave your front door open and your lawn unguarded. Sincerely, mom (not the Zombies)";
-            public string note5 = "Homeowner, you have failed to submit to our rightful claim. Be advised that unless you comply, we will be forced to take extreme action. Please remit your home and brains to us forthwith. Sincerely, Dr. Edgar Zomboss";
-            public string note6 = "Ok, you win. No more eatin brains for us. We just want to make music video with you now. Sincerely, the Zombies";
-
-            public string shovelTitle = "You got the shovel!";
-            public string shovelMessage = "Lets you dig up a plant to make room for another plant";
-
-            public string almanacTitle = "You found a suburban almanac!";
-            public string almanacMessage = "Keeps track of all plants and zombies you encounter";
-
-            public string shopTitle = "You found Crazy Dave's car key!";
-            public string shopMessage = "Now you can visit Crazy Dave's shop!";
-
-            public string tacoTitle = "You found a taco!";
-            public string tacoMessage = "What are you going to do with a taco?";
-
-            public string zenGardenTitle = "You found a watering can!";
-            public string zenGardenMessage = "Now you can play Zen Garden Mode!";
-
-            public string trophyTitle = "You got a trophy!";
-            public string vaseBreaker = "You've unlocked a new Vasebreaker level!";
-            public string iZombie = "You've unlocked a new 'I, Zombie' level!";
-            public string minigame = "You've unlocked a new mini-game!";
-            public string survival = "You've unlocked a new survival level!";
-
-            public string badHelpTitle = "Help for Plants and Zombies Game";
-            public string badHelpMessage = "When the Zombies show up. just sit there and don't do anything. You win the game when the Zombies get to your houze. -this help section brought to you by the Zombies";
-
+            public string newPlant;
+            public string bossTitle;
+            public string bossMessage;
+            public string noteTitle;
+            public string note1;
+            public string note2;
+            public string note3;
+            public string note4;
+            public string note5;
+            public string note6;
+            public string shovelTitle;
+            public string shovelMessage;
+            public string almanacTitle;
+            public string almanacMessage;
+            public string shopTitle;
+            public string shopMessage;
+            public string tacoTitle;
+            public string tacoMessage;
+            public string zenGardenTitle;
+            public string zenGardenMessage;
+            public string trophyTitle;
+            public string vaseBreaker;
+            public string iZombie;
+            public string minigame;
+            public string survival;
+            public string badHelpTitle;
+            public string badHelpMessage;
         }
 
         public static Game game = new Game();
         public class Game
         {
-            public string completion = "[0]% complete";
-            public string waveStatus = "Wave [0] of [1]";
-            public string finalWave = "Final Wave";
-            public string dirt = "dirt";
-            public string grass = "grass";
-            public string water = "water";
-            public string roof = "roof";
-            public string emptyTileString = "Empty [0] tile";
-            public string crater = "Crater";
-            public string graveStone = "Gravestone";
-            public string plantInVase = "[0] in vase";
-            public string zombieInVase = "[0] zombie in vase";
-            public string vase = "Vase";
-            public string plantVase = "Plant vase";
-            public string zombieVase = "Zombie vase";
-
-            public string ice = "Ice";
-            public string starGuide = "Starfruit guide";
-            public string roundPortal = "Round portal";
-            public string squarePortal = "Square portal";
-
-            public string squished = "Squished ";
-            public string sleeping = "Sleeping ";
-            public string buried = "Buried ";
-            public string armed = "Armed ";
-            public string chewing = "Chewing ";
-            public string small = "Small ";
-            public string magnetFilled = "Filled ";
-            public string laddered = "Laddered ";
-            public string cobCharging = "Charging ";
-            public string cobReady = "Ready ";
-            public string nutDamaged = "Damaged ";
-            public string nutChipped = "Chipped ";
-            public string tallnutCrying = "Crying ";
-            public string garlicSad = "Sad ";
-            public string garlicNibbled = "Nibbled ";
-            public string pumpkinShield = " with [0]pumpkin shield";
-
-            public string magBucket = " holding bucket";
-            public string magHelmet = " holding football helmet";
-            public string magDoor = " holding screen door";
-            public string magPogo = " holding pogo stick";
-            public string magJack = " holding Jack-in-the-box";
-            public string magLadder = " holding ladder";
-            public string magPickaxe = " holding pickaxe";
-
-            public string hasRoundPortal = "[0] and Round portal";
-            public string hasSquarePortal = "[0] and Square portal";
-
-            public string bossHead = "Zomboss Head";
-            public string offBoard = "Off-Board";
-
-            public string hypnotized = "Hypnotized ";
-            public string dinted = "Dinted ";
-            public string damaged = "Damaged ";
-            public string exposed = "Exposed ";
-            public string ripped = "Ripped ";
-            public string shredded = "Shredded ";
-            public string angry = "Angry ";
-
-            public string armless = "Armless ";
-            public string headless = "Headless ";
-            public string underground = "Underground ";
-            public string grounded = "Grounded ";
-            public string tired = "Tired ";
-            public string falling = "Falling ";
-            public string icy = "Icy ";
-            public string buttered = "Buttered ";
-            public string hungry = "Hungry ";
-
-            public string iceBall = "Ice Ball.";
-            public string fireBall = "Fire Ball.";
-
-            public string notEnoughSun = "Not enough sun! [0] out of [1]";
-
-            public string imitation = "Imitation [0]";
-            public string plantReady = "Ready";
-            public string plantRefreshing = "Refreshing";
-            public string plantSun = "[0] of [1] sun";
-
-            public string frozen = "Frozen!";
-            public string unfrozen = "UnFrozen!";
-            public string noLawnmower = "Unprotected!";
-            public string lawnMower = "Lawn Mower";
-            public string poolCleaner = "Pool Cleaner";
-            public string roofSweeper = "Roof Sweeper";
-            public string hasBrain = "Brain remaining!";
-            public string noBrain = "No Brain!";
-
-            public string noZombies = "No Zombies";
-
-            public string buySnorkel = "Buy snorkel zombie.";
-            public string buyTrophy = "Buy trophy.";
-            public string buyBrain = "Brain food.";
-            public string purchased = "Purchased. ";
-
-            public string upgradePeashooters = " Upgrade peashooters to repeaters.";
-            public string upgradeShrooms = " Upgrade puff-shrooms to fume-shrooms.";
-            public string upgradeNuts = " Upgrade wall-nuts to tall-nuts.";
-            public string shufflePlants = " Shuffle plants.";
-            public string repairCrater = " Repair crater.";
-            public string collectSun = "Collect sun to unlock options";
-
-            public string refreshPercent = "[0]% refreshed";
-            public string alreadyPurchased = "Already purchased.";
-            public string waitingForPlants = "Waiting for plants to arrive";
-
-            public string brainStatus = "[0] of 5 brains eaten";
-            public string slotStatus = "[0] of 2,000 sun";
-            public string beghouledStatus = "[0] of 75 matches.";
-            public string starStatus = "[0] of 14 required stars";
-            public string vasesRemaining = "[0] vases remaining";
-            public string vaseRemaining = "1 vase remaining";
-            public string noVases = "no vases remaining";
-            public string survivalEndlessStage = "[0] stages completed";
-            public string survivalStage = "[0] of 5 stages completed!";
-            public string zombiquariumGoal = "Save up 1000 sun to purchase the level trophy";
-
-            public string coinCount = "[0] coins!";
-            public string sunCount = "[0] sun!";
+            public string completion;
+            public string waveStatus;
+            public string finalWave;
+            public string dirt;
+            public string grass;
+            public string water;
+            public string roof;
+            public string emptyTileString;
+            public string crater;
+            public string graveStone;
+            public string plantInVase;
+            public string zombieInVase;
+            public string vase;
+            public string plantVase;
+            public string zombieVase;
+            public string ice;
+            public string starGuide;
+            public string roundPortal;
+            public string squarePortal;
+            public string squished;
+            public string sleeping;
+            public string buried;
+            public string armed;
+            public string chewing;
+            public string small;
+            public string magnetFilled;
+            public string laddered;
+            public string cobCharging;
+            public string cobReady;
+            public string nutDamaged;
+            public string nutChipped;
+            public string tallnutCrying;
+            public string garlicSad;
+            public string garlicNibbled;
+            public string pumpkinShield;
+            public string magBucket;
+            public string magHelmet;
+            public string magDoor;
+            public string magPogo;
+            public string magJack;
+            public string magLadder;
+            public string magPickaxe;
+            public string hasRoundPortal;
+            public string hasSquarePortal;
+            public string bossHead;
+            public string offBoard;
+            public string hypnotized;
+            public string dinted;
+            public string damaged;
+            public string exposed;
+            public string ripped;
+            public string shredded;
+            public string angry;
+            public string armless;
+            public string headless;
+            public string underground;
+            public string grounded;
+            public string tired;
+            public string falling;
+            public string icy;
+            public string buttered;
+            public string hungry;
+            public string iceBall;
+            public string fireBall;
+            public string notEnoughSun;
+            public string imitation;
+            public string plantReady;
+            public string plantRefreshing;
+            public string plantSun;
+            public string frozen;
+            public string unfrozen;
+            public string noLawnmower;
+            public string lawnMower;
+            public string poolCleaner;
+            public string roofSweeper;
+            public string hasBrain;
+            public string noBrain;
+            public string noZombies;
+            public string buySnorkel;
+            public string buyTrophy;
+            public string buyBrain;
+            public string purchased;
+            public string upgradePeashooters;
+            public string upgradeShrooms;
+            public string upgradeNuts;
+            public string shufflePlants;
+            public string repairCrater;
+            public string collectSun;
+            public string refreshPercent;
+            public string alreadyPurchased;
+            public string waitingForPlants;
+            public string brainStatus;
+            public string slotStatus;
+            public string beghouledStatus;
+            public string starStatus;
+            public string vasesRemaining;
+            public string vaseRemaining;
+            public string noVases;
+            public string survivalEndlessStage;
+            public string survivalStage;
+            public string zombiquariumGoal;
+            public string coinCount;
+            public string sunCount;
         }
 
-        public static Almanac almanac;
+        public static Almanac almanac = new Almanac();
         public class Almanac
         {
-            public string plants = "Plants.";
-            public string zombies = "Zombies.";
-            public string index = "Almanac Index.";
-
-            public string fast = "Fast.";
-            public string slow = "Slow.";
-            public string verySlow = "Very Slow.";
-
-            public string rechargeTime = "Recharge time: ";
-            public string sun = " sun.";
-
-            public string mysteryZombie = "Mystery Zombie. Not encountered yet.";
+            public string plants;
+            public string zombies;
+            public string index;
+            public string fast;
+            public string slow;
+            public string verySlow;
+            public string rechargeTime;
+            public string sun;
+            public string mysteryZombie;
         }
 
         static bool LoadLanguage(string langName)
@@ -644,6 +598,12 @@ namespace PvZA11y
                 string[] newMinigames = deserializer.Deserialize<string[]>(File.ReadAllText(langDir + "\\" + langName + "\\Minigames.yaml"));
                 string[] newLevelTypes = deserializer.Deserialize<string[]>(File.ReadAllText(langDir + "\\" + langName + "\\LevelTypes.yaml"));
                 Store newStore = deserializer.Deserialize<Store>(File.ReadAllText(langDir + "\\" + langName + "\\Store.yaml"));
+                Game newGame = deserializer.Deserialize<Game>(File.ReadAllText(langDir + "\\" + langName + "\\Game.yaml"));
+                ZenGarden newZenGarden = deserializer.Deserialize<ZenGarden>(File.ReadAllText(langDir + "\\" + langName + "\\ZenGarden.yaml"));
+                Inputs newInputs = deserializer.Deserialize<Inputs>(File.ReadAllText(langDir + "\\" + langName + "\\Inputs.yaml"));
+                Awards newAwards = deserializer.Deserialize<Awards>(File.ReadAllText(langDir + "\\" + langName + "\\Awards.yaml"));
+                Menus newMenus = deserializer.Deserialize<Menus>(File.ReadAllText(langDir + "\\" + langName + "\\Menus.yaml"));
+                Almanac newAlmanac = deserializer.Deserialize<Almanac>(File.ReadAllText(langDir + "\\" + langName + "\\Almanac.yaml"));
 
                 plantNames = newPlantNames;
                 plantTooltips = newPlantTooltips;
@@ -658,6 +618,12 @@ namespace PvZA11y
                 minigameNames = newMinigames;
                 levelTypes = newLevelTypes;
                 store = newStore;
+                game = newGame;
+                zenGarden = newZenGarden;
+                inputs = newInputs;
+                awards = newAwards;
+                menus = newMenus;
+                almanac = newAlmanac;
                 Console.WriteLine("Language '{0}' loaded successfully!", langName);
                 Config.current.LanguageID = K4os.Hash.xxHash.XXH32.DigestOf(Encoding.Unicode.GetBytes(langName));
                 Config.SaveConfig();
@@ -747,6 +713,12 @@ namespace PvZA11y
             //File.WriteAllText("Language\\English\\Minigames.yaml", serializer.Serialize(minigameNames), Encoding.Unicode);
             //File.WriteAllText("Language\\English\\LevelTypes.yaml", serializer.Serialize(levelTypes), Encoding.Unicode);
             //File.WriteAllText("Language\\English\\Store.yaml", serializer.Serialize(store), Encoding.Unicode);
+            //File.WriteAllText("Language\\English\\Game.yaml", serializer.Serialize(game), Encoding.Unicode);
+            //File.WriteAllText("Language\\English\\ZenGarden.yaml", serializer.Serialize(zenGarden), Encoding.Unicode);
+            //File.WriteAllText("Language\\English\\Inputs.yaml", serializer.Serialize(inputs), Encoding.Unicode);
+            //File.WriteAllText("Language\\English\\Awards.yaml", serializer.Serialize(awards), Encoding.Unicode);
+            //File.WriteAllText("Language\\English\\Menus.yaml", serializer.Serialize(menus), Encoding.Unicode);
+            //File.WriteAllText("Language\\English\\Almanac.yaml", serializer.Serialize(almanac), Encoding.Unicode);
 
             //var deserializer = new YamlDotNet.Serialization.Deserializer();
             //var treedial = deserializer.Deserialize<Dictionary<int, string>>(File.ReadAllText("Language\\English\\TreeDialogue.yaml"));

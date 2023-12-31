@@ -39,9 +39,9 @@ namespace PvZA11y.Widgets
                     case 0:
                         return Text.almanac.index;
                     case 1:
-                        return Text.almanac.plants;
+                        return Text.almanac.plants + "\r\n";
                     case 2:
-                        return Text.almanac.zombies;
+                        return Text.almanac.zombies + "\r\n";
                 }
             }
             return null;
@@ -145,13 +145,6 @@ namespace PvZA11y.Widgets
                     string fullChain = indexChain + memIO.ptr.inlineButtonPosXOffset;
 
                     Program.Click(clickX, clickY, false, false,100,true);
-
-                    int delayCount = 30;   //~30ms timeout to avoid hanging while waiting for almanac to update
-                    while (pageID > 0 && delayCount-- > 0)
-                    {
-                        pageID = memIO.GetAlmanacPage(pointerChain);
-                        Task.Delay(1).Wait();
-                    }
                 }
                 else
                 {
