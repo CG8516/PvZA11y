@@ -113,8 +113,6 @@ namespace PvZA11y.Widgets
         {
             ZenTools = new List<ZenTool>();
 
-            memIO.SetPlayerPurchase((int)StoreItem.ZenGoldWateringcan, 0);
-
             float xPos = -0.04f;
             float xInc = 0.09f;
             float yPos = 0.04f;
