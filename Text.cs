@@ -607,6 +607,23 @@ namespace PvZA11y
                 Menus newMenus = deserializer.Deserialize<Menus>(File.ReadAllText(langDir + "\\" + langName + "\\Menus.yaml"));
                 Almanac newAlmanac = deserializer.Deserialize<Almanac>(File.ReadAllText(langDir + "\\" + langName + "\\Almanac.yaml"));
 
+                //int codepage = 437; //EN-US
+                Encoding newEncoding = Encoding.UTF8;
+                try
+                {
+                    string codePageStr = File.ReadAllText(langDir + "\\" + langName + "\\codepage.txt");
+                    Console.WriteLine("Read codepage string");
+                    int codepage = int.Parse(codePageStr);
+                    Console.WriteLine("Read codepage int: {0}", codepage);
+                    Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+                    newEncoding = Encoding.GetEncoding(codepage);
+                    Console.WriteLine("Using codepage {0}", codepage);
+                }
+                catch
+                {
+                    Console.WriteLine("Using default encoding...");
+                }
+
                 plantNames = newPlantNames;
                 plantTooltips = newPlantTooltips;
                 plantAlmanacDescriptions = newPlantAlmanacDescriptions;
@@ -626,6 +643,7 @@ namespace PvZA11y
                 awards = newAwards;
                 menus = newMenus;
                 almanac = newAlmanac;
+                Program.encoding = newEncoding;
                 Console.WriteLine("Language '{0}' loaded successfully!", langName);
                 Config.current.LanguageID = K4os.Hash.xxHash.XXH32.DigestOf(Encoding.Unicode.GetBytes(langName));
                 Config.SaveConfig();

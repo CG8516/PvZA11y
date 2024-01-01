@@ -114,7 +114,7 @@ namespace PvZA11y.Widgets
         protected override string? GetContent()
         {
             string titleString = Text.menus.mainMenu;
-            string bodyString = Text.menus.welcomeBack + memIO.mem.ReadString(memIO.ptr.lawnAppPtr + ",94c,04", "", 32, true, Encoding.UTF7);  //TODO: Move this to memIO. //lawnapp,playerInfo,name
+            string bodyString = Text.menus.welcomeBack + memIO.mem.ReadString(memIO.ptr.lawnAppPtr + ",94c,04", "", 32, true, Program.encoding);  //TODO: Move this to memIO. //lawnapp,playerInfo,name
             string inputStr = Text.inputs.mainMenu ;
             return titleString + "\r\n" + bodyString + (Config.current.SayAvailableInputs ? "\r\n" + inputStr : "");
         }

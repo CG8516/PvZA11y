@@ -30,6 +30,7 @@
     <PackageReference Include="SoundTouch.Net.NAudioSupport" Version="2.3.2" />
     <PackageReference Include="System.Management" Version="8.0.0" />
     <PackageReference Include="System.Speech" Version="7.0.0" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
     <PackageReference Include="Vortice.XInput" Version="3.3.4" />
     <PackageReference Include="YamlDotNet" Version="13.7.1" />
   </ItemGroup>

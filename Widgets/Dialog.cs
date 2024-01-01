@@ -66,13 +66,13 @@ namespace PvZA11y.Widgets
             int bodyLen = memIO.mem.ReadInt(pointerChain + memIO.ptr.dialogBodyLenOffset);
             string titleString = "";
             if (titleLen <= 15)
-                titleString = memIO.mem.ReadString(pointerChain + memIO.ptr.dialogTitleStrOffset,"", titleLen, true, Encoding.UTF7);
+                titleString = memIO.mem.ReadString(pointerChain + memIO.ptr.dialogTitleStrOffset,"", titleLen, true, Program.encoding);
             else
-                titleString = memIO.mem.ReadString(pointerChain + memIO.ptr.dialogTitleStrOffset + ",0", "", titleLen, true, Encoding.UTF7);
+                titleString = memIO.mem.ReadString(pointerChain + memIO.ptr.dialogTitleStrOffset + ",0", "", titleLen, true, Program.encoding);
             
             string bodyString = "";
             if (bodyLen > 0)
-                bodyString = memIO.mem.ReadString(pointerChain + memIO.ptr.dialogBodyStrOffset + ",0", "", bodyLen, true, Encoding.UTF7);
+                bodyString = memIO.mem.ReadString(pointerChain + memIO.ptr.dialogBodyStrOffset + ",0", "", bodyLen, true, Program.encoding);
             bodyString = bodyString.ReplaceLineEndings(" ");
 
             string completeString =  titleString + "\r\n" + bodyString;

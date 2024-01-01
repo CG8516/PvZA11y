@@ -202,6 +202,8 @@ namespace PvZA11y
             public float absX;
         }
 
+        public static Encoding encoding = Encoding.UTF8;
+
         static plantInPicker[] plantPickerState = new plantInPicker[(int)SeedType.NUM_SEED_TYPES];
         static byte[] plantPickerBytes = new byte[3180];
 
@@ -1650,7 +1652,7 @@ namespace PvZA11y
             Mutex mutex = new System.Threading.Mutex(false, "PvZ-A11y");
             if (!mutex.WaitOne(0, false))
                 Environment.Exit(1);
-            Console.OutputEncoding = Encoding.Unicode;
+            Console.OutputEncoding = Encoding.UTF8;
             Console.WriteLine("Starting...");
 
             //This is pretty gross, but kind of required until more edge-cases are handled safely
@@ -1900,7 +1902,7 @@ namespace PvZA11y
                     int messageDuration = mem.ReadInt(memIO.ptr.boardChain + ",158,88");
                     if (oldMsgDuration == 0 && messageDuration != 0)
                     {
-                        string messageStr = mem.ReadString(memIO.ptr.boardChain + ",158,4","",128, true, Encoding.UTF7);
+                        string messageStr = mem.ReadString(memIO.ptr.boardChain + ",158,4","",128, true, Program.encoding);
                         if (messageStr.StartsWith("Click-and-drag"))
                             messageStr = "Press the deny button, then a direction, to swap plants and make matches of three.";
                         if (messageStr == "No possible moves!")
