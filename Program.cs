@@ -1860,6 +1860,7 @@ namespace PvZA11y
             long lastSweep = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             long nextFloatingPacketUpdate = 0;  //When to scan for floating seed packets (need to delay, to avoid slowing the game)
             int prevSunAmount = 0;
+            bool reloadLast = false;
             while (true)
             {
                 //Ensure window/draw specs, and hwnd are accurate
@@ -1878,6 +1879,14 @@ namespace PvZA11y
                 prevScene = gameScene;
 
                 currentWidget = GetActiveWidget(currentWidget);
+
+                bool reloadLang = input.CheckLangReloadKey();
+                if (reloadLang && !reloadLast)
+                {
+                    Text.FindLanguages();
+                    currentWidget.hasReadContent = false;
+                }
+                reloadLast = reloadLang;
 
                 bool inVaseBreaker = VaseBreakerCheck(); //GetPlayerLevel() == 35 || (gameMode >= (int)GameMode.SCARY_POTTER_1 && gameMode <= (int)GameMode.SCARY_POTTER_ENDLESS);
 

@@ -309,6 +309,11 @@ namespace PvZA11y
             ClearIntents();
         }
 
+        public bool CheckLangReloadKey()
+        {
+            return NativeKeyboard.IsKeyDown((int)System.Windows.Forms.Keys.Space);
+        }
+
         public uint GetKey(bool blocking = true)
         {
             //Wait until no keys are being pressed, then return first key pressed after
