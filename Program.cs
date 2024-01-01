@@ -477,7 +477,12 @@ namespace PvZA11y
 
             Console.WriteLine("IsSteam: {0}", isSteam);
 
-            ProcessModule? mainModule = foundProcs[0].MainModule;
+            ProcessModule? mainModule = null;
+            try
+            {
+                mainModule = foundProcs[0].MainModule;
+            }
+            catch { }
             if(mainModule == null)
                 return HookProcess();   //Process probably closed/crashed, or hasn't loaded yet. Try again.
             string procDir = mainModule.FileName;
@@ -544,11 +549,23 @@ namespace PvZA11y
 
             //TODO: Detect game version
 
-            string? versionStr = gameProc.MainModule.FileVersionInfo.ProductVersion;
+            string? versionStr = null;
+
+            try
+            {
+                versionStr = gameProc.MainModule.FileVersionInfo.ProductVersion;
+            }
+            catch { }
 
             //Steam version creates temporary/locked popcapgames1.exe, which will fail to grab version info. If that's the case, grab the verison info from PlantsVsZombies.exe instead.
             if (versionStr is null && appName == appNamePopcap && foundProcs != null && foundProcs.Length > 0)
-                versionStr = foundProcs[0].MainModule.FileVersionInfo.ProductVersion;
+            {
+                try
+                {
+                    versionStr = foundProcs[0].MainModule.FileVersionInfo.ProductVersion;
+                }
+                catch { }
+            }
 
             if (versionStr == null)
                 versionStr = "";
@@ -581,9 +598,21 @@ namespace PvZA11y
             if (isSteam)
                 Config.current.GameStartPath = "steam://rungameid/3590";
             else if (!reqpopcapgame1)
-                Config.current.GameStartPath = gameProc.MainModule.FileName;
-            else if(foundProcs != null && foundProcs.Length > 0 && foundProcs[0].MainModule != null)
-                Config.current.GameStartPath = foundProcs[0].MainModule.FileName;
+            {
+                try
+                {
+                    Config.current.GameStartPath = gameProc.MainModule.FileName;
+                }
+                catch { }
+            }
+            else if (foundProcs != null && foundProcs.Length > 0 && foundProcs[0].MainModule != null)
+            {
+                try
+                {
+                    Config.current.GameStartPath = foundProcs[0].MainModule.FileName;
+                }
+                catch { }
+            }
 
             Config.SaveConfig();
 
