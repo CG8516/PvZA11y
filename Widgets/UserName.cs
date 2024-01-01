@@ -34,7 +34,7 @@ namespace PvZA11y.Widgets
 
             //Wait for enter or escape
             uint keyInput = 0;
-            string prevName = memIO.mem.ReadString(pointerChain + memIO.ptr.usernamePickerNamesOffset + ",a8", "", 12);
+            string prevName = memIO.mem.ReadString(pointerChain + memIO.ptr.usernamePickerNamesOffset + ",a8", "", 12, true, Encoding.UTF7);
 
             string menuStr = newUser ? Text.menus.createUser : Text.menus.renameUser;
             Console.WriteLine(menuStr);
@@ -51,7 +51,7 @@ namespace PvZA11y.Widgets
                     Program.Say(menuStr);
                 }
 
-                string nameText = memIO.mem.ReadString(pointerChain + memIO.ptr.usernamePickerNamesOffset + ",a8", "", 12);
+                string nameText = memIO.mem.ReadString(pointerChain + memIO.ptr.usernamePickerNamesOffset + ",a8", "", 12, true, Encoding.UTF7);
                 if (nameText != prevName)
                 {
                     Console.WriteLine(nameText);
@@ -108,15 +108,15 @@ namespace PvZA11y.Widgets
         protected override string? GetContent()
         {
             //string titleString = memIO.mem.ReadString(pointerChain + ",bc");    //New User / Rename User
-            string titleString = memIO.mem.ReadString(pointerChain + memIO.ptr.dialogTitleStrOffset);    //New User / Rename User
-            string bodyString = memIO.mem.ReadString(pointerChain + ",f4,0", "", 128);  //Please Enter your name:
-            string currentName = memIO.mem.ReadString(pointerChain + memIO.ptr.usernamePickerNamesOffset + ",a8", "", 16); //Current name text
+            string titleString = memIO.mem.ReadString(pointerChain + memIO.ptr.dialogTitleStrOffset, "", 32, true, Encoding.UTF7);    //New User / Rename User
+            string bodyString = memIO.mem.ReadString(pointerChain + ",f4,0", "", 128, true, Encoding.UTF7);  //Please Enter your name:
+            string currentName = memIO.mem.ReadString(pointerChain + memIO.ptr.usernamePickerNamesOffset + ",a8", "", 16, true, Encoding.UTF7); //Current name text
             return titleString + " ... " + bodyString + " ... " + currentName;
         }
 
         protected override string? GetContentUpdate()
         {
-            return memIO.mem.ReadString(pointerChain + memIO.ptr.usernamePickerNamesOffset + ",a8", "", 16);  //Current name text
+            return memIO.mem.ReadString(pointerChain + memIO.ptr.usernamePickerNamesOffset + ",a8", "", 16, true, Encoding.UTF7);  //Current name text
         }
     }
 }

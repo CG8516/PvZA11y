@@ -14,7 +14,7 @@ using PvZA11y.Widgets;
 using NAudio.Mixer;
 
 /*
-[PVZ-A11y Beta 1.15]
+[PVZ-A11y Beta 1.16]
 
 Blind and motor accessibility mod for Plants Vs Zombies.
 Allows input with rebindable keys and controller buttons, rather than requiring a mouse for input.
@@ -1653,7 +1653,6 @@ namespace PvZA11y
             Console.OutputEncoding = Encoding.Unicode;
             Console.WriteLine("Starting...");
 
-
             //This is pretty gross, but kind of required until more edge-cases are handled safely
             try
             {
@@ -1901,7 +1900,7 @@ namespace PvZA11y
                     int messageDuration = mem.ReadInt(memIO.ptr.boardChain + ",158,88");
                     if (oldMsgDuration == 0 && messageDuration != 0)
                     {
-                        string messageStr = mem.ReadString(memIO.ptr.boardChain + ",158,4","",128);
+                        string messageStr = mem.ReadString(memIO.ptr.boardChain + ",158,4","",128, true, Encoding.UTF7);
                         if (messageStr.StartsWith("Click-and-drag"))
                             messageStr = "Press the deny button, then a direction, to swap plants and make matches of three.";
                         if (messageStr == "No possible moves!")

@@ -247,7 +247,7 @@ namespace PvZA11y
             int length = GetDaveMessageLength();
             if (length == 0)
                 return null;
-            return mem.ReadString(ptr.daveMessageTextChain, "", length);
+            return mem.ReadString(ptr.daveMessageTextChain, "", length, true, Encoding.UTF7);
         }
 
         public bool WidgetHasButton2(string ptrChain)
@@ -265,9 +265,9 @@ namespace PvZA11y
         public string GetWidgetButton1String(string ptrChain)
         {
             if(ptr.buttonTextAlwaysPtr)
-                return mem.ReadString(ptrChain + ptr.dialogueWidgetButton1Offset + ptr.widgetDialogStringOffset + ",0", "", 64);
+                return mem.ReadString(ptrChain + ptr.dialogueWidgetButton1Offset + ptr.widgetDialogStringOffset + ",0", "", 64, true, Encoding.UTF7);
 
-            return mem.ReadString(ptrChain + ptr.dialogueWidgetButton1Offset + ptr.widgetDialogStringOffset, "", 64);
+            return mem.ReadString(ptrChain + ptr.dialogueWidgetButton1Offset + ptr.widgetDialogStringOffset, "", 64, true, Encoding.UTF7);
         }
 
         public Vector2 GetWidgetButton2Pos(string ptrChain)
@@ -280,9 +280,9 @@ namespace PvZA11y
         public string GetWidgetButton2String(string ptrChain)
         {
             if (ptr.buttonTextAlwaysPtr)
-                return mem.ReadString(ptrChain + ptr.dialogueWidgetButton2Offset + ptr.widgetDialogStringOffset + ",0", "", 64);
+                return mem.ReadString(ptrChain + ptr.dialogueWidgetButton2Offset + ptr.widgetDialogStringOffset + ",0", "", 64, true, Encoding.UTF7);
 
-            return mem.ReadString(ptrChain + ptr.dialogueWidgetButton2Offset + ptr.widgetDialogStringOffset, "", 64);
+            return mem.ReadString(ptrChain + ptr.dialogueWidgetButton2Offset + ptr.widgetDialogStringOffset, "", 64, true, Encoding.UTF7);
         }
 
         public int GetUserCountFromProfileMgr()
@@ -313,9 +313,9 @@ namespace PvZA11y
 
                 //If name is over 15 characters, name will be a pointer to the name. Otherwise name will be embedded directly in struct.
                 if(nameLength > 15)
-                    userNames[i] = mem.ReadString(ptrChainToWidget + ptr.usernamePickerNamesOffset + ",c0," + ((i * userEntrySize) + 4).ToString("X2") + ",0", "", nameLength);
+                    userNames[i] = mem.ReadString(ptrChainToWidget + ptr.usernamePickerNamesOffset + ",c0," + ((i * userEntrySize) + 4).ToString("X2") + ",0", "", nameLength, true, Encoding.UTF7);
                 else
-                    userNames[i] = mem.ReadString(ptrChainToWidget + ptr.usernamePickerNamesOffset + ",c0," + ((i * userEntrySize) + 4).ToString("X2"), "", nameLength);
+                    userNames[i] = mem.ReadString(ptrChainToWidget + ptr.usernamePickerNamesOffset + ",c0," + ((i * userEntrySize) + 4).ToString("X2"), "", nameLength, true, Encoding.UTF7);
             }
 
             return userNames;

@@ -18,7 +18,7 @@ namespace PvZA11y.Widgets
         
         static ListItem[] InitListItems(MemoryIO memIO, string ptrChain, Widget? prevWidget = null)
         {
-            string continueString = memIO.mem.ReadString(ptrChain + memIO.ptr.optionsMenuContinueOffset + memIO.ptr.widgetDialogStringOffset);  //"OK" at main menu, "Return To Game" in game
+            string continueString = memIO.mem.ReadString(ptrChain + memIO.ptr.optionsMenuContinueOffset + memIO.ptr.widgetDialogStringOffset, "", 32, true, Encoding.UTF7);  //"OK" at main menu, "Return To Game" in game
 
             Vector2 baseSize = memIO.GetWidgetSize(ptrChain);
 
@@ -107,7 +107,7 @@ namespace PvZA11y.Widgets
             relativePos /= new Vector2(800.0f, 600.0f);
 
             //Update continue/ok button string, in case it wasn't read properly on init (timing error)
-            string continueString = memIO.mem.ReadString(pointerChain + memIO.ptr.optionsMenuContinueOffset + memIO.ptr.widgetDialogStringOffset);  //"OK" at main menu, "Return To Game" in game
+            string continueString = memIO.mem.ReadString(pointerChain + memIO.ptr.optionsMenuContinueOffset + memIO.ptr.widgetDialogStringOffset, "", 32, true, Encoding.UTF7);  //"OK" at main menu, "Return To Game" in game
             listItems[listItems.Length - 1].text = continueString;
 
             if (accessibilitySettings != null)
@@ -206,9 +206,9 @@ namespace PvZA11y.Widgets
             int titleLen = memIO.mem.ReadInt(pointerChain + memIO.ptr.dialogTitleLenOffset);
             string titleString = "";
             if (titleLen <= 15)
-                titleString = memIO.mem.ReadString(pointerChain + memIO.ptr.dialogTitleStrOffset);
+                titleString = memIO.mem.ReadString(pointerChain + memIO.ptr.dialogTitleStrOffset, "", 32, true, Encoding.UTF7);
             else
-                titleString = memIO.mem.ReadString(pointerChain + memIO.ptr.dialogTitleStrOffset + ",0");
+                titleString = memIO.mem.ReadString(pointerChain + memIO.ptr.dialogTitleStrOffset + ",0", "", 32, true, Encoding.UTF7);
 
             titleString += (Config.current.SayAvailableInputs ? "\r\n" + Text.inputs.optionsMenu : "");
 
