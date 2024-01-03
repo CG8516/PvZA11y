@@ -1057,7 +1057,7 @@ namespace PvZA11y.Widgets
                 if (plant.plantType == (int)SeedType.SEED_SUNSHROOM)
                 {
                     if (plant.state == 23)
-                        plantInfoString = Text.game.small;
+                        plantInfoString += Text.game.small;
                 }
                 if(plant.plantType == (int)SeedType.SEED_MAGNETSHROOM)
                 {
