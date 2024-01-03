@@ -373,5 +373,10 @@ namespace PvZA11y
         {
             return mem.ReadInt(ptr.lawnAppPtr + ",3a0,bc"); ;
         }
+
+        public bool GetWindowed()
+        {
+            return mem.ReadByte(ptr.lawnAppPtr + ",3a0,ce4") == 1;
+        }
     }
 }

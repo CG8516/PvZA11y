@@ -339,7 +339,7 @@ namespace PvZA11y
 
             float windowScale = GetScalingFactor();
 
-            int posX = (int)(((x * drawWidth)/ windowScale) + drawStartX);
+            int posX = (int)(((x * drawWidth)/ windowScale) + drawStartX/windowScale);
             int posY = (int)((y * drawHeight)/ windowScale);
             RECT rect = new RECT();
             GetWindowRect(gameWHnd, ref rect);
@@ -376,10 +376,10 @@ namespace PvZA11y
         {
             float windowScale = GetScalingFactor();
 
-            int clickX = (int)(((downX * drawWidth)/ windowScale) + drawStartX);
+            int clickX = (int)(((downX * drawWidth)/ windowScale) + drawStartX/windowScale);
             int clickY = (int)((downY * drawHeight)/windowScale);
 
-            int clickUpX = (int)(((upX * drawWidth)/ windowScale) + drawStartX);
+            int clickUpX = (int)(((upX * drawWidth)/ windowScale) + drawStartX/windowScale);
             int clickUpY = (int)((upY * drawHeight)/ windowScale);
 
             PostMessage(gameWHnd, WM_LBUTTONDOWN, 1, MakeLParam(clickX, clickY));
@@ -391,7 +391,7 @@ namespace PvZA11y
         {
             float windowScale = GetScalingFactor();
 
-            int clickX = (int)(((x * drawWidth)/windowScale) + drawStartX);
+            int clickX = (int)(((x * drawWidth)/windowScale) + drawStartX/windowScale);
             int clickY = (int)((y*drawHeight)/windowScale);
 
             //Console.WriteLine("ClickX: {0} ClickY: {1}", clickX, clickY);
