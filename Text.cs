@@ -288,6 +288,15 @@ namespace PvZA11y
             public Name name = new Name();
             public Description description = new Description();
             public Value value = new Value();
+            public Category category = new Category();
+            public class Category
+            {
+                public string input;
+                public string gameplay;
+                public string narration;
+                public string volume;
+                public string other;
+            }
 
             public class Name
             {

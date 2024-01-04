@@ -604,7 +604,26 @@ namespace PvZA11y.Widgets
             if (currentCategory != thisCategory)
             {
                 currentCategory = thisCategory;
-                optionText = options[optionIndex].category.ToString() + ".\r\n" + optionText;
+                string categoryName = "";
+                switch(options[optionIndex].category)
+                {
+                    case OptionCategory.Input:
+                        categoryName = Text.accessibility.category.input;
+                        break;
+                    case OptionCategory.Gameplay:
+                        categoryName = Text.accessibility.category.gameplay;
+                        break;
+                    case OptionCategory.Narration:
+                        categoryName = Text.accessibility.category.narration;
+                        break;
+                    case OptionCategory.Volume:
+                        categoryName = Text.accessibility.category.volume;
+                        break;
+                    case OptionCategory.Other:
+                        categoryName = Text.accessibility.category.other;
+                        break;
+                }
+                optionText = categoryName + ".\r\n" + optionText;
             }
 
             optionText = prepend + optionText;
