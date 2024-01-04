@@ -1022,28 +1022,30 @@ namespace PvZA11y
 
                 if (Config.current.SayCoinValueOnCollect)
                 {
-                    string sayStr = "";
+                    string sayStr = Text.game.coinCount;
+                    int count = 0;
                     switch ((CoinType)coinType)
                     {
                         case CoinType.Silver:
-                            sayStr = "10 coins!";
+                            count = 10;
                             break;
                         case CoinType.Gold:
-                            sayStr = "50 coins!";
+                            count = 50;
                             break;
                         case CoinType.Diamond:
-                            sayStr = "1,000 coins!";
+                            count = 1000;
                             break;
                         case CoinType.AwardMoneyBag:
-                            sayStr = "250 coins!";
+                            count = 250;
                             break;
                         case CoinType.AwardBagDiamond:
-                            sayStr = "3,000 coins!";
+                            count = 3000;
                             break;
                     }
 
-                    if (sayStr.Length > 0)
-                    {
+                    if(count != 0)
+                    { 
+                        sayStr = sayStr.Replace("[0]", FormatNumber(count));
                         Console.WriteLine(sayStr);
                         Say(sayStr);
                     }
@@ -1991,7 +1993,7 @@ namespace PvZA11y
                     newSunAmount = ((Board)currentWidget).GetTotalSun();
                     if (newSunAmount > prevSunAmount && Config.current.SaySunCountOnCollect)
                     {
-                        string sunString = FormatNumber(newSunAmount) + " Sun!";
+                        string sunString = Text.game.sunCount.Replace("[0]", FormatNumber(newSunAmount));
                         Console.WriteLine(sunString);
                         Say(sunString);
                     }
