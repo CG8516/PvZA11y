@@ -96,6 +96,7 @@ namespace PvZA11y
             public string accessibilitySettings;
             public string createUser;
             public string renameUser;
+            public string pressStart;
         }
 
         public static ZenGarden zenGarden = new ZenGarden();

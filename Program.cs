@@ -2147,8 +2147,8 @@ namespace PvZA11y
                         {
                             PlayTone(1, 1, 400, 400, 100, SignalGeneratorType.Triangle);
                             PlayTone(1, 1, 600, 600, 100, SignalGeneratorType.Triangle,50);
-                            Console.WriteLine("Press Start To begin");
-                            Say("Press Start to begin", true);
+                            Console.WriteLine(Text.menus.pressStart);
+                            Say(Text.menus.pressStart, true);
 
                         }
                         playedPlantFullIndicator = true;
