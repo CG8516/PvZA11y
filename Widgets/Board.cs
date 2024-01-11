@@ -678,6 +678,13 @@ namespace PvZA11y.Widgets
         {
             GameMode gameMode = (GameMode)memIO.GetGameMode();
 
+            //Don't replay tutorials if a level is already in progress.
+            int boardTimer = memIO.mem.ReadInt(memIO.ptr.boardChain + ",5580");
+            int timer2 = memIO.mem.ReadInt(memIO.ptr.boardChain + ",5584");
+            if (boardTimer > 20 || timer2 > 1000000)
+                return;
+            memIO.mem.WriteMemory(memIO.ptr.boardChain + ",5584", "int", "1000001");
+
             if (gameMode is GameMode.Adventure)
             {
                 int level = memIO.GetPlayerLevel();
