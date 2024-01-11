@@ -758,6 +758,11 @@ namespace PvZA11y
                     Say(splitLines[currentLine]);
                 }
                 intent = input.GetCurrentIntent();
+
+                bool gameClosed = false;
+                try { gameClosed = memIO.mem.mProc.Process.HasExited; } catch { }
+                if (gameClosed)
+                    Environment.Exit(0);
             }
             memIO.SetBoardPaused(false);
         }
