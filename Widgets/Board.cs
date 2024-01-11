@@ -1310,8 +1310,16 @@ namespace PvZA11y.Widgets
             bool needToAddFireball = false;
             if (fireball.HasValue && fireball.Value.row == gridInput.cursorY)
             {
-                verboseZombieInfo = (1 + zombiesThisRow.Count).ToString() + ". ";
-                needToAddFireball = true;
+                int ballColumn = (int)((fireball.Value.x + 100.0f) / 100.0f);
+                ballColumn = ballColumn < 0 ? 0 : ballColumn;
+                ballColumn = ballColumn > 10 ? 10 : ballColumn;
+                if (currentTileOnly && ballColumn != gridInput.cursorX)
+                    ;
+                else
+                {
+                    verboseZombieInfo = (1 + zombiesThisRow.Count).ToString() + ". ";
+                    needToAddFireball = true;
+                }
             }
             else
                 verboseZombieInfo = zombiesThisRow.Count.ToString() + ". ";
@@ -1325,9 +1333,15 @@ namespace PvZA11y.Widgets
 
             List<Program.ToneProperties> tones = new List<Program.ToneProperties>();
 
+            bool fireballHack = false;
+            if(needToAddFireball && zombiesThisRow.Count == 0)
+            {
+                zombiesThisRow.Add(new Zombie());
+                fireballHack = true;
+            }
             for (int i = 0; i < zombiesThisRow.Count; i++)
             {
-                if (needToAddFireball && zombiesThisRow[i].posX > fireball.Value.x)
+                if ((needToAddFireball && zombiesThisRow[i].posX > fireball.Value.x) || fireballHack)
                 {
                     string name = fireball.Value.isIce ? Text.game.iceBall :Text.game.fireBall;
 
@@ -1345,7 +1359,14 @@ namespace PvZA11y.Widgets
                     verboseZombieInfo += name;
 
                     needToAddFireball = false;
+                    float fireballVolumeR = fireball.Value.x / 900.0f;
+                    float fireballVolumeL = 1.0f - fireballVolumeR;
+                    fireballVolumeL *= Config.current.ManualZombieSonarVolume;
+                    fireballVolumeR *= Config.current.ManualZombieSonarVolume;
+                    tones.Add(new Program.ToneProperties() { leftVolume = fireballVolumeL, rightVolume = fireballVolumeR, startFrequency = 300 + (i * 10), endFrequency = 300 + (i * 10), duration = 100, signalType = SignalGeneratorType.Sin, startDelay = (int)(fireball.Value.x /2.0f) });
                 }
+                if (fireballHack)
+                    break;
 
 
                 //For each zombie, play a sound, with a start delay relative to their distance from left to right
