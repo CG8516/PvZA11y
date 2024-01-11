@@ -343,8 +343,6 @@ namespace PvZA11y
             pressedKey = 0;
             pressedButton = GamepadButtons.None;
 
-            string startWarning = "Please release all keyboard keys and controller buttons.";
-
             WaitForNoInput();
 
             while (pressedKey == 0 && pressedButton == GamepadButtons.None)
@@ -411,7 +409,7 @@ namespace PvZA11y
             ClearIntents();
         }
 
-        public bool CheckEscapeHeld(ref bool wasPressed, int holdTimeMs = 3000)
+        public bool CheckEscapeHeld(ref bool wasPressed, int holdTimeMs = 1000)
         {
 
             bool escapeDown = NativeKeyboard.IsKeyDown(Key.Escape);

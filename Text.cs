@@ -418,6 +418,78 @@ namespace PvZA11y
             }
         }
 
+        public static InputRebind inputRebind = new InputRebind();
+
+        public class InputRebind
+        {
+            public InputNames inputNames = new InputNames();
+            public InputDescriptions inputDescriptions = new InputDescriptions();
+            public class InputNames
+            {
+                public string up = "Up";
+                public string down = "Down";
+                public string left = "Left";
+                public string right = "Right";
+                public string confirm = "Confirm";
+                public string deny = "Deny";
+                public string start = "Start";
+                public string option = "Option";
+                public string cycleLeft = "Cycle Left";
+                public string cycleRight = "Cycle Right";
+                public string zombieMinus = "Zombie Minus";
+                public string zombiePlus = "Zombie Plus";
+                public string info1 = "Info1";
+                public string info2 = "Info2";
+                public string info3 = "Info3";
+                public string info4 = "Info4";
+                public string slot = "Slot[0]";
+            }
+
+            public class InputDescriptions
+            {
+                public string up = "Scroll menu up, directional input for grid navigation.";
+                public string down = "Scroll menu down, directional input for board navigation.";
+                public string left = "Adjust menu value, directional input for board navigation.";
+                public string right = "Adjust menu value, directional input for board navigation.";
+                public string confirm = "Plant placement and confirming menu choices.";
+                public string deny = "Shovel plants, deny menu choices.";
+                public string start = "Open the pause menu, start game from plant selector.";
+                public string option = "Toggle freeze mode, open the store from Zen Garden, start wave in Last Stand.";
+                public string cycleLeft = "Cycle left between plants, zen garden tools, and store pages.";
+                public string cycleRight = "Cycle right between plants, zen garden tools, and store pages.";
+                public string zombieMinus = "Cycle backwards through zombies on the lawn.";
+                public string zombiePlus = "Cycle forwards through zombies on the lawn.";
+                public string info1 = "Zombie sonar, repeat dialogue messages, say upcoming zombies while on plant selector, rename user when in user picker dialogue, say current coin balance in store, say zen garden plant name, double-tap for lawnmower and iZombie brain information.";
+                public string info2 = "Plant and object information for current tile, say level type while on plant selector, delete user when in user picker dialogue, say zen garden plant status.";
+                public string info3 = "Say current sun count, say number of needy plants in zen garden, spin slots in SlotMachine minigames, say trophy count on gamemode selection screens, select/deselect imitater plant in plant picker, double-tap to say coin count while in a game.";
+                public string info4 = "Say level progress.";
+                public string slot = "Instantly select plant/tool slot [0]";
+            }
+
+            public string resetKeyboard = "Reset all keyboard binds to default";
+            public string resetController = "Reset all controller binds to default";
+            public string setKeyboard = "Set all keyboard binds";
+            public string setController = "Set all controller binds";
+            public string keyboardReset = "All keyboard binds have been reset!";
+            public string controllerReset = "All controller binds have been reset!";
+            public string rebindComplete = "Rebinding Complete!";
+            public string pressKeyboard = "Press a keyboard key to map to this input, or hold escape to cancel";
+            public string pressController = "Press a controller button to map to this input, or hold escape to cancel";
+            public string pressKeyboardOrController = "Press a keyboard or controller button to map to this input, or hold escape to cancel";
+            public string keyAlreadyBound = "Specified key was alread bound to: [0]";
+            public string buttonAlreadyBound = "Specified button was already bound to: [0]";
+            public string keyUnbound = "Keyboard input for [0] action is now unbound!";
+            public string buttonUnbound = "Controller input for [0] action is now unbound!";
+            public string inputBound = "Input bound!";
+            public string keyboardBind = "Keyboard: [0]";
+            public string controllerBind = "Controller: [0]";
+            public string controllerExtraBind = "Controller: [0] and [1]";
+            public string leftStick = "Left Stick";
+            public string rightStick = "Right Stick";
+            public string leftTrigger = "Left Trigger";
+            public string rightTrigger = "Right Trigger";
+            public string unknownKey = "Unknown Key:";
+        }
         public static Inputs inputs = new Inputs();
         public class Inputs
         {
@@ -434,6 +506,7 @@ namespace PvZA11y
             public string almanacGrid;
             public string achievements;
             public string accessibility;
+            public string rebindMenu = "Inputs: Confirm to rebind, Deny to close, Info1 to repeat, Info2 to say bound keys/buttons, Directional up and down to scroll list.";
         }
 
         public static Awards awards = new Awards();
@@ -616,6 +689,7 @@ namespace PvZA11y
                 Awards newAwards = deserializer.Deserialize<Awards>(File.ReadAllText(langDir + "\\" + langName + "\\Awards.yaml"));
                 Menus newMenus = deserializer.Deserialize<Menus>(File.ReadAllText(langDir + "\\" + langName + "\\Menus.yaml"));
                 Almanac newAlmanac = deserializer.Deserialize<Almanac>(File.ReadAllText(langDir + "\\" + langName + "\\Almanac.yaml"));
+                InputRebind newRebind = deserializer.Deserialize<InputRebind>(File.ReadAllText(langDir + "\\" + langName + "\\RebindMenu.yaml"));
 
                 //int codepage = 437; //EN-US
                 Encoding newEncoding = Encoding.UTF8;
@@ -653,6 +727,7 @@ namespace PvZA11y
                 awards = newAwards;
                 menus = newMenus;
                 almanac = newAlmanac;
+                inputRebind = newRebind;
                 Program.encoding = newEncoding;
                 Console.WriteLine("Language '{0}' loaded successfully!", langName);
                 Config.current.LanguageID = K4os.Hash.xxHash.XXH32.DigestOf(Encoding.Unicode.GetBytes(langName));
@@ -746,6 +821,7 @@ namespace PvZA11y
             //File.WriteAllText("Language\\English\\Game.yaml", serializer.Serialize(game), Encoding.Unicode);
             //File.WriteAllText("Language\\English\\ZenGarden.yaml", serializer.Serialize(zenGarden), Encoding.Unicode);
             //File.WriteAllText("Language\\English\\Inputs.yaml", serializer.Serialize(inputs), Encoding.Unicode);
+            //File.WriteAllText("Language\\English\\RebindMenu.yaml", serializer.Serialize(inputRebind), Encoding.Unicode);
             //File.WriteAllText("Language\\English\\Awards.yaml", serializer.Serialize(awards), Encoding.Unicode);
             //File.WriteAllText("Language\\English\\Menus.yaml", serializer.Serialize(menus), Encoding.Unicode);
             //File.WriteAllText("Language\\English\\Almanac.yaml", serializer.Serialize(almanac), Encoding.Unicode);

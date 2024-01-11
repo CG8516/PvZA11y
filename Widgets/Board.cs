@@ -1384,8 +1384,9 @@ namespace PvZA11y.Widgets
             {
                 if (beepOnNone)
                 {
-                    Program.PlayTone(Config.current.ManualZombieSonarVolume, Config.current.ManualZombieSonarVolume, 200, 200, 50, SignalGeneratorType.SawTooth);
-                    Program.PlayTone(Config.current.ManualZombieSonarVolume, Config.current.ManualZombieSonarVolume, 250, 250, 50, SignalGeneratorType.SawTooth, 55);
+                    float volume = Config.current.ManualZombieSonarVolume * 0.8f;
+                    Program.PlayTone(volume,volume, 200, 200, 50, SignalGeneratorType.Sin);
+                    Program.PlayTone(volume, volume, 250, 250, 50, SignalGeneratorType.Sin, 55);
                 }
                 return null;
             }
@@ -2142,8 +2143,8 @@ namespace PvZA11y.Widgets
                     if (Config.current.ZombieSonarOnRowChange > 0 && prevY != gridInput.cursorY)
                     {
                         string? zombiesThisRow = GetZombieInfo(false, (Config.current.ZombieSonarOnRowChange == 1 || Config.current.ZombieSonarOnRowChange == 2), Config.current.ZombieSonarOnRowChange == 1 || Config.current.ZombieSonarOnRowChange == 2, Config.current.ZombieSonarOnRowChange == 1, Config.current.ZombieSonarOnRowChange == 3);
-                        if (zombiesThisRow == null)
-                            zombiesThisRow = Text.game.noZombies;
+                        //if (zombiesThisRow == null)
+                          //  zombiesThisRow = Text.game.noZombies;
 
                         if (Config.current.ZombieSonarOnRowChange == 1 || Config.current.ZombieSonarOnRowChange == 3)
                             totalTileInfoStr += " " + zombiesThisRow;

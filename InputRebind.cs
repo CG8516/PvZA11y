@@ -22,63 +22,74 @@ namespace PvZA11y
 
         RequiredInput[] requiredInputs = new RequiredInput[]
         {
-            new RequiredInput(){intent = InputIntent.None, description = "Reset all keyboard binds to default"},
-            new RequiredInput(){intent = InputIntent.None, description = "Reset all controller binds to default"},
-            new RequiredInput(){intent = InputIntent.None, description = "Set all keyboard binds"},
-            new RequiredInput(){intent = InputIntent.None, description = "Set all controller binds"},
+            new RequiredInput(){intent = InputIntent.None, description = Text.inputRebind.resetKeyboard},
+            new RequiredInput(){intent = InputIntent.None, description =  Text.inputRebind.resetController},
+            new RequiredInput(){intent = InputIntent.None, description =  Text.inputRebind.setKeyboard},
+            new RequiredInput(){intent = InputIntent.None, description =  Text.inputRebind.setController},
 
-            new RequiredInput(){intent = InputIntent.Up, description = "Scroll menu up, directional input for grid navigation."},
-            new RequiredInput(){intent = InputIntent.Down, description = "Scroll menu down, directional input for board navigation."},
-            new RequiredInput(){intent = InputIntent.Left, description = "Adjust menu value, directional input for board navigation."},
-            new RequiredInput(){intent = InputIntent.Right, description = "Adjust menu value, directional input for board navigation."},
-            new RequiredInput(){intent = InputIntent.Confirm, description = "Plant placement and confirming menu choices."},
-            new RequiredInput(){intent = InputIntent.Deny, description = "Shovel plants, deny menu choices."},
-            new RequiredInput(){intent = InputIntent.Start, description = "Open the pause menu, start game from plant selector."},
-            new RequiredInput(){intent = InputIntent.Option, description = "Toggle freeze mode, open the store from Zen Garden, start wave in Last Stand."},
-            new RequiredInput(){intent = InputIntent.CycleLeft, description = "Cycle left between plants, zen garden tools, and store pages."},
-            new RequiredInput(){intent = InputIntent.CycleRight, description = "Cycle right between plants, zen garden tools, and store pages."},
-            new RequiredInput(){intent = InputIntent.ZombieMinus, description = "Cycle backwards through zombies on the lawn."},
-            new RequiredInput(){intent = InputIntent.ZombiePlus, description = "Cycle forwards through zombies on the lawn."},
-            new RequiredInput(){intent = InputIntent.Info1, description = "Zombie sonar, repeat dialogue messages, say upcoming zombies while on plant selector, rename user when in user picker dialogue, say current coin balance in store, say zen garden plant name, double-tap for lawnmower and iZombie brain information."},
-            new RequiredInput(){intent = InputIntent.Info2, description = "Plant and object information for current tile, say level type while on plant selector, delete user when in user picker dialogue, say zen garden plant status."},
-            new RequiredInput(){intent = InputIntent.Info3, description = "Say current sun count, say number of needy plants in zen garden, spin slots in SlotMachine minigames, say trophy count on gamemode selection screens, select/deselect imitater plant in plant picker, double-tap to say coin count while in a game."},
-            new RequiredInput(){intent = InputIntent.Info4, description = "Say level progress."},
-            new RequiredInput(){intent = InputIntent.Slot1, description = "Instantly select plant/tool slot 1."},
-            new RequiredInput(){intent = InputIntent.Slot2, description = "Instantly select plant/tool slot 2."},
-            new RequiredInput(){intent = InputIntent.Slot3, description = "Instantly select plant/tool slot 3."},
-            new RequiredInput(){intent = InputIntent.Slot4, description = "Instantly select plant/tool slot 4."},
-            new RequiredInput(){intent = InputIntent.Slot5, description = "Instantly select plant/tool slot 5."},
-            new RequiredInput(){intent = InputIntent.Slot6, description = "Instantly select plant/tool slot 6."},
-            new RequiredInput(){intent = InputIntent.Slot7, description = "Instantly select plant/tool slot 7."},
-            new RequiredInput(){intent = InputIntent.Slot8, description = "Instantly select plant/tool slot 8."},
-            new RequiredInput(){intent = InputIntent.Slot9, description = "Instantly select plant/tool slot 9."},
-            new RequiredInput(){intent = InputIntent.Slot10, description = "Instantly select plant/tool slot 10."},
+            new RequiredInput(){intent = InputIntent.Up, description =  Text.inputRebind.inputDescriptions.up},
+            new RequiredInput(){intent = InputIntent.Down, description = Text.inputRebind.inputDescriptions.down},
+            new RequiredInput(){intent = InputIntent.Left, description = Text.inputRebind.inputDescriptions.left},
+            new RequiredInput(){intent = InputIntent.Right, description = Text.inputRebind.inputDescriptions.right},
+            new RequiredInput(){intent = InputIntent.Confirm, description = Text.inputRebind.inputDescriptions.confirm},
+            new RequiredInput(){intent = InputIntent.Deny, description = Text.inputRebind.inputDescriptions.deny},
+            new RequiredInput(){intent = InputIntent.Start, description = Text.inputRebind.inputDescriptions.start},
+            new RequiredInput(){intent = InputIntent.Option, description = Text.inputRebind.inputDescriptions.option},
+            new RequiredInput(){intent = InputIntent.CycleLeft, description = Text.inputRebind.inputDescriptions.cycleLeft},
+            new RequiredInput(){intent = InputIntent.CycleRight, description = Text.inputRebind.inputDescriptions.cycleRight},
+            new RequiredInput(){intent = InputIntent.ZombieMinus, description = Text.inputRebind.inputDescriptions.zombieMinus},
+            new RequiredInput(){intent = InputIntent.ZombiePlus, description = Text.inputRebind.inputDescriptions.zombiePlus},
+            new RequiredInput(){intent = InputIntent.Info1, description = Text.inputRebind.inputDescriptions.info1},
+            new RequiredInput(){intent = InputIntent.Info2, description = Text.inputRebind.inputDescriptions.info2},
+            new RequiredInput(){intent = InputIntent.Info3, description = Text.inputRebind.inputDescriptions.info3},
+            new RequiredInput(){intent = InputIntent.Info4, description = Text.inputRebind.inputDescriptions.info4},
+            new RequiredInput(){intent = InputIntent.Slot1, description = Text.inputRebind.inputDescriptions.slot},
+            new RequiredInput(){intent = InputIntent.Slot2, description = Text.inputRebind.inputDescriptions.slot},
+            new RequiredInput(){intent = InputIntent.Slot3, description = Text.inputRebind.inputDescriptions.slot},
+            new RequiredInput(){intent = InputIntent.Slot4, description = Text.inputRebind.inputDescriptions.slot},
+            new RequiredInput(){intent = InputIntent.Slot5, description = Text.inputRebind.inputDescriptions.slot},
+            new RequiredInput(){intent = InputIntent.Slot6, description = Text.inputRebind.inputDescriptions.slot},
+            new RequiredInput(){intent = InputIntent.Slot7, description = Text.inputRebind.inputDescriptions.slot},
+            new RequiredInput(){intent = InputIntent.Slot8, description = Text.inputRebind.inputDescriptions.slot},
+            new RequiredInput(){intent = InputIntent.Slot9, description = Text.inputRebind.inputDescriptions.slot},
+            new RequiredInput(){intent = InputIntent.Slot10, description = Text.inputRebind.inputDescriptions.slot},
         };
 
         public InputRebind()
         {
-            SayCurrentOption(Config.current.SayAvailableInputs ? "\r\nInputs: Confirm to rebind, Deny to close, Info1 to repeat, Info2 to say bound keys/buttons, Directional up and down to scroll list." : "");
+            SayCurrentOption(Config.current.SayAvailableInputs ? "\r\n" + Text.inputs.rebindMenu : "");
         }
 
         string GetBoundInputStr()
         {            
             string controllerStr = "";
+            string controllerButton = "";
+            string controllerButton2 = "";
 
             if (Config.current.controllerBinds.ContainsValue(requiredInputs[inputIndex].intent))
-                controllerStr += "Controller: " + Config.current.controllerBinds.FirstOrDefault((x) => x.Value == requiredInputs[inputIndex].intent).Key.ToString();
+                controllerButton = Config.current.controllerBinds.FirstOrDefault((x) => x.Value == requiredInputs[inputIndex].intent).Key.ToString();
+
+            
 
             //TODO: Make these changable
             if (requiredInputs[inputIndex].intent >= InputIntent.Slot1 && requiredInputs[inputIndex].intent <= InputIntent.Slot10)
-                controllerStr += (controllerStr.Length > 0 ? " and " : "Controller: ") + "Right Stick";
+                controllerButton2 = Text.inputRebind.rightStick;
 
             if (requiredInputs[inputIndex].intent >= InputIntent.Up && requiredInputs[inputIndex].intent <= InputIntent.Right)
-                controllerStr += (controllerStr.Length > 0 ? " and " : "Controller: ") + "Left Stick";
+                controllerButton2 = Text.inputRebind.leftStick;
 
             if (requiredInputs[inputIndex].intent is InputIntent.ZombieMinus)
-                controllerStr += (controllerStr.Length > 0 ? " and " : "Controller: ") + "Left Trigger";
+                controllerButton2 = Text.inputRebind.leftTrigger;
 
             if (requiredInputs[inputIndex].intent is InputIntent.ZombiePlus)
-                controllerStr += (controllerStr.Length > 0 ? " and " : "Controller: ") + "Right Trigger";
+                controllerButton2 = Text.inputRebind.rightTrigger;
+
+            if (controllerButton != "" && controllerButton2 != "")
+                controllerStr = Text.inputRebind.controllerExtraBind.Replace("[0]", controllerButton).Replace("[1]", controllerButton2);
+            else if (controllerButton != "")
+                controllerStr = Text.inputRebind.controllerBind.Replace("[0]", controllerButton);
+            else if (controllerButton2 != "")
+                controllerStr = Text.inputRebind.controllerBind.Replace("[0]", controllerButton2);
 
             if (Config.current.keyBinds.ContainsValue(requiredInputs[inputIndex].intent))
             {
@@ -90,11 +101,11 @@ namespace PvZA11y
                     keyName = keyName.Replace("Oem", "");
                     if (keyName[0] == 'D' && keyName[1] >= '0' && keyName[1] <= '9')
                         keyName = keyName[1].ToString();
-                    controllerStr += ", Keyboard: " + keyName;
+                    controllerStr += ", " + Text.inputRebind.keyboardBind.Replace("[0]",keyName);
                 }
                 catch
                 {
-                    controllerStr += ", Keyboard: Unknown Key " + keyCode.ToString();
+                    controllerStr += ", " + Text.inputRebind.keyboardBind.Replace("[0]",Text.inputRebind.unknownKey) + " " + keyCode.ToString();
                 }
             }
 
@@ -105,19 +116,75 @@ namespace PvZA11y
         {               
             if (prependStr == null)
                 prependStr = "";
-
-            string thisInputStr = prependStr + requiredInputs[inputIndex].intent.ToString() + ", " + requiredInputs[inputIndex].description;
+            string description = requiredInputs[inputIndex].description.Replace("[0]", (inputIndex - 16).ToString());
+            string thisInputStr = prependStr + InputName(requiredInputs[inputIndex].intent) + ", " + description;
 
             thisInputStr += " " + GetBoundInputStr();
 
             if (requiredInputs[inputIndex].intent == InputIntent.None)
-                thisInputStr = prependStr + requiredInputs[inputIndex].description;
+                thisInputStr = prependStr + description;
 
             Console.WriteLine(thisInputStr);
             Program.Say(thisInputStr);
 
             float frequency = 400 + (((requiredInputs.Length - inputIndex) + 1) * 100);
             Program.PlayTone(1.0f, 1.0f, frequency, frequency, 100, SignalGeneratorType.Sin, 0);
+        }
+
+        public string InputName(int index)
+        {
+            switch(index)
+            {
+                case 0:
+                    return Text.inputRebind.inputNames.up;
+                case 1:
+                    return Text.inputRebind.inputNames.down;
+                case 2:
+                    return Text.inputRebind.inputNames.left;
+                case 3:
+                    return Text.inputRebind.inputNames.right;
+                case 4:
+                    return Text.inputRebind.inputNames.confirm;
+                case 5:
+                    return Text.inputRebind.inputNames.deny;
+                case 6:
+                    return Text.inputRebind.inputNames.start;
+                case 7:
+                    return Text.inputRebind.inputNames.option;
+                case 8:
+                    return Text.inputRebind.inputNames.cycleLeft;
+                case 9:
+                    return Text.inputRebind.inputNames.cycleRight;
+                case 10:
+                    return Text.inputRebind.inputNames.zombieMinus;
+                case 11:
+                    return Text.inputRebind.inputNames.zombiePlus;
+                case 12:
+                    return Text.inputRebind.inputNames.info1;
+                case 13:
+                    return Text.inputRebind.inputNames.info2;
+                case 14:
+                    return Text.inputRebind.inputNames.info3;
+                case 15:
+                    return Text.inputRebind.inputNames.info4;
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                    return Text.inputRebind.inputNames.slot.Replace("[0]",(index-16).ToString());
+            }
+            return "";
+        }
+
+        public string InputName(InputIntent intent)
+        {
+            return InputName(((int)intent) - 1);
         }
 
         public bool HandleInput()
@@ -166,14 +233,14 @@ namespace PvZA11y
                     Program.input.StopThread();
                     Config.current.keyBinds = new Dictionary<uint, InputIntent>();
                     Program.input = new Input();
-                    SayCurrentOption("All keyboard binds have been reset!\r\n");
+                    SayCurrentOption(Text.inputRebind.keyboardReset + "\r\n");
                 }
                 else if (inputIndex == 1)
                 {
                     Program.input.StopThread();
                     Config.current.controllerBinds = new Dictionary<GamepadButtons, InputIntent>();
                     Program.input = new Input();
-                    SayCurrentOption("All controller binds have been reset!\r\n");
+                    SayCurrentOption(Text.inputRebind.controllerReset + "\r\n");
                 }
                 else if (inputIndex == 2)
                     BindAllInputs(false);
@@ -220,7 +287,7 @@ namespace PvZA11y
                 }
             }
 
-            SayCurrentOption("Rebinding Complete!\r\n");
+            SayCurrentOption(Text.inputRebind.rebindComplete + "\r\n");
         }
 
         string? BindInput(int index = -1, bool allowKeyboard = true, bool allowController = true)
@@ -229,16 +296,15 @@ namespace PvZA11y
                 index = inputIndex;
             //Try grabbing keyboard or controller input
             RequiredInput reqInput = requiredInputs[index];
-            string instruction = reqInput.intent.ToString();
-            instruction += ", Press a ";
-            if (allowKeyboard && allowController)
-                instruction += "keyboard or controller ";
-            else if (allowController)
-                instruction += "controller ";
-            else if (allowKeyboard)
-                instruction += "keyboard ";
+            string instruction = InputName(index-4);
 
-            instruction += "button to map to this input, or hold escape to cancel.";
+            if (allowKeyboard && allowController)
+                instruction += ". " + Text.inputRebind.pressKeyboardOrController;
+            else if(allowKeyboard)
+                instruction += ". " + Text.inputRebind.pressKeyboard;
+            else if(allowController)
+                instruction += ". " + Text.inputRebind.pressController;
+
             Console.WriteLine(instruction);
             Program.Say(instruction);
 
@@ -272,8 +338,8 @@ namespace PvZA11y
                 }
                 if (Config.current.controllerBinds.ContainsKey(pressedButton))
                 {
-                    resultString = "Specified button was already bound to: " + Config.current.controllerBinds[pressedButton].ToString();
-                    resultString += "\r\nController input for " + Config.current.controllerBinds[pressedButton].ToString() + " action is now unbound!";
+                    resultString = Text.inputRebind.buttonAlreadyBound.Replace("[0]", InputName(Config.current.controllerBinds[pressedButton]));
+                    resultString += "\r\n" + Text.inputRebind.buttonUnbound.Replace("[0]", InputName(Config.current.controllerBinds[pressedButton]));
                     Config.current.controllerBinds.Remove(pressedButton);
                 }
                 Config.current.controllerBinds.Add(pressedButton, reqInput.intent);
@@ -289,14 +355,14 @@ namespace PvZA11y
                 }
                 if (Config.current.keyBinds.ContainsKey(pressedKey))
                 {
-                    resultString = "Specified key was already bound to: " +  Config.current.keyBinds[pressedKey].ToString();
-                    resultString += "\r\nKeyboard input for " + Config.current.keyBinds[pressedKey].ToString() + " action is now unbound!";
+                    resultString = Text.inputRebind.keyAlreadyBound.Replace("[0]", InputName(Config.current.keyBinds[pressedKey]));
+                    resultString += "\r\n" + Text.inputRebind.keyUnbound.Replace("[0]", InputName(Config.current.keyBinds[pressedKey]));
                     Config.current.keyBinds.Remove(pressedKey);
                 }
                 Config.current.keyBinds.Add(pressedKey, reqInput.intent);
                 Program.input.UpdateKeyboardBinds(Config.current.keyBinds);
             }
-            resultString += (resultString.Length > 0 ? "\r\n" : "") + "Input bound!";
+            resultString += (resultString.Length > 0 ? "\r\n" : "") + Text.inputRebind.inputBound;
             return resultString + "\r\n";
         }
 
