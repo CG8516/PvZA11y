@@ -1277,7 +1277,7 @@ namespace PvZA11y
 
             //options menu has mID of 2? || widget.type == (uint)WidgetType.Options
             //Check if plantPicker
-            bool wallnutBowling = (memIO.GetPlayerLevel() == 5) && memIO.GetGameScene() == (int)GameScene.SeedPicker;
+            bool wallnutBowling = (memIO.GetPlayerLevel() == 5) && memIO.GetGameScene() == (int)GameScene.SeedPicker && gameMode == (int)GameMode.Adventure;
 
             //Sometimes seed picker isn't the active widget, despite it being the focal point
             //Eg if you open the pause menu on the seed picker, and unpause again, the board will become the active widget :(
