@@ -649,6 +649,8 @@ namespace PvZA11y
             public string zombiquariumGoal;
             public string coinCount;
             public string sunCount;
+            public string tripwire1;
+            public string tripwire2;
         }
 
         public static Almanac almanac = new Almanac();

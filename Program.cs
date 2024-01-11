@@ -1758,8 +1758,8 @@ namespace PvZA11y
                 tripwireAlarmState = 1;
                 if (Config.current.SayWhenTripwireCrossed)
                 {
-                    Console.WriteLine("Tripwire triggered!");
-                    Say("Tripwire triggered!");
+                    Console.WriteLine(Text.game.tripwire1);
+                    Say(Text.game.tripwire1);
                 }
             }
             if (tripwireAlarmState <= 1 && intense)
@@ -1767,8 +1767,8 @@ namespace PvZA11y
                 tripwireAlarmState = 2;
                 if (Config.current.SayWhenTripwireCrossed)
                 {
-                    Console.WriteLine("ALERT! Multiple tripwires triggered!");
-                    Say("ALERT! Multiple tripwires triggered!");
+                    Console.WriteLine(Text.game.tripwire2);
+                    Say(Text.game.tripwire2);
                 }
             }
 
