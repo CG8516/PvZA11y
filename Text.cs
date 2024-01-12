@@ -334,6 +334,7 @@ namespace PvZA11y
                 public string AutomaticZombieSonarVolume;
                 public string ManualZombieSonarVolume;
                 public string PlantReadyCueVolume;
+                public string BackgroundPlantReadyCueVolume;
                 public string FoundObjectCueVolume;
                 public string FastZombieCueVolume;
                 public string DeadZombieCueVolume;
@@ -385,6 +386,7 @@ namespace PvZA11y
                 public string AutomaticZombieSonarVolume;
                 public string ManualZombieSonarVolume;
                 public string PlantReadyCueVolume;
+                public string BackgroundPlantReadyCueVolume;
                 public string FoundObjectCueVolume;
                 public string FastZombieCueVolume;
                 public string DeadZombieCueVolume;

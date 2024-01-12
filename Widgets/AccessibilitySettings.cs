@@ -508,6 +508,14 @@ namespace PvZA11y.Widgets
             ];
 
 
+            List<ToneProperties> backgroundPlantReady =
+            [
+                new ToneProperties() { leftVolume = 0.6f, rightVolume = 0.4f, startFrequency = 400.0f, endFrequency = 400.0f, duration = 190, signalType = SignalGeneratorType.Sin, startDelay = 40 },
+                new ToneProperties() { leftVolume = 0.6f, rightVolume = 0.4f, startFrequency = 500.0f, endFrequency = 500.0f, duration = 170, signalType = SignalGeneratorType.Sin, startDelay = 20 },
+                new ToneProperties() { leftVolume = 0.6f, rightVolume = 0.4f, startFrequency = 600.0f, endFrequency = 600.0f, duration = 150, signalType = SignalGeneratorType.Sin, startDelay = 0 },
+            ];
+
+
             List<ToneProperties> gridPos = new List<ToneProperties>() { new ToneProperties() { leftVolume = 0.5f, rightVolume = 0.5f, startFrequency = 800, endFrequency = 800, duration = 100, signalType = SignalGeneratorType.Sin, startDelay = 0 } };
             List<ToneProperties> plantFinder = new List<ToneProperties>() { new ToneProperties() { leftVolume = 0.5f, rightVolume = 0.5f, startFrequency = 800, endFrequency = 800, duration = 100, signalType = SignalGeneratorType.SawTooth, startDelay = 0 } };
 
@@ -558,6 +566,7 @@ namespace PvZA11y.Widgets
             options.Add(new Option() { name = Text.accessibility.name.AutomaticZombieSonarVolume, description = Text.accessibility.description.AutomaticZombieSonarVolume, leftRightAction = (intent) => SetFloat(intent, ref Config.current.AutomaticZombieSonarVolume, autoSonar), valueGrabber = () => GetFloatOptionAsPercentage(Config.current.AutomaticZombieSonarVolume), category = OptionCategory.Volume });
             options.Add(new Option() { name = Text.accessibility.name.ManualZombieSonarVolume, description = Text.accessibility.description.ManualZombieSonarVolume, leftRightAction = (intent) => SetFloat(intent, ref Config.current.ManualZombieSonarVolume, manualSonar), valueGrabber = () => GetFloatOptionAsPercentage(Config.current.ManualZombieSonarVolume), category = OptionCategory.Volume });
             options.Add(new Option() { name = Text.accessibility.name.PlantReadyCueVolume, description = Text.accessibility.description.PlantReadyCueVolume, leftRightAction = (intent) => SetFloat(intent, ref Config.current.PlantReadyCueVolume, plantReady), valueGrabber = () => GetFloatOptionAsPercentage(Config.current.PlantReadyCueVolume), category = OptionCategory.Volume });
+            options.Add(new Option() { name = Text.accessibility.name.BackgroundPlantReadyCueVolume, description = Text.accessibility.description.BackgroundPlantReadyCueVolume, leftRightAction = (intent) => SetFloat(intent, ref Config.current.BackgroundPlantReadyCueVolume, backgroundPlantReady), valueGrabber = () => GetFloatOptionAsPercentage(Config.current.BackgroundPlantReadyCueVolume), category = OptionCategory.Volume });
             options.Add(new Option() { name = Text.accessibility.name.FoundObjectCueVolume, description = Text.accessibility.description.FoundObjectCueVolume, leftRightAction = (intent) => SetFloat(intent, ref Config.current.FoundObjectCueVolume, plantFinder), valueGrabber = () => GetFloatOptionAsPercentage(Config.current.FoundObjectCueVolume), category = OptionCategory.Volume });
             options.Add(new Option() { name = Text.accessibility.name.FastZombieCueVolume, description = Text.accessibility.description.FastZombieCueVolume, leftRightAction = (intent) => SetFloat(intent, ref Config.current.FastZombieCueVolume, fastAlert), valueGrabber = () => GetFloatOptionAsPercentage(Config.current.FastZombieCueVolume), category = OptionCategory.Volume });
             options.Add(new Option() { name = Text.accessibility.name.DeadZombieCueVolume, description = Text.accessibility.description.DeadZombieCueVolume, leftRightAction = (intent) => SetFloat(intent, ref Config.current.DeadZombieCueVolume, zombieDead), valueGrabber = () => GetFloatOptionAsPercentage(Config.current.DeadZombieCueVolume), category = OptionCategory.Volume });

@@ -78,6 +78,7 @@ namespace PvZA11y
             public float AutomaticZombieSonarVolume = 0.3f;
             public float ManualZombieSonarVolume = 1.0f;
             public float PlantReadyCueVolume = 0.3f;
+            public float BackgroundPlantReadyCueVolume = 0.0f;
             public float FoundObjectCueVolume = 0.6f;
             public float FastZombieCueVolume = 1.0f;
             public float DeadZombieCueVolume = 0.1f;

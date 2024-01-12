@@ -1896,6 +1896,7 @@ namespace PvZA11y
             long lastSweep = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             long nextFloatingPacketUpdate = 0;  //When to scan for floating seed packets (need to delay, to avoid slowing the game)
             int prevSunAmount = 0;
+            List<int> prevReadyPlants = new List<int>();
             while (true)
             {
                 //Ensure window/draw specs, and hwnd are accurate
@@ -1983,6 +1984,7 @@ namespace PvZA11y
                 int fastZombieRow = 0;
                 float gridHeight = 1;
                 int newSunAmount = 0;
+                List<int>? newPlantsReady = new List<int>();
                 if (currentWidget is Board)
                 {
                     if(nextFloatingPacketUpdate <= DateTimeOffset.UtcNow.ToUnixTimeMilliseconds())
@@ -2008,6 +2010,7 @@ namespace PvZA11y
                     if (((Board)currentWidget).seedbankSlot != prevSeedbankSlot)
                         packetWasReady = false;
 
+                    newPlantsReady = ((Board)currentWidget).GetAllPlantsReady();
                     prevSeedbankSlot = ((Board)currentWidget).seedbankSlot;
                     if(Config.current.DeadZombieCueVolume > 0)
                     {
@@ -2130,6 +2133,36 @@ namespace PvZA11y
                     PlayTones(tones);
                 }
 
+                if (newPlantsReady.Count > 0 && Config.current.BackgroundPlantReadyCueVolume > 0)
+                {
+                    List<ToneProperties> tones = new List<ToneProperties>();
+                    int extraDelay = 0;
+                    for (int i = 0; i < newPlantsReady.Count; i++)
+                    {
+                        if (prevReadyPlants.Contains(newPlantsReady[i]))
+                            continue;
+
+                        //Don't play tone for current plant
+                        if (((Board)currentWidget).seedbankSlot == newPlantsReady[i])
+                            continue;
+
+                        float rVolume = newPlantsReady[i] / 10.0f;
+                        float lVolume = 1.0f - rVolume;
+                        rVolume *= Config.current.BackgroundPlantReadyCueVolume;
+                        lVolume *= Config.current.BackgroundPlantReadyCueVolume;
+
+                        float freq1 = 200.0f + (50.0f * newPlantsReady[i]);
+                        float freq2 = freq1 * 1.25f;
+                        float freq3 = freq1 * 1.5f;
+
+                        tones.Add(new ToneProperties() { leftVolume = lVolume, rightVolume = rVolume, startFrequency = freq1, endFrequency = freq1, duration = 190, signalType = SignalGeneratorType.Sin, startDelay = extraDelay + 40 });
+                        tones.Add(new ToneProperties() { leftVolume = lVolume, rightVolume = rVolume, startFrequency = freq2, endFrequency = freq2, duration = 170, signalType = SignalGeneratorType.Sin, startDelay = extraDelay + 20 });
+                        tones.Add(new ToneProperties() { leftVolume = lVolume, rightVolume = rVolume, startFrequency = freq3, endFrequency = freq3, duration = 150, signalType = SignalGeneratorType.Sin, startDelay = extraDelay });
+                        extraDelay += 100;
+                    }
+                    PlayTones(tones);
+                    prevReadyPlants = newPlantsReady;
+                }
                 packetWasReady = plantPacketReady;
 
                 DoWidgetInteractions(currentWidget, input);

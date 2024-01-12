@@ -791,6 +791,49 @@ namespace PvZA11y.Widgets
             return false;
         }
 
+        public List<int> GetAllPlantsReady()
+        {
+            List<int> readySlots = new List<int>();
+            GameMode gameMode = (GameMode)memIO.GetGameMode();
+
+            if (gameMode is GameMode.SlotMachine or GameMode.Zombiquarium or GameMode.Beghouled or GameMode.BeghouledTwist or GameMode.VaseBreakerEndless or GameMode.ItsRainingSeeds)
+                return readySlots;
+
+            if (ConveyorBeltCounter() > 0)
+                return readySlots;
+
+            if (VaseBreakerCheck())
+                return readySlots;
+
+            bool inIZombie = gameMode >= GameMode.IZombie1 && gameMode <= GameMode.IZombieEndless;
+
+            int sunAmount = memIO.mem.ReadInt(memIO.ptr.boardChain + ",5578");
+            sunAmount += animatingSunAmount;
+            var plants = GetPlantsInBoardBank();
+
+            int seedbankSize = memIO.mem.ReadInt(memIO.ptr.lawnAppPtr + ",868,15c,24") - 1;  //10 seeds have max index of 9
+            
+            for (int i =0; i < seedbankSize; i++)
+            {
+                if (plants[i].packetType < 0)
+                    continue;
+
+                int sunCost = inIZombie ? Consts.iZombieSunCosts[plants[i].packetType - 60] : Consts.plantCosts[plants[i].packetType];
+                if (plants[i].packetType == (int)SeedType.SEED_IMITATER)
+                    sunCost = Consts.plantCosts[plants[i].imitaterType];
+
+                bool notEnoughSun = sunAmount < sunCost;
+                bool refreshing = plants[i].isRefreshing;
+
+                if (notEnoughSun || refreshing)
+                    continue;
+
+                readySlots.Add(i);
+            }
+
+            return readySlots;
+        }
+
         //Returns true if current plant packet is fully refreshed, and there's enough sun to place it
         public bool PlantPacketReady()
         {
