@@ -1160,9 +1160,9 @@ namespace PvZA11y.Widgets
                 }
 
                 if (hasCirclePortal)
-                    Text.game.hasRoundPortal.Replace("[0]", plantInfoString);
+                    plantInfoString = Text.game.hasRoundPortal.Replace("[0]", plantInfoString);
                 else if (hasSquarePortal)
-                    Text.game.hasSquarePortal.Replace("[0]", plantInfoString);
+                    plantInfoString = Text.game.hasSquarePortal.Replace("[0]", plantInfoString);
 
                 if (beepOnFound)
                 {
