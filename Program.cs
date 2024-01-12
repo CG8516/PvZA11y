@@ -32,15 +32,6 @@ Works by using pointerchains to find values in memory.
 Sends mouse movement and click events to the game process, to simulate input.
 
 Todo:
-    Imitater support in plant picker
-    Ensure feature-parity across game versions
-    Level progress for all minigame/puzzle modes
-    Make all minigames blind-accessible. Some will be easy (Seeing Stars), but some will take a lot of work to before they can be not just played, but enjoyed, by blind gamers.
-    Fix bug that causes tutorial messages to be played more than once (also happens when resuming an in-progress game on a level with a tutorial)
-    Make dropped seed packets more acccessible, for modes like vasebreaker (don't instantly grab them, maybe move them to top of screen, and cycle similarly to normal plant deck)
-    Allow plants to be placed in whack-a-zombie (cherry bomb, gravebuster, ice shroom)
-    Calculate scaled plant-upgrade prices in 'Last Stand' minigame (plant upgrade prices increase as you use them)
-        Inform player that sun plants aren't allowed on 'Last Stand' minigame
     Move all pointers/offsets/struct-sizes into pointers.cs
     Move all memory interaction operations into memoryIO.cs
     General code cleanup (so much dead code, things where they shouldn't be, etc)
@@ -60,14 +51,10 @@ Discussions:
         We could offer an option for information brevity. With short nicknames for each plant/zombie (Peashooter > pea, Magnet-Shroom > Mag, Screen Door > Door)
         Could disable the delay in the zombie sonar, and just use panning.
         Could implement pitch to indicate zombie threat (health/armor, speed, digger, pole-vaulter pre-jump, etc..)
-        Could change grid tone type (sine/square), to indicate if tile is empty or occupied.
-        Could have a whole-grid zombie-sonar, rather than per-row, to get a quick/rough idea of where each zombie is.
         Could have a plant-column checker, to indicate how many empty/plantable tiles are in the current column (useful for detecting if a plant has been eaten, or if you missed a spot)
         Could add a screen reader cue when a plant is eaten (eg; "E-4 Peashooter Eaten").
-    
 
 The memory.dll library could use some enhancements, but it's workable for now.
-
 
 */
 
@@ -1916,7 +1903,7 @@ namespace PvZA11y
 
                 currentWidget = GetActiveWidget(currentWidget);
 
-                bool inVaseBreaker = VaseBreakerCheck(); //GetPlayerLevel() == 35 || (gameMode >= (int)GameMode.SCARY_POTTER_1 && gameMode <= (int)GameMode.SCARY_POTTER_ENDLESS);
+                bool inVaseBreaker = VaseBreakerCheck();
 
                 bool onBoard = mem.ReadUInt(memIO.ptr.boardChain) != 0;
 

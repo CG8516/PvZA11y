@@ -35,7 +35,6 @@ namespace PvZA11y.Widgets
             int userCount = memIO.GetUserCountFromProfileMgr();
 
             //Don't click ok if creating a new user
-            //if (listItems[listIndex].text.Equals("(Create a New User)"))
             if (listIndex == userCount)
             {
                 clickPos = relativePos + new Vector2(0.2f, 0.27f + (0.036f * listIndex));
@@ -67,11 +66,9 @@ namespace PvZA11y.Widgets
         public override void Interact(InputIntent intent)
         {
             base.Interact(intent);
-            //memIO.mem.WriteMemory(pointerChain + ",18c,fc", "int", listIndex.ToString()); //Set index of current selection
 
             int userCount = memIO.GetUserCountFromProfileMgr();
             //Don't try to rename/delete the 'Create a new user' entry. smh
-            //if (!listItems[listIndex].text.Equals("(Create a New User)"))
             if(listIndex != userCount)
             {
                 if (intent == InputIntent.Info1)

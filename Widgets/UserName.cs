@@ -67,23 +67,6 @@ namespace PvZA11y.Widgets
                 }
             }
 
-            //Game already handles enter key input, oops didn't need this (left just in case we need to overwrite that keyboard-checking function in the future)
-            /*
-            if(keyInput == VIRTUALKEY.VK_RETURN)
-            {
-
-                Vector2 okButtonPos = memIO.GetWidgetButton1Pos(pointerChain);
-                okButtonPos.X += 0.1f;
-                okButtonPos.Y += 0.1f;
-                okButtonPos /= new Vector2(800, 600);
-
-                Vector2 parentPos = memIO.GetWidgetPos(pointerChain) / new Vector2(800, 600);
-
-                okButtonPos += parentPos;
-                Program.Click(okButtonPos);
-
-            }
-            */
             if (keyInput == Key.Escape)
             {
                 Vector2 cancelButtonPos = memIO.GetWidgetButton2Pos(pointerChain);
@@ -107,7 +90,6 @@ namespace PvZA11y.Widgets
 
         protected override string? GetContent()
         {
-            //string titleString = memIO.mem.ReadString(pointerChain + ",bc");    //New User / Rename User
             string titleString = memIO.mem.ReadString(pointerChain + memIO.ptr.dialogTitleStrOffset, "", 32, true, Program.encoding);    //New User / Rename User
             string bodyString = memIO.mem.ReadString(pointerChain + ",f4,0", "", 128, true, Program.encoding);  //Please Enter your name:
             string currentName = memIO.mem.ReadString(pointerChain + memIO.ptr.usernamePickerNamesOffset + ",a8", "", 16, true, Program.encoding); //Current name text

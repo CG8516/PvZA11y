@@ -1,14 +1,13 @@
-PvZ a11y Beta 1.
+PvZ a11y Beta 1.16
 
 This program requires the microsoft dotnet 8.0 runtime to be installed on your system.
 A shortcut to the download page can be found in this directory.
-
-This version is compatible with both the Game of The Year DvD release, as well as the latest GOTY steam release.
 
 This tool supports JAWS, NVDA, and SAPI.
 By default, it will be set to automatic mode, which will try to choose the best option it can find for you.
 If you accidentally deactivate the screenreader, you can re-enable it by pressing the Deny button five times at the main menu.
 
+All audio cues can be previewed in the accessibility menu by adjusting their individual volume levels.
 
 All buttons are rebindable from the accessibility menu.
 Default keyboard keys:

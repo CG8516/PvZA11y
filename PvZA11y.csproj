@@ -117,6 +117,8 @@
 	  <None Update="PvZA11y-Updater.exe">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
+	  <None Update="Readme.md">
+	  </None>
 	  <None Update="readme.txt">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
