@@ -79,6 +79,17 @@ namespace PvZA11y
             }
             mem.WriteMemory(codeAddr4.ToString("X2"), "bytes", "90 90");
 
+
+            long codeAddr5 = mem.AoBScan(ptr.keyboardInputDisable4).Result.FirstOrDefault();
+            if(codeAddr5 == 0)
+            {
+                if(mem.AoBScan(ptr.keyboardInputDisable4Patched).Result.FirstOrDefault() != 0)
+                    Console.WriteLine("'keyboardInputDisable4' already patched!");
+                else
+                    Console.WriteLine("Failed to find 'keyboardInputDisable4' code!");
+            }
+            mem.WriteMemory(codeAddr5.ToString("X2"), "bytes", "c2 04 00");
+
             Console.WriteLine("Finished patching");
         }
 
