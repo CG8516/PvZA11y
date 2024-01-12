@@ -2570,8 +2570,10 @@ namespace PvZA11y.Widgets
                 }
                 else if (inWhackAZombie)
                     PlacePlant(seedbankSlot, seedbankSize, plants[seedbankSlot].offsetX, false, false, false);
-                else if (inRainingSeeds || inVaseBreaker || inSlotMachine)
+                else if (inRainingSeeds || inVaseBreaker)
                     ShovelPlant(5);
+                else if (inSlotMachine)
+                    ShovelPlant(8);
                 else if (Config.current.RequireShovelConfirmation)
                 {
                     if (shovelPressedLast)
