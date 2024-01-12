@@ -45,7 +45,7 @@ namespace PvZA11y
             public bool GameplayTutorial = true;
             public int ZombieSonarInterval = 3;
             public int ZombieSonarOnRowChange = 0;
-            public int ZombieTripwireRow = 5;
+            public int ZombieTripwireRow = 3;
             public int ZombieCycleMode = 1;
             public bool MoveOnZombieCycle = true;
             public int BeghouledMatchAssist = 1;
@@ -75,15 +75,15 @@ namespace PvZA11y
             public float HitBoundaryVolume = 0.6f;
             public float GridPositionCueVolume = 0.6f;
             public float PlantSlotChangeVolume = 0.5f;
-            public float AutomaticZombieSonarVolume = 0.6f;
+            public float AutomaticZombieSonarVolume = 0.3f;
             public float ManualZombieSonarVolume = 1.0f;
             public float PlantReadyCueVolume = 0.3f;
             public float FoundObjectCueVolume = 0.6f;
             public float FastZombieCueVolume = 1.0f;
-            public float DeadZombieCueVolume = 0.0f;
+            public float DeadZombieCueVolume = 0.1f;
             public float ZombieOnTileVolume = 1.0f;
             public float ZombieEntryVolume = 1.0f;
-            public float ZombieTripwireVolume = 0.5f;
+            public float ZombieTripwireVolume = 0.2f;
             public float BeghouledAssistVolume = 1.0f;
             public float MiscAlertCueVolume = 1.0f; //Not enough sun, refreshing, press start to begin, lawnmowers, etc..
             public float AudioCueMasterVolume = 1.0f;

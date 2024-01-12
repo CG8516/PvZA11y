@@ -2079,7 +2079,7 @@ namespace PvZA11y.Widgets
 
                 //If in wallnut bowling
                 bool inBowling = gameMode == GameMode.WallnutBowling || gameMode == GameMode.WallnutBowling2;
-                inBowling |= memIO.GetPlayerLevel() == 5 && ConveyorBeltCounter() > 0; //converyorBeltCounter >0, means we're passed the peashooter-shovelling part.
+                inBowling |= memIO.GetPlayerLevel() == 5 && ConveyorBeltCounter() > 0 && gameMode == GameMode.Adventure; //converyorBeltCounter >0, means we're passed the peashooter-shovelling part.
                 if (inBowling)
                 {
                     if (!doneBowlingTutorial && Config.current.GameplayTutorial && gameMode != GameMode.WallnutBowling2)
