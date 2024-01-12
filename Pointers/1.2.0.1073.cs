@@ -14,6 +14,7 @@ namespace PvZA11y
             return new PointerInfo(
                 appName:                            appName,
                 lawnAppPtrOffset:                   "+00329670",
+                //lawnAppPtrOffset:                   "+0035799C",  //Pointer for cn version of 1.2.0.1073 (why didn't they change the version number)
                 dirtyBoardPtr:                      ",320,18,0,8",
                 boardPtrOffset:                     ",868",
                 boardPausedOffset:                  ",17c",
