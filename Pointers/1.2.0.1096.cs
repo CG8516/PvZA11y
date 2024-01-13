@@ -87,6 +87,9 @@ namespace PvZA11y
 
             ret.buttonDisabledOffet = ",22";
 
+            ret.userPickerRenameOffset = ",198";
+            ret.userPickerDeleteOffset = ",19c";
+
             return ret;
         }
     }

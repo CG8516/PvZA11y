@@ -80,6 +80,9 @@ namespace PvZA11y
         public string dialogBodyLenOffset = ",104";
         public string dialogBodyStrOffset = ",f4";
 
+        public string userPickerRenameOffset = ",190";
+        public string userPickerDeleteOffset = ",194";
+
         public string optionsMenuContinueOffset = ",190"; //optionsMenu[,returnButton]
         public string optionsMenuRestartOffset = ",18c"; //optionsMenu[,RestartLevelButton]
         public string optionsMenuReturnToMainOffset = ",188"; //optionsMenu[,MainMenuButton]

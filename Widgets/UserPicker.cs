@@ -42,7 +42,11 @@ namespace PvZA11y.Widgets
             else
             {
                 memIO.mem.WriteMemory(pointerChain + memIO.ptr.usernamePickerNamesOffset + ",fc", "int", listIndex.ToString()); //Set index of current selection
-                clickPos = relativePos + new Vector2(0.1f, 0.77f);  //position of 'ok' button in user picker
+
+                //Ok button position
+                UpdateWidgetPosition();
+                Vector2 buttonSize = memIO.GetWidgetSize(pointerChain + memIO.ptr.dialogueWidgetButton1Offset) / new Vector2(2, 2);
+                clickPos = relativePos + ((memIO.GetWidgetButton1Pos(pointerChain) + buttonSize) / new Vector2(800, 600));
             }
             
             Program.Click(clickPos);
@@ -75,21 +79,38 @@ namespace PvZA11y.Widgets
                 {
                     memIO.mem.WriteMemory(pointerChain + memIO.ptr.usernamePickerNamesOffset + ",fc", "int", listIndex.ToString()); //Set index of current selection
                     //Click rename button
-                    Vector2 clickPos = relativePos + new Vector2(0.1f, 0.7f);
+
+                    UpdateWidgetPosition();
+                    string buttonOffset = pointerChain + memIO.ptr.userPickerRenameOffset;
+                    int buttonX = memIO.mem.ReadInt(buttonOffset + memIO.ptr.widgetPosXOffset);
+                    int buttonY = memIO.mem.ReadInt(buttonOffset + memIO.ptr.widgetPosYOffset);
+                    int buttonWidth = memIO.mem.ReadInt(buttonOffset + memIO.ptr.widgetWidthOffset) / 2;
+                    int buttonHeight = memIO.mem.ReadInt(buttonOffset + memIO.ptr.widgetHeightOffset) / 2;
+                    Vector2 clickPos = relativePos + ((new Vector2((buttonX + buttonWidth), (buttonY + buttonHeight)) / new Vector2(800, 600)));
                     Program.Click(clickPos);
                 }
                 else if (intent == InputIntent.Info2)
                 {
                     memIO.mem.WriteMemory(pointerChain + memIO.ptr.usernamePickerNamesOffset + ",fc", "int", listIndex.ToString()); //Set index of current selection
                     //Click delete button (don't worry, there's a confirmation dialogue)
-                    Vector2 clickPos = relativePos + new Vector2(0.5f, 0.7f);
+
+                    UpdateWidgetPosition();
+                    string buttonOffset = pointerChain + memIO.ptr.userPickerDeleteOffset;
+                    int buttonX = memIO.mem.ReadInt(buttonOffset + memIO.ptr.widgetPosXOffset);
+                    int buttonY = memIO.mem.ReadInt(buttonOffset + memIO.ptr.widgetPosYOffset);
+                    int buttonWidth = memIO.mem.ReadInt(buttonOffset + memIO.ptr.widgetWidthOffset) / 2;
+                    int buttonHeight = memIO.mem.ReadInt(buttonOffset + memIO.ptr.widgetHeightOffset) / 2;
+                    Vector2 clickPos = relativePos + ((new Vector2((buttonX+buttonWidth), (buttonY+buttonHeight))/ new Vector2(800,600)));
                     Program.Click(clickPos);
                 }
             }
             if (intent == InputIntent.Deny)
             {
                 //Click cancel button
-                Vector2 clickPos = relativePos + new Vector2(0.4f, 0.78f);
+
+                UpdateWidgetPosition();
+                Vector2 buttonSize = memIO.GetWidgetSize(pointerChain + memIO.ptr.dialogueWidgetButton2Offset) / new Vector2(2, 2);
+                Vector2 clickPos = relativePos + ((memIO.GetWidgetButton2Pos(pointerChain)+buttonSize) / new Vector2(800,600));
                 Program.Click(clickPos);
             }
 
