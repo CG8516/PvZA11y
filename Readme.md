@@ -1,4 +1,4 @@
-﻿# PvzA11y Beta 1.16
+﻿# PvzA11y Beta 1.16.1
 #### A blind and motor accessibility mod for Plants Vs Zombies.
 
 ### Blind accessibility
@@ -69,5 +69,5 @@ I'd also be suited for a role that involves software reverse-engineering and/or 
 You can contact me via the email on my profile page.  
 
 I'm also available for contract work in any of the fields mentioned above, including small/personal projects for anyone reading this.  
-For example, I could probably make you a noclip hack or trainer for any (single player) game for $10 AUD.  
+For example, I could make you a noclip hack or trainer for a single player game.  
 Shoot me an email, or message me on discord @cg8516
