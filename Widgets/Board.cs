@@ -2382,7 +2382,30 @@ namespace PvZA11y.Widgets
                 }
                 
                 PlacePlant(seedbankSlot, seedbankSize, plants[seedbankSlot].offsetX, false, true, true); //Move mouse cursor to aid sighted players in knowing which seed packet is selected
-                Program.PlaySlotTone(seedbankSlot, seedbankSize);
+                float refreshPercent = ((float)plants[seedbankSlot].refreshCounter / (float)plants[seedbankSlot].refreshTime);
+                if (!plants[seedbankSlot].isRefreshing)
+                    refreshPercent = 1.0f;
+
+                int sunCost = Consts.plantCosts[plants[seedbankSlot].packetType];
+                if (plants[seedbankSlot].packetType == (int)SeedType.SEED_IMITATER)
+                    sunCost = Consts.plantCosts[plants[seedbankSlot].imitaterType];
+                
+                int sunAmount = memIO.mem.ReadInt(memIO.ptr.boardChain + ",5578");
+                sunAmount += animatingSunAmount;
+                bool notEnoughSun = sunAmount < sunCost;
+
+                if (refreshPercent < 0.99f || notEnoughSun)
+                {
+                    float frequency = 698.46f;// * refreshPercent;
+                    frequency = frequency / 2.0f;
+                    frequency = frequency + (frequency * refreshPercent);
+                    float rVolume = (float)seedbankSlot / (float)seedbankSize;
+                    float lVolume = 1.0f - rVolume;
+
+                    rVolume *= Config.current.PlantSlotChangeVolume;
+                    lVolume *= Config.current.PlantSlotChangeVolume;
+                    Program.PlayTone(lVolume, rVolume, frequency, frequency, 100, SignalGeneratorType.Sin);
+                }
 
                 if (inZombiquarium)
                 {
