@@ -60,7 +60,7 @@ namespace PvZA11y.Widgets
         {
             if (listIndex == listItems.Length - 1)
                 return "";
-            bool isComplete = memIO.GetChallengeScore(listItems[listIndex].extraData + 1) > 0;
+            bool isComplete = CheckComplete((GameMode)listItems[listIndex].extraData + 1);
             string completionString = isComplete ? Text.menus.minigameComplete : "";
             if(say)
             {
@@ -95,7 +95,7 @@ namespace PvZA11y.Widgets
             int completions = 0;
             for(int i =0; i < listItems.Length-1; i++)
             {
-                if (memIO.GetChallengeScore(listItems[i].extraData + 1) > 0)
+                if (CheckComplete((GameMode)listItems[i].extraData + 1))
                     completions++;
             }
 
@@ -112,6 +112,17 @@ namespace PvZA11y.Widgets
             clickPos.X += 0.05f;
             clickPos.Y += 0.05f;
             Program.Click(clickPos.X, clickPos.Y, false, false, 50, true);
+        }
+
+        bool CheckComplete(GameMode mode)
+        {
+            int reqScore = 1;
+            if (mode >= GameMode.SurvivalDay && mode < GameMode.SurvivalHardDay)
+                reqScore = 5;
+            else if (mode >= GameMode.SurvivalHardDay && mode < GameMode.SurvivalEndless1)
+                reqScore = 10;
+
+            return memIO.GetChallengeScore((int)mode) >= reqScore;
         }
 
         public override void Interact(InputIntent intent)
@@ -156,8 +167,8 @@ namespace PvZA11y.Widgets
                 Program.MoveMouse(mousePos.X, mousePos.Y);
 
                 float freq = 1250.0f - ((((float)listIndex / (float)listItems.Length) * 5000.0f) / 5.0f);
-                bool isComplete = memIO.GetChallengeScore(listItems[listIndex].extraData + 1) > 0;
-                if(isComplete)
+
+                if (CheckComplete((GameMode)listItems[listIndex].extraData + 1))
                     Program.PlayTone(Config.current.MenuPositionCueVolume, Config.current.MenuPositionCueVolume, freq, freq, 100, SignalGeneratorType.Square);
                 else
                     Program.PlayTone(Config.current.MenuPositionCueVolume, Config.current.MenuPositionCueVolume, freq, freq, 100, SignalGeneratorType.Sin);
