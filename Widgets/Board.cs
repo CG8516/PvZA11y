@@ -791,7 +791,7 @@ namespace PvZA11y.Widgets
             return false;
         }
 
-        public List<int> GetAllPlantsReady()
+        public List<int> GetAllPlantsReady(bool ignoreSun = true)
         {
             List<int> readySlots = new List<int>();
             GameMode gameMode = (GameMode)memIO.GetGameMode();
@@ -811,8 +811,7 @@ namespace PvZA11y.Widgets
             sunAmount += animatingSunAmount;
             var plants = GetPlantsInBoardBank();
 
-            int seedbankSize = memIO.mem.ReadInt(memIO.ptr.lawnAppPtr + ",868,15c,24") - 1;  //10 seeds have max index of 9
-            
+            int seedbankSize = memIO.mem.ReadInt(memIO.ptr.lawnAppPtr + ",868,15c,24");
             for (int i =0; i < seedbankSize; i++)
             {
                 if (plants[i].packetType < 0)
@@ -822,7 +821,7 @@ namespace PvZA11y.Widgets
                 if (plants[i].packetType == (int)SeedType.SEED_IMITATER)
                     sunCost = Consts.plantCosts[plants[i].imitaterType];
 
-                bool notEnoughSun = sunAmount < sunCost;
+                bool notEnoughSun = (sunAmount < sunCost) && !ignoreSun;
                 bool refreshing = plants[i].isRefreshing;
 
                 if (notEnoughSun || refreshing)
