@@ -485,7 +485,7 @@ namespace PvZA11y.Widgets
                 new ToneProperties() { leftVolume = 0, rightVolume = Config.current.FastZombieCueVolume, startFrequency = 800, endFrequency = 800, duration = 50, signalType = SignalGeneratorType.SawTooth, startDelay = 200 }
             ];
 
-            List<ToneProperties> slotTone = new List<ToneProperties>() { new ToneProperties() { leftVolume = 1, rightVolume = 1, startFrequency = 300, endFrequency = 300, duration = 50, signalType = SignalGeneratorType.Square, startDelay = 0 } };
+            List<ToneProperties> slotTone = new List<ToneProperties>() { new ToneProperties() { leftVolume = 1, rightVolume = 1, startFrequency = 698.46f, endFrequency = 698.46f, duration = 100, signalType = SignalGeneratorType.Sin, startDelay = 0 } };
 
             List<ToneProperties> autoSonar =
             [

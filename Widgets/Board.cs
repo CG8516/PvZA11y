@@ -2395,17 +2395,7 @@ namespace PvZA11y.Widgets
                 bool notEnoughSun = sunAmount < sunCost;
 
                 if (refreshPercent < 0.99f || notEnoughSun)
-                {
-                    float frequency = 698.46f;// * refreshPercent;
-                    frequency = frequency / 2.0f;
-                    frequency = frequency + (frequency * refreshPercent);
-                    float rVolume = (float)seedbankSlot / (float)seedbankSize;
-                    float lVolume = 1.0f - rVolume;
-
-                    rVolume *= Config.current.PlantSlotChangeVolume;
-                    lVolume *= Config.current.PlantSlotChangeVolume;
-                    Program.PlayTone(lVolume, rVolume, frequency, frequency, 100, SignalGeneratorType.Sin);
-                }
+                    Program.PlaySlotTone(seedbankSlot,seedbankSize,refreshPercent);
 
                 if (inZombiquarium)
                 {
