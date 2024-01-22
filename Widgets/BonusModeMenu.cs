@@ -139,7 +139,10 @@ namespace PvZA11y.Widgets
                     listIndex++;
                     break;
                 case InputIntent.Confirm:
-                    ConfirmInteraction();
+                    if (listIndex == listItems.Length - 1)
+                        DenyInteraction();
+                    else
+                        ConfirmInteraction();
                     break;
                 case InputIntent.Deny:
                     DenyInteraction();
