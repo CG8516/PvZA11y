@@ -74,7 +74,7 @@ namespace PvZA11y.Widgets
             string awardTitle = Text.awards.newPlant;
             string awardBody = Text.plantNames[plant] + ": " + Text.plantTooltips[plant]; //TODO: Move plantNames and plantDescriptions somewhere better
 
-            bool adventureMode = memIO.GetGameMode() == 0;
+            GameMode gameMode = (GameMode)memIO.GetGameMode();
             awardType = memIO.GetAwardType();
             //Console.WriteLine("Award Type: " + awardType);
             //Level resets to 1 after beating zomboss
@@ -83,7 +83,7 @@ namespace PvZA11y.Widgets
                 playerLevel = 60;
                 listItems[1].relativePos = new Vector2(0.5f, 0.95f);
             }
-            if (adventureMode)
+            if (gameMode == GameMode.Adventure)
             {
                 if(playerLevel == 1)
                 {
@@ -136,9 +136,8 @@ namespace PvZA11y.Widgets
             }
             else
             {
-                int gameMode = memIO.GetGameMode();
-                bool isVaseBreaker = (gameMode >= (int)GameMode.VaseBreaker1 && gameMode <= (int)GameMode.VaseBreakerEndless);
-                bool isIZombie = gameMode >= (int)GameMode.IZombie1 && gameMode <= (int)GameMode.IZombieEndless;
+                bool isVaseBreaker = (gameMode >= GameMode.VaseBreaker1 && gameMode <= GameMode.VaseBreakerEndless);
+                bool isIZombie = gameMode >= GameMode.IZombie1 && gameMode <= GameMode.IZombieEndless;
                 awardTitle = Text.awards.trophyTitle;
                 //TODO: Make sure player actually 'has' unlocked a new level (I think it's capped to the first three of each mode, before adventure mode is complete)
                 if (isVaseBreaker)
@@ -146,11 +145,51 @@ namespace PvZA11y.Widgets
                 if (isIZombie)
                     awardBody = Text.awards.iZombie;
 
-                if (gameMode >= (int)GameMode.ZomBotany && gameMode <= (int)GameMode.LimboIntro)
+                int earnedTrophies = 0;
+
+                if (gameMode >= GameMode.ZomBotany && gameMode <= GameMode.LimboIntro)
+                {
                     awardBody = Text.awards.minigame;
 
-                if (gameMode >= (int)GameMode.SurvivalDay && gameMode <= (int)GameMode.SurvivalEndless5)
+                    for(int i = (int)GameMode.ZomBotany; i < (int)GameMode.DrZombossRevenge; i++)
+                    {
+                        if (memIO.GetChallengeScore(i) >= 1)
+                            earnedTrophies++;
+                    }
+                    if (earnedTrophies > 17)
+                        awardBody = Text.awards.getMoreTrophies;
+                }
+
+
+
+
+
+                if (gameMode >= GameMode.SurvivalDay && gameMode <= GameMode.SurvivalEndless5)
+                {
                     awardBody = Text.awards.survival;
+                    for (int i = (int)GameMode.SurvivalDay; i < (int)GameMode.SurvivalHardRoof; i++)
+                    {
+                        int reqScore = 10;
+                        if (i < (int)GameMode.SurvivalHardDay)
+                            reqScore = 5;
+
+                        if (memIO.GetChallengeScore(i) >= reqScore)
+                            earnedTrophies++;
+                    }
+
+                    if (earnedTrophies > 7)
+                        awardBody = Text.awards.moreSurvivalTrophies;
+                    if(earnedTrophies == 10)
+                        awardBody = Text.awards.endlessSurvivalUnlocked;
+                }
+
+                if(MainMenu.CheckTrophies(memIO) >= 48)
+                {
+                    awardTitle = Text.awards.goldenSunflowerTitle;
+                    awardBody = Text.awards.goldenSunflowerBody;
+                }
+                
+                
 
             }
 

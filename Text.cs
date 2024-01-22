@@ -541,6 +541,11 @@ namespace PvZA11y
             public string survival;
             public string badHelpTitle;
             public string badHelpMessage;
+            public string getMoreTrophies;
+            public string moreSurvivalTrophies;
+            public string endlessSurvivalUnlocked;
+            public string goldenSunflowerTitle;
+            public string goldenSunflowerBody;
         }
 
         public static Game game = new Game();

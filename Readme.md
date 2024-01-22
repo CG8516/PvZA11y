@@ -1,4 +1,4 @@
-﻿# PvzA11y Beta 1.16.1
+﻿# PvzA11y Beta 1.17
 #### A blind and motor accessibility mod for Plants Vs Zombies.
 
 ### Blind accessibility
@@ -59,15 +59,17 @@ You may be able to work around this issue by disabling either of those options, 
 If you're unable to interact with any of the checkboxes in the options menus; close the game and open/import any of the included registry files in the RegistryKeys folder.   
 These registry files only affect the game's settings, and will not impact any other functionality of your system.  
 
-<br>
+### Special thanks
+This mod wouldn't be where it is without these awesome people:  
+[azurejoga](https://github.com/azurejoga): For creating and helping to revise the updater.  
+[Cyrax2001](https://github.com/Cyrax2001): For contributing the Spanish translation.  
+[The amazing people on the audiogames.net forum](https://forum.audiogames.net/post/822297): For testing, providing feedback, and being a great source of motivation.  
+[Everybody who's left feedback and bug reports on github](https://github.com/CG8516/PvZA11y/issues?q=): Same as above, but better, because your feedback is much easier to keep track of.  
 
-### Hire Me
-If there's any game dev companies hiring, I'm looking for a job.  
-I'd love to work in an accessibility or programming role, but I enjoy all aspects of game development.  
-[Check out this PSP game I made in two weeks, using my own assets, and a 3d game engine I wrote in C.](https://cg8516.itch.io/valentines-day-psp)  
-I'd also be suited for a role that involves software reverse-engineering and/or modifyng closed-source programs.  
-You can contact me via the email on my profile page.  
+#### Libraries used:
+[memory.dll](https://github.com/erfg12/memory.dll). For accessing the game's memory.  
+[Accessible Output](https://github.com/SaqibS/AccessibleOutput). For implementing screenreader support.  
+[NAudio](https://github.com/naudio/NAudio). Generates and plays all sound effects that the mod uses.  
+[YamlDotNet](https://github.com/aaubry/YamlDotNet). For loading the translation files.  
+[Vortice.Xinput](https://github.com/amerkoleci/Vortice.Windows). For adding controller support.
 
-I'm also available for contract work in any of the fields mentioned above, including small/personal projects for anyone reading this.  
-For example, I could make you a noclip hack or trainer for a single player game.  
-Shoot me an email, or message me on discord @cg8516

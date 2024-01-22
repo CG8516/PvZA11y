@@ -69,7 +69,7 @@ namespace PvZA11y.Widgets
             return listItems;
         }
 
-        static int CheckTrophies(MemoryIO memIO)
+        public static int CheckTrophies(MemoryIO memIO)
         {
             int trophyCount = 0;
 
@@ -84,14 +84,15 @@ namespace PvZA11y.Widgets
                 if (memIO.GetChallengeScore(i) > 0)
                     trophyCount++;
             }
-
             //Survival modes
             for (int i = (int)GameMode.SurvivalDay; i < (int)GameMode.SurvivalEndless1; i++)
             {
-                if (memIO.GetChallengeScore(i) > 0)
+                int reqTrophies = 5;
+                if (i > (int)GameMode.SurvivalRoof)
+                    reqTrophies = 10;
+                if (memIO.GetChallengeScore(i) >= reqTrophies)
                     trophyCount++;
             }
-
             //Minigames
             for (int i = (int)GameMode.ZomBotany; i <= (int)GameMode.DrZombossRevenge; i++)
             {
