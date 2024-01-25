@@ -2382,20 +2382,23 @@ namespace PvZA11y.Widgets
                 }
                 
                 PlacePlant(seedbankSlot, seedbankSize, plants[seedbankSlot].offsetX, false, true, true); //Move mouse cursor to aid sighted players in knowing which seed packet is selected
-                float refreshPercent = ((float)plants[seedbankSlot].refreshCounter / (float)plants[seedbankSlot].refreshTime);
-                if (!plants[seedbankSlot].isRefreshing)
-                    refreshPercent = 1.0f;
+                bool checkablePlant = (plants[seedbankSlot].packetType > 0 && plants[seedbankSlot].packetType < (int)SeedType.NUM_SEED_TYPES) || ((plants[seedbankSlot].packetType >= (int)SeedType.SEED_ZOMBIE_NORMAL && plants[seedbankSlot].packetType <= (int)SeedType.SEED_ZOMBIE_IMP) && inIZombie);
+                if (checkablePlant)
+                {
+                    float refreshPercent = ((float)plants[seedbankSlot].refreshCounter / (float)plants[seedbankSlot].refreshTime);
+                    if (!plants[seedbankSlot].isRefreshing)
+                        refreshPercent = 1.0f;
+                    int sunCost = inIZombie ? Consts.iZombieSunCosts[plants[seedbankSlot].packetType - 60] : Consts.plantCosts[plants[seedbankSlot].packetType];
+                    if (plants[seedbankSlot].packetType == (int)SeedType.SEED_IMITATER)
+                        sunCost = Consts.plantCosts[plants[seedbankSlot].imitaterType];
 
-                int sunCost = Consts.plantCosts[plants[seedbankSlot].packetType];
-                if (plants[seedbankSlot].packetType == (int)SeedType.SEED_IMITATER)
-                    sunCost = Consts.plantCosts[plants[seedbankSlot].imitaterType];
-                
-                int sunAmount = memIO.mem.ReadInt(memIO.ptr.boardChain + ",5578");
-                sunAmount += animatingSunAmount;
-                bool notEnoughSun = sunAmount < sunCost;
+                    int sunAmount = memIO.mem.ReadInt(memIO.ptr.boardChain + ",5578");
+                    sunAmount += animatingSunAmount;
+                    bool notEnoughSun = sunAmount < sunCost;
 
-                if (refreshPercent < 0.99f || notEnoughSun)
-                    Program.PlaySlotTone(seedbankSlot,seedbankSize,refreshPercent);
+                    if (refreshPercent < 0.99f || notEnoughSun)
+                        Program.PlaySlotTone(seedbankSlot, seedbankSize, refreshPercent);
+                }
 
                 if (inZombiquarium)
                 {
