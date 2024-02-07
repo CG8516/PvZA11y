@@ -1,4 +1,4 @@
-﻿# PvzA11y Beta 1.17.1
+﻿# PvzA11y Beta 1.17.2
 #### A blind and motor accessibility mod for Plants Vs Zombies.
 
 ### Blind accessibility

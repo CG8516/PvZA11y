@@ -1,4 +1,4 @@
-PvZ a11y Beta 1.17.1
+PvZ a11y Beta 1.17.2
 
 This program requires the microsoft dotnet 8.0 runtime to be installed on your system.
 A shortcut to the download page can be found in this directory.
