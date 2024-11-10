@@ -492,12 +492,24 @@ namespace PvZA11y
 
             Process? gameProc = null;
 
+            int processIndex = 0;
+            
             //See if we can find popcapgame first
-            Process[] procs2 = Process.GetProcessesByName("popcapgame1");
+            Process[] procs2 = null;
+
+            for (processIndex = 0; processIndex < appNameArray.Length; processIndex++)
+            {
+                procs2 = Process.GetProcessesByName(appNameArray[processIndex]);
+                if (procs2 is { Length: > 0 })
+                {
+                    break;
+                }
+            }
+            
             if (procs2 != null && procs2.Length > 0)
             {
                 gameProc = procs2[0];
-                appName = appNamePopcap;
+                appName = appNameArray[processIndex] + ".exe";
             }
             else
             {
@@ -505,7 +517,14 @@ namespace PvZA11y
                 {
                     while (procs2 == null || procs2.Length < 1)
                     {
-                        procs2 = Process.GetProcessesByName("popcapgame1");
+                        for (processIndex = 0; processIndex < appNameArray.Length; processIndex++)
+                        {
+                            procs2 = Process.GetProcessesByName(appNameArray[processIndex]);
+                            if (procs2 is { Length: > 0 })
+                            {
+                                break;
+                            }
+                        }
 
                         //If plantsVsZombies.exe starts more threads, it's not a launcher. So stop searching for popcapagame1
                         foundProcs = Process.GetProcessesByName("PlantsVsZombies");
@@ -520,7 +539,7 @@ namespace PvZA11y
                     if (reqpopcapgame1)
                     {
                         gameProc = procs2[0];
-                        appName = appNamePopcap;
+                        appName = appNameArray[processIndex]+ ".exe";
                     }
                 }
 
@@ -545,7 +564,7 @@ namespace PvZA11y
             catch { }
 
             //Steam version creates temporary/locked popcapgames1.exe, which will fail to grab version info. If that's the case, grab the verison info from PlantsVsZombies.exe instead.
-            if (versionStr is null && appName == appNamePopcap && foundProcs != null && foundProcs.Length > 0)
+            if (versionStr is null && Array.IndexOf(appNameArray,Path.GetFileNameWithoutExtension(appName))!=-1 && foundProcs != null && foundProcs.Length > 0)
             {
                 try
                 {
@@ -631,7 +650,8 @@ namespace PvZA11y
 
             
         }
-
+        
+        static string[] appNameArray = ["popcapgame1","popcapgame2"];
         static string appNamePopcap = "popcapgame1.exe";
         static string appNamePvz = "PlantsVsZombies.exe";
         static string appName = "";
