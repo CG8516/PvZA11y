@@ -147,21 +147,21 @@ namespace PvZA11y.Widgets
         {
             List<LawnMower> lawnMowers = new List<LawnMower>();
 
-            int maxIndex = memIO.mem.ReadInt(memIO.ptr.boardChain + ",11c");
-            int currentCount = memIO.mem.ReadInt(memIO.ptr.boardChain + ",128");
-            //118
+            int maxIndex = memIO.mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.mowersMaxCountOffset);
+            int currentCount = memIO.mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.mowersCurrentCountOffset);
+
             for(int i =0; i < maxIndex; i++)
             {
-                int index = i * 0x48;
+                int index = i * memIO.ptr.mowerObjSize;
 
-                int state = memIO.mem.ReadInt(memIO.ptr.boardChain + ",118," + (index + 0x2c).ToString("X2"));
-                byte isDead = (byte)memIO.mem.ReadByte(memIO.ptr.boardChain + ",118," + (index + 0x30).ToString("X2"));
-                byte isVisible = (byte)memIO.mem.ReadByte(memIO.ptr.boardChain + ",118," + (index + 0x31).ToString("X2"));
+                int state = memIO.mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.mowersOffset + (index + 0x2c).ToString("X2"));
+                byte isDead = (byte)memIO.mem.ReadByte(memIO.ptr.boardChain + memIO.ptr.mowersOffset + (index + 0x30).ToString("X2"));
+                byte isVisible = (byte)memIO.mem.ReadByte(memIO.ptr.boardChain + memIO.ptr.mowersOffset + (index + 0x31).ToString("X2"));
                 if (state != 1 || isDead == 1 || isVisible == 0)
                     continue;
 
-                int row = memIO.mem.ReadInt(memIO.ptr.boardChain + ",118," + (index + 0x14).ToString("X2"));
-                int type = memIO.mem.ReadInt(memIO.ptr.boardChain + ",118," + (index + 0x34).ToString("X2"));
+                int row = memIO.mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.mowersOffset + (index + 0x14).ToString("X2"));
+                int type = memIO.mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.mowersOffset + (index + 0x34).ToString("X2"));
 
                 if (thisRowOnly && row != gridInput.cursorY)
                     continue;
@@ -175,21 +175,21 @@ namespace PvZA11y.Widgets
         {
             List<Program.ToneProperties> tones = new List<Program.ToneProperties>();
 
-            int maxIndex = memIO.mem.ReadInt(memIO.ptr.boardChain + ",ac");
+            int maxIndex = memIO.mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.zombiesMaxCountOffset);
             List<Zombie> zombies = new List<Zombie>();
 
             for (int i = 0; i < maxIndex; i++)
             {
-                int index = i * 360;
-                int health = memIO.mem.ReadInt(memIO.ptr.boardChain + ",a8," + (index + 0xc8).ToString("X2"));
+                int index = i * memIO.ptr.zombieObjSize;
+                int health = memIO.mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.zombiesOffset + (index + 0xc8).ToString("X2"));
 
                 //Set dead zombie health to -99999 when scanned with deadScanner for first time, to avoid replaying the scanner beep.
                 if (health <= 0 && health != -99999)
                 {
-                    memIO.mem.WriteMemory(memIO.ptr.boardChain + ",a8," + (index + 0xc8).ToString("X2"), "int", "-99999");
+                    memIO.mem.WriteMemory(memIO.ptr.boardChain + memIO.ptr.zombiesOffset + (index + 0xc8).ToString("X2"), "int", "-99999");
 
-                    int row = memIO.mem.ReadInt(memIO.ptr.boardChain + ",a8," + (index + 0x1c).ToString("X2"));
-                    float posX = memIO.mem.ReadFloat(memIO.ptr.boardChain + ",a8," + (index + 0x2c).ToString("X2"));
+                    int row = memIO.mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.zombiesOffset + (index + 0x1c).ToString("X2"));
+                    float posX = memIO.mem.ReadFloat(memIO.ptr.boardChain + memIO.ptr.zombiesOffset + (index + 0x2c).ToString("X2"));
 
                     float rVolume = posX / 900.0f;
                     float lVolume = 1.0f - rVolume;
@@ -237,8 +237,8 @@ namespace PvZA11y.Widgets
 
         public List<Zombie> GetZombies(bool seedPicker = false, bool entryScanner = false)
         {
-            int maxIndex = memIO.mem.ReadInt(memIO.ptr.boardChain + ",ac");
-            int currentCount = memIO.mem.ReadInt(memIO.ptr.boardChain + ",b8");
+            int maxIndex = memIO.mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.zombiesMaxCountOffset);
+            int currentCount = memIO.mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.zombiesCurrentCountOffset);
 
             List<Zombie> zombies = new List<Zombie>();
             int addedZombies = 0;
@@ -247,35 +247,35 @@ namespace PvZA11y.Widgets
             for (int i = 0; i < maxIndex; i++)
             {
                 int index = i * 360;
-                bool isDead = memIO.mem.ReadByte(memIO.ptr.boardChain + ",a8," + (index + 0xec).ToString("X2")) > 0;
-                int health = memIO.mem.ReadInt(memIO.ptr.boardChain + ",a8," + (index + 0xc8).ToString("X2"));
+                bool isDead = memIO.mem.ReadByte(memIO.ptr.boardChain + memIO.ptr.zombiesOffset + (index + 0xec).ToString("X2")) > 0;
+                int health = memIO.mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.zombiesOffset + (index + 0xc8).ToString("X2"));
                 if (isDead || health <= 0)
                 {
                     deadZombies++;
                     continue;
                 }
                 Zombie zombie = new Zombie();
-                zombie.row = memIO.mem.ReadInt(memIO.ptr.boardChain + ",a8," + (index + 0x1c).ToString("X2"));
-                zombie.zombieType = memIO.mem.ReadInt(memIO.ptr.boardChain + ",a8," + (index + 0x24).ToString("X2"));
-                zombie.age = memIO.mem.ReadInt(memIO.ptr.boardChain + ",a8," + (index + 0x60).ToString("X2"));
+                zombie.row = memIO.mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.zombiesOffset + (index + 0x1c).ToString("X2"));
+                zombie.zombieType = memIO.mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.zombiesOffset + (index + 0x24).ToString("X2"));
+                zombie.age = memIO.mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.zombiesOffset + (index + 0x60).ToString("X2"));
 
-                zombie.health = memIO.mem.ReadInt(memIO.ptr.boardChain + ",a8," + (index + 0xc8).ToString("X2"));
-                zombie.maxHealth = memIO.mem.ReadInt(memIO.ptr.boardChain + ",a8," + (index + 0xcc).ToString("X2"));
+                zombie.health = memIO.mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.zombiesOffset + (index + 0xc8).ToString("X2"));
+                zombie.maxHealth = memIO.mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.zombiesOffset + (index + 0xcc).ToString("X2"));
 
-                zombie.phase = memIO.mem.ReadInt(memIO.ptr.boardChain + ",a8," + (index + 0x28).ToString("X2"));
-                zombie.posX = memIO.mem.ReadFloat(memIO.ptr.boardChain + ",a8," + (index + 0x2c).ToString("X2"));
+                zombie.phase = memIO.mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.zombiesOffset + (index + 0x28).ToString("X2"));
+                zombie.posX = memIO.mem.ReadFloat(memIO.ptr.boardChain + memIO.ptr.zombiesOffset + (index + 0x2c).ToString("X2"));
 
-                zombie.hypnotized = memIO.mem.ReadByte(memIO.ptr.boardChain + ",a8," + (index + 0xb8).ToString("X2")) == 1;
-                zombie.headless = memIO.mem.ReadByte(memIO.ptr.boardChain + ",a8," + (index + 0xba).ToString("X2")) == 0;
-                zombie.armless = memIO.mem.ReadByte(memIO.ptr.boardChain + ",a8," + (index + 0xbb).ToString("X2")) == 0;
-                zombie.holdingSomething = memIO.mem.ReadByte(memIO.ptr.boardChain + ",a8," + (index + 0xbc).ToString("X2")) == 1;
-                zombie.frozen = memIO.mem.ReadInt(memIO.ptr.boardChain + ",a8," + (index + 0xac).ToString("X2")) > 0;
-                zombie.buttered = memIO.mem.ReadInt(memIO.ptr.boardChain + ",a8," + (index + 0xb0).ToString("X2")) > 0;
+                zombie.hypnotized = memIO.mem.ReadByte(memIO.ptr.boardChain + memIO.ptr.zombiesOffset + (index + 0xb8).ToString("X2")) == 1;
+                zombie.headless = memIO.mem.ReadByte(memIO.ptr.boardChain + memIO.ptr.zombiesOffset + (index + 0xba).ToString("X2")) == 0;
+                zombie.armless = memIO.mem.ReadByte(memIO.ptr.boardChain + memIO.ptr.zombiesOffset + (index + 0xbb).ToString("X2")) == 0;
+                zombie.holdingSomething = memIO.mem.ReadByte(memIO.ptr.boardChain + memIO.ptr.zombiesOffset + (index + 0xbc).ToString("X2")) == 1;
+                zombie.frozen = memIO.mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.zombiesOffset + (index + 0xac).ToString("X2")) > 0;
+                zombie.buttered = memIO.mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.zombiesOffset + (index + 0xb0).ToString("X2")) > 0;
 
-                int helmetHealth = memIO.mem.ReadInt(memIO.ptr.boardChain + ",a8," + (index + 0xd0).ToString("X2"));
-                int helmetMax = memIO.mem.ReadInt(memIO.ptr.boardChain + ",a8," + (index + 0xd4).ToString("X2"));
+                int helmetHealth = memIO.mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.zombiesOffset + (index + 0xd0).ToString("X2"));
+                int helmetMax = memIO.mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.zombiesOffset + (index + 0xd4).ToString("X2"));
 
-                zombie.uniqueID = memIO.mem.ReadInt(memIO.ptr.boardChain + ",a8," + (index + 0x164).ToString("X2"));
+                zombie.uniqueID = memIO.mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.zombiesOffset + (index + 0x164).ToString("X2"));
                 zombie.helmetState = 0;
                 if (helmetHealth > 0 && helmetMax > 0)
                 {
@@ -287,8 +287,8 @@ namespace PvZA11y.Widgets
                 else if (helmetMax > 0 && helmetHealth <= 0)
                     zombie.helmetState = 3;
 
-                int shieldHealth = memIO.mem.ReadInt(memIO.ptr.boardChain + ",a8," + (index + 0xdc).ToString("X2"));
-                int shieldMax = memIO.mem.ReadInt(memIO.ptr.boardChain + ",a8," + (index + 0xe0).ToString("X2"));
+                int shieldHealth = memIO.mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.zombiesOffset + (index + 0xdc).ToString("X2"));
+                int shieldMax = memIO.mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.zombiesOffset + (index + 0xe0).ToString("X2"));
 
                 zombie.shieldState = 0;
                 if (shieldHealth > 0 && shieldMax > 0)
@@ -309,12 +309,12 @@ namespace PvZA11y.Widgets
                 if (zombie.posX > 800 && !seedPicker && !entryScanner)
                     continue;
 
-                zombie.posY = memIO.mem.ReadFloat(memIO.ptr.boardChain + ",a8," + (index + 0x30).ToString("X2"));
+                zombie.posY = memIO.mem.ReadFloat(memIO.ptr.boardChain + memIO.ptr.zombiesOffset + (index + 0x30).ToString("X2"));
 
-                int zombieAge = memIO.mem.ReadInt(memIO.ptr.boardChain + ",a8," + (index + 0x60).ToString("X2"));
+                int zombieAge = memIO.mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.zombiesOffset + (index + 0x60).ToString("X2"));
                 if(entryScanner && zombieAge < 5)
                 {
-                    memIO.mem.WriteMemory(memIO.ptr.boardChain + ",a8," + (index + 0x60).ToString("X2"), "int", "5");
+                    memIO.mem.WriteMemory(memIO.ptr.boardChain + memIO.ptr.zombiesOffset + (index + 0x60).ToString("X2"), "int", "5");
                     zombies.Add(zombie);
                     addedZombies++;
                 }
@@ -373,13 +373,13 @@ namespace PvZA11y.Widgets
 
         Fireball? GetZombossFireballInfo()
         {
-            int reanimCount = memIO.mem.ReadInt(memIO.ptr.lawnAppPtr + ",940,8,4");
+            int reanimCount = memIO.mem.ReadInt(memIO.ptr.lawnAppPtr + memIO.ptr.reanimsMaxCountOffset);
 
-            byte[] reanimBytes = memIO.mem.ReadBytes(memIO.ptr.lawnAppPtr + ",940,8,0,0", reanimCount * 0xa0);
+            byte[] reanimBytes = memIO.mem.ReadBytes(memIO.ptr.lawnAppPtr + memIO.ptr.reanimsOffset + ",0", reanimCount * 0xa0);
 
             for (int i = 0; i < reanimCount; i++)
             {
-                int index = i * 0xa0;
+                int index = i * memIO.ptr.reanimObjSize;
                 int reanimID = BitConverter.ToInt32(reanimBytes, index);
                 bool isDead = reanimBytes[index + 0x14] != 0;
 
@@ -455,9 +455,9 @@ namespace PvZA11y.Widgets
 
         }
 
-        uint ConveyorBeltCounter()
+        int ConveyorBeltCounter()
         {
-            return memIO.mem.ReadUInt(memIO.ptr.boardChain + ",15c,34c"); //TODO: Move to pointers/memIO
+            return memIO.mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.conveyorBeltCounterOffset);
         }
 
 
@@ -505,7 +505,7 @@ namespace PvZA11y.Widgets
             while (newPlants.Count < 10)
                 newPlants.Add(new plantInBoardBank() { packetType = -1 });
 
-            byte[] plantBytes = memIO.mem.ReadBytes(memIO.ptr.lawnAppPtr + ",868,15c,28", 800);    //yucky
+            byte[] plantBytes = memIO.mem.ReadBytes(memIO.ptr.boardChain + memIO.ptr.seedPacketArrayOffset, 800);
             if (plantBytes == null)
                 return newPlants;
 
@@ -558,8 +558,8 @@ namespace PvZA11y.Widgets
 
         string GetWaveInfo()
         {
-            int numWaves = memIO.mem.ReadInt(memIO.ptr.boardChain + ",557c");
-            int currentWave = memIO.mem.ReadInt(memIO.ptr.boardChain + ",5594");
+            int numWaves = memIO.mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.numWavesOffset);
+            int currentWave = memIO.mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.currentWaveOffset);
 
             int wavesPerFlag = numWaves < 10 ? numWaves : 10;
             int numFlags = numWaves / wavesPerFlag;
@@ -679,11 +679,11 @@ namespace PvZA11y.Widgets
             GameMode gameMode = (GameMode)memIO.GetGameMode();
 
             //Don't replay tutorials if a level is already in progress.
-            int boardTimer = memIO.mem.ReadInt(memIO.ptr.boardChain + ",5580");
-            int timer2 = memIO.mem.ReadInt(memIO.ptr.boardChain + ",5584");
+            int boardTimer = memIO.mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.mainCounterOffset);
+            int timer2 = memIO.mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.effectCounterOffset);
             if (boardTimer > 20 || timer2 > 1000000)
                 return;
-            memIO.mem.WriteMemory(memIO.ptr.boardChain + ",5584", "int", "1000001");
+            memIO.mem.WriteMemory(memIO.ptr.boardChain + memIO.ptr.effectCounterOffset, "int", "1000001");
 
             if (gameMode is GameMode.Adventure)
             {
@@ -807,12 +807,12 @@ namespace PvZA11y.Widgets
 
             bool inIZombie = gameMode >= GameMode.IZombie1 && gameMode <= GameMode.IZombieEndless;
 
-            int sunAmount = memIO.mem.ReadInt(memIO.ptr.boardChain + ",5578");
+            int sunAmount = memIO.mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.sunAmountOffset);
             sunAmount += animatingSunAmount;
             var plants = GetPlantsInBoardBank();
 
-            int seedbankSize = memIO.mem.ReadInt(memIO.ptr.lawnAppPtr + ",868,15c,24");
-            for (int i =0; i < seedbankSize; i++)
+            int seedbankSize = memIO.mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.seedPacketCountOffset);
+            for (int i = 0; i < seedbankSize; i++)
             {
                 if (plants[i].packetType < 0)
                     continue;
@@ -848,7 +848,7 @@ namespace PvZA11y.Widgets
             bool vaseBreakerEndless = gameMode is GameMode.VaseBreakerEndless;
             bool inRainingSeeds = gameMode is GameMode.ItsRainingSeeds;
 
-            int sunAmount = memIO.mem.ReadInt(memIO.ptr.boardChain + ",5578");
+            int sunAmount = memIO.mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.sunAmountOffset);
             sunAmount += animatingSunAmount;
 
             var plants = GetPlantsInBoardBank();
@@ -888,7 +888,7 @@ namespace PvZA11y.Widgets
 
             if (inSlotMachine)
             {
-                bool slotReady = memIO.mem.ReadInt(memIO.ptr.boardChain + ",178,54") == 0;
+                bool slotReady = memIO.mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.challengeOffset + memIO.ptr.challengeStateOffset) == 0;
                 return slotReady;
             }
 
@@ -946,8 +946,8 @@ namespace PvZA11y.Widgets
 
         bool CheckIceAtTile()
         {
-            int distanceIndex = 0x624 + (4 * gridInput.cursorY);
-            int timerIndex = 0x63c + (4 * gridInput.cursorY);
+            int distanceIndex = memIO.ptr.iceMinXOffset + (4 * gridInput.cursorY);
+            int timerIndex = memIO.ptr.iceTimerOffset + (4 * gridInput.cursorY);
             int iceTimerThisRow = memIO.mem.ReadInt(memIO.ptr.boardChain + "," + timerIndex.ToString("X2"));
             int iceDistanceThisRow = memIO.mem.ReadInt(memIO.ptr.boardChain + "," + distanceIndex.ToString("X2"));
             int[] iceLimits = new int[] { 107, 187, 267, 347, 427, 507, 587, 667, 750 };
@@ -1030,7 +1030,7 @@ namespace PvZA11y.Widgets
             if (plant.plantType == -1)
             {
                 //Get row type
-                int rowType = memIO.mem.ReadInt(memIO.ptr.boardChain + "," + (0x5f0 + (gridInput.cursorY * 4)).ToString("X2"));
+                int rowType = memIO.mem.ReadInt(memIO.ptr.boardChain + "," + (memIO.ptr.rowTypeOffset + (gridInput.cursorY * 4)).ToString("X2"));
                 LevelType levelType = memIO.GetLevelType();
 
                 string typeString = "";
@@ -1472,7 +1472,7 @@ namespace PvZA11y.Widgets
 
         public int GetTotalSun()
         {
-            return animatingSunAmount + memIO.mem.ReadInt(memIO.ptr.boardChain + ",5578");
+            return animatingSunAmount + memIO.mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.sunAmountOffset);
         }
 
         public int GetFastZombieCount(ref int lastRow)
@@ -1845,9 +1845,9 @@ namespace PvZA11y.Widgets
             bool vaseBreakerEndless = memIO.GetGameMode() == (int)GameMode.VaseBreakerEndless;
 
             //Grab all coins, sunflowers, awards
-            int maxCount = memIO.mem.ReadInt(memIO.ptr.boardChain + ",100");
+            int maxCount = memIO.mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.coinsMaxCountOffset);
 
-            byte[] coinBytes = memIO.mem.ReadBytes(memIO.ptr.boardChain + ",fc,0", maxCount * 216);           
+            byte[] coinBytes = memIO.mem.ReadBytes(memIO.ptr.boardChain + memIO.ptr.coinsOffset + "0", maxCount * 216);           
 
             floatingPackets = new List<FloatingPacket>();
 
@@ -1867,10 +1867,10 @@ namespace PvZA11y.Widgets
                 {
                     int newY = 550;
                     string newYStr = newY.ToString();
-                    memIO.mem.WriteMemory(memIO.ptr.boardChain + ",fc," + (index + 0x2c).ToString("X2"), "float", "0"); //Xvelocity 0
-                    memIO.mem.WriteMemory(memIO.ptr.boardChain + ",fc," + (index + 0x30).ToString("X2"), "float", "0"); //yVelocity 0
+                    memIO.mem.WriteMemory(memIO.ptr.boardChain + memIO.ptr.coinsOffset + (index + 0x2c).ToString("X2"), "float", "0"); //Xvelocity 0
+                    memIO.mem.WriteMemory(memIO.ptr.boardChain + memIO.ptr.coinsOffset + (index + 0x30).ToString("X2"), "float", "0"); //yVelocity 0
 
-                    int packetType = memIO.mem.ReadInt(memIO.ptr.boardChain + ",fc," + (index + 0x68).ToString("X2"));
+                    int packetType = memIO.mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.coinsOffset + (index + 0x68).ToString("X2"));
                     floatingPackets.Add(new FloatingPacket() { packetType = packetType, arrayIndex = i, disappearTime = disappearTime });
                 }
             }
@@ -1894,12 +1894,12 @@ namespace PvZA11y.Widgets
                 string newXStr = posX.ToString();
                 string newYStr = floatingPackets[i].posY.ToString();
                 int index = floatingPackets[i].arrayIndex * 216;
-                memIO.mem.WriteMemory(memIO.ptr.boardChain + ",fc," + (index + 0x24).ToString("X2"), "float", newXStr);   //xPos
-                memIO.mem.WriteMemory(memIO.ptr.boardChain + ",fc," + (index + 0x40).ToString("X2"), "float", newXStr);   //collectionXpos
+                memIO.mem.WriteMemory(memIO.ptr.boardChain + memIO.ptr.coinsOffset + (index + 0x24).ToString("X2"), "float", newXStr);   //xPos
+                memIO.mem.WriteMemory(memIO.ptr.boardChain + memIO.ptr.coinsOffset + (index + 0x40).ToString("X2"), "float", newXStr);   //collectionXpos
 
-                memIO.mem.WriteMemory(memIO.ptr.boardChain + ",fc," + (index + 0x44).ToString("X2"), "float", newYStr);   //collectionYpos
-                memIO.mem.WriteMemory(memIO.ptr.boardChain + ",fc," + (index + 0x48).ToString("X2"), "int", newYStr);     //groundPos
-                memIO.mem.WriteMemory(memIO.ptr.boardChain + ",fc," + (index + 0x28).ToString("X2"), "float", newYStr);   //yPos 
+                memIO.mem.WriteMemory(memIO.ptr.boardChain + memIO.ptr.coinsOffset + (index + 0x44).ToString("X2"), "float", newYStr);   //collectionYpos
+                memIO.mem.WriteMemory(memIO.ptr.boardChain + memIO.ptr.coinsOffset + (index + 0x48).ToString("X2"), "int", newYStr);     //groundPos
+                memIO.mem.WriteMemory(memIO.ptr.boardChain + memIO.ptr.coinsOffset + (index + 0x28).ToString("X2"), "float", newYStr);   //yPos 
                 posX += 50;
             }
 
@@ -1950,7 +1950,7 @@ namespace PvZA11y.Widgets
             else if (!isConveyor)
             {
                 bool refreshing = plants[seedbankSlot].isRefreshing;
-                int sunAmount = memIO.mem.ReadInt(memIO.ptr.boardChain + ",5578");
+                int sunAmount = memIO.mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.sunAmountOffset);
                 sunAmount += animatingSunAmount;
                 if (refreshing)
                     plantState = Text.game.plantRefreshing;
@@ -2038,9 +2038,8 @@ namespace PvZA11y.Widgets
             bool inSlotMachine = gameMode == GameMode.SlotMachine;
             bool vaseBreakerEndless = gameMode is GameMode.VaseBreakerEndless;
 
-            //TODO: move to memIO/Pointers
-            int seedbankSize = memIO.mem.ReadInt(memIO.ptr.lawnAppPtr + ",868,15c,24") - 1;  //10 seeds have max index of 9
-            int maxConveryorBeltIndex = memIO.mem.ReadInt(memIO.ptr.lawnAppPtr + ",868,15c,34c") - 1;
+            int seedbankSize = memIO.mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.seedPacketCountOffset) - 1;  //10 seeds have max index of 9
+            int maxConveryorBeltIndex = ConveyorBeltCounter() - 1;
             if (inVaseBreaker || inRainingSeeds || inSlotMachine)
                 seedbankSize = floatingPackets.Count - 1;
             if (vaseBreakerEndless)
@@ -2392,7 +2391,7 @@ namespace PvZA11y.Widgets
                     if (plants[seedbankSlot].packetType == (int)SeedType.SEED_IMITATER)
                         sunCost = Consts.plantCosts[plants[seedbankSlot].imitaterType];
 
-                    int sunAmount = memIO.mem.ReadInt(memIO.ptr.boardChain + ",5578");
+                    int sunAmount = memIO.mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.sunAmountOffset);
                     sunAmount += animatingSunAmount;
                     bool notEnoughSun = sunAmount < sunCost;
 
@@ -2476,7 +2475,7 @@ namespace PvZA11y.Widgets
                 bool isCobCannon = Program.GetPlantAtCell(gridInput.cursorX, gridInput.cursorY).plantType == (int)SeedType.SEED_COBCANNON;
                 isCobCannon |= Program.GetCursorType() == 8;
 
-                int sunAmount = memIO.mem.ReadInt(memIO.ptr.boardChain + ",5578");
+                int sunAmount = memIO.mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.sunAmountOffset);
                 sunAmount += animatingSunAmount;
 
                 //Click where plant needs to go. Not where plant is located (we already grab plant when auto-collecting everything on screen)
@@ -2677,13 +2676,13 @@ namespace PvZA11y.Widgets
                 }
                 else if (inSlotMachine)
                 {
-                    int sunAmount = memIO.mem.ReadInt(memIO.ptr.boardChain + ",5578");
+                    int sunAmount = memIO.mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.sunAmountOffset);
                     sunAmount += animatingSunAmount;
                     info4String += " " + Text.game.slotStatus.Replace("[0]", Program.FormatNumber(sunAmount));
                 }
                 else if (inBeghouled || inBeghouled2)
                 {
-                    int matches = memIO.mem.ReadInt(memIO.ptr.boardChain + ",178,60");
+                    int matches = memIO.mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.challengeOffset + memIO.ptr.challengeScoreOffset);
                     info4String += " " + Text.game.beghouledStatus.Replace("[0]", matches.ToString());
                 }
                 else if (gameMode == GameMode.SeeingStars)
@@ -2717,7 +2716,7 @@ namespace PvZA11y.Widgets
                 }
                 else if (gameMode == GameMode.LastStand || IsSurvival())
                 {
-                    int stageCount = memIO.mem.ReadInt(memIO.ptr.boardChain + ",178,6c");
+                    int stageCount = memIO.mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.challengeOffset + memIO.ptr.survivalStageOffset);
                     bool isEndless = gameMode >= GameMode.SurvivalEndless1 && gameMode <= GameMode.SurvivalEndless5;
 
 
@@ -2765,12 +2764,12 @@ namespace PvZA11y.Widgets
                 {
                     if (inSlotMachine)
                     {
-                        //bool slotReady = memIO.mem.ReadInt(memIO.ptr.boardChain + ",178,54") == 0;
+                        //bool slotReady = memIO.mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.challengeOffset + memIO.ptr.challengeStateOffset) == 0;
                         //if (slotReady)
                         Program.Click(0.62f, 0.1f);
                         return;
                     }
-                    int sunAmount = memIO.mem.ReadInt(memIO.ptr.boardChain + ",5578");
+                    int sunAmount = memIO.mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.sunAmountOffset);
                     sunAmount += animatingSunAmount;
                     string sunString = Text.game.sunCount.Replace("[0]", Program.FormatNumber(sunAmount));
                     Console.WriteLine(sunString);

@@ -111,40 +111,40 @@ namespace PvZA11y.Widgets
         {
             if (shouldRemove)
             {
-                memIO.mem.WriteMemory(memIO.ptr.lawnAppPtr + ",874," + (0xbc + ((int)SeedType.SEED_IMITATER * 0x3c) + 0x24).ToString("X2"), "int", "3");    //Clear InBank
-                memIO.mem.WriteMemory(memIO.ptr.lawnAppPtr + ",874," + (0xbc + ((int)SeedType.SEED_IMITATER * 0x3c) + 0x28).ToString("X2"), "int", "0");    //Clear Index
-                memIO.mem.WriteMemory(memIO.ptr.lawnAppPtr + ",874," + (0xbc + ((int)SeedType.SEED_IMITATER * 0x3c) + 0x34).ToString("X2"), "int", "-1");   //Clear imitaterType
-                int prevCount = memIO.mem.ReadInt(memIO.ptr.lawnAppPtr + ",874,d3c");
-                memIO.mem.WriteMemory(memIO.ptr.lawnAppPtr + ",874,d3c", "int", (prevCount - 1).ToString());
+                memIO.mem.WriteMemory(memIO.ptr.seedChooserScreenChain + "," + (memIO.ptr.chosenSeedsOffset + ((int)SeedType.SEED_IMITATER * 0x3c) + 0x24).ToString("X2"), "int", "3");    //Clear InBank
+                memIO.mem.WriteMemory(memIO.ptr.seedChooserScreenChain + "," + (memIO.ptr.chosenSeedsOffset + ((int)SeedType.SEED_IMITATER * 0x3c) + 0x28).ToString("X2"), "int", "0");    //Clear Index
+                memIO.mem.WriteMemory(memIO.ptr.seedChooserScreenChain + "," + (memIO.ptr.chosenSeedsOffset + ((int)SeedType.SEED_IMITATER * 0x3c) + 0x34).ToString("X2"), "int", "-1");   //Clear imitaterType
+                int prevCount = memIO.mem.ReadInt(memIO.ptr.seedChooserScreenChain + memIO.ptr.seedsInBankCountOffset);
+                memIO.mem.WriteMemory(memIO.ptr.seedChooserScreenChain + memIO.ptr.seedsInBankCountOffset, "int", (prevCount - 1).ToString());
                 
                 //Shuffle plants from the right, to fill the empty gap.
-                for(int i =0; i < (int)SeedType.NUM_SEED_TYPES; i++)
+                for(int i = 0; i < (int)SeedType.NUM_SEED_TYPES; i++)
                 {
-                    int slotIndex = memIO.mem.ReadInt(memIO.ptr.lawnAppPtr + ",874," + (0xbc + (i * 0x3c) + 0x28).ToString("X2"));
+                    int slotIndex = memIO.mem.ReadInt(memIO.ptr.seedChooserScreenChain + "," + (memIO.ptr.chosenSeedsOffset + (i * 0x3c) + 0x28).ToString("X2"));
                     if (slotIndex > slot)
                     {
-                        memIO.mem.WriteMemory(memIO.ptr.lawnAppPtr + ",874," + (0xbc + (i * 0x3c) + 0x28).ToString("X2"), "int", (slotIndex - 1).ToString());
-                        int posX = memIO.mem.ReadInt(memIO.ptr.lawnAppPtr + ",874," + (0xbc + (i * 0x3c)).ToString("X2"));
-                        memIO.mem.WriteMemory(memIO.ptr.lawnAppPtr + ",874," + (0xbc + (i * 0x3c)).ToString("X2"), "int", (posX-50).ToString());
+                        memIO.mem.WriteMemory(memIO.ptr.seedChooserScreenChain + "," + (memIO.ptr.chosenSeedsOffset + (i * 0x3c) + 0x28).ToString("X2"), "int", (slotIndex - 1).ToString());
+                        int posX = memIO.mem.ReadInt(memIO.ptr.seedChooserScreenChain + "," + (memIO.ptr.chosenSeedsOffset + (i * 0x3c)).ToString("X2"));
+                        memIO.mem.WriteMemory(memIO.ptr.seedChooserScreenChain + "," + (memIO.ptr.chosenSeedsOffset + (i * 0x3c)).ToString("X2"), "int", (posX-50).ToString());
                     }
                 }
             }
             else
             {
-                memIO.mem.WriteMemory(memIO.ptr.lawnAppPtr + ",874," + (0xbc + ((int)SeedType.SEED_IMITATER * 0x3c) + 0x24).ToString("X2"), "int", "1");    //Write InBank
-                memIO.mem.WriteMemory(memIO.ptr.lawnAppPtr + ",874," + (0xbc + ((int)SeedType.SEED_IMITATER * 0x3c) + 0x28).ToString("X2"), "int", slot.ToString());    //Write Index
-                memIO.mem.WriteMemory(memIO.ptr.lawnAppPtr + ",874," + (0xbc + ((int)SeedType.SEED_IMITATER * 0x3c) + 0x34).ToString("X2"), "int", plantID.ToString()); //Write imitaterType
+                memIO.mem.WriteMemory(memIO.ptr.seedChooserScreenChain + "," + (memIO.ptr.chosenSeedsOffset + ((int)SeedType.SEED_IMITATER * 0x3c) + 0x24).ToString("X2"), "int", "1");    //Write InBank
+                memIO.mem.WriteMemory(memIO.ptr.seedChooserScreenChain + "," + (memIO.ptr.chosenSeedsOffset + ((int)SeedType.SEED_IMITATER * 0x3c) + 0x28).ToString("X2"), "int", slot.ToString());    //Write Index
+                memIO.mem.WriteMemory(memIO.ptr.seedChooserScreenChain + "," + (memIO.ptr.chosenSeedsOffset + ((int)SeedType.SEED_IMITATER * 0x3c) + 0x34).ToString("X2"), "int", plantID.ToString()); //Write imitaterType
                 if (increaseCount)
                 {
-                    int prevCount = memIO.mem.ReadInt(memIO.ptr.lawnAppPtr + ",874,d3c");
-                    memIO.mem.WriteMemory(memIO.ptr.lawnAppPtr + ",874,d3c", "int", (prevCount + 1).ToString());
+                    int prevCount = memIO.mem.ReadInt(memIO.ptr.seedChooserScreenChain + memIO.ptr.seedsInBankCountOffset);
+                    memIO.mem.WriteMemory(memIO.ptr.seedChooserScreenChain + memIO.ptr.seedsInBankCountOffset, "int", (prevCount + 1).ToString());
                 }
             }
         }
 
         void RefreshPlantPickerState()
         {
-            byte[] plantPickerBytes = memIO.mem.ReadBytes(memIO.ptr.lawnAppPtr + ",874,bc", 3180);  //Can we do this without reallocating the byte array? Might have to fork memory.dll to allow it
+            byte[] plantPickerBytes = memIO.mem.ReadBytes(memIO.ptr.seedChooserScreenChain + "," + memIO.ptr.chosenSeedsOffset.ToString("X2"), 3180);  //Can we do this without reallocating the byte array? Might have to fork memory.dll to allow it
 
             //If not in plant picker?
             if (plantPickerBytes == null)
@@ -249,14 +249,14 @@ namespace PvZA11y.Widgets
 
             //Set "Let's Rock" button to enabled/disabled, if enough plants have been picked
             if (GetSelectedPlants().Length == seedBankSize)
-                memIO.mem.WriteMemory(memIO.ptr.lawnAppPtr + ",874,A0" + memIO.ptr.buttonDisabledOffet, "byte", "0");
+                memIO.mem.WriteMemory(memIO.ptr.seedChooserScreenChain + memIO.ptr.letsRockButtonOffset + memIO.ptr.buttonDisabledOffet, "byte", "0");
             else
-                memIO.mem.WriteMemory(memIO.ptr.lawnAppPtr + ",874,A0" + memIO.ptr.buttonDisabledOffet, "byte", "1");
+                memIO.mem.WriteMemory(memIO.ptr.seedChooserScreenChain + memIO.ptr.letsRockButtonOffset + memIO.ptr.buttonDisabledOffet, "byte", "1");
         }
 
         public override void Interact(InputIntent intent)
         {
-            bool plantPickerActive = memIO.mem.ReadByte(memIO.ptr.lawnAppPtr + ",868,174,2c") > 0;
+            bool plantPickerActive = memIO.mem.ReadByte(memIO.ptr.boardChain + memIO.ptr.choosingSeedOffset) > 0;
             if (!plantPickerActive)
                 return;
 
@@ -325,7 +325,7 @@ namespace PvZA11y.Widgets
 
                 if (plantPickerState[pickerIndex].seedState == ChosenSeedState.Hidden || !plantUnlocked)
                 {
-                    int finishedAdventure = memIO.mem.ReadInt(memIO.ptr.lawnAppPtr + ",94c,54");
+                    int finishedAdventure = memIO.mem.ReadInt(memIO.ptr.playerAdventureCompletionsChain);
                     bool storeUnlocked = finishedAdventure > 0 || memIO.GetPlayerLevel() > 24;
 
                     if (gridInput.cursorY == 5)
@@ -353,7 +353,7 @@ namespace PvZA11y.Widgets
             if (intent == InputIntent.CycleLeft)
                 pickedPlantIndex--;
 
-            int seedBankSize = memIO.mem.ReadInt(memIO.ptr.lawnAppPtr + ",868,15c,24");
+            int seedBankSize = memIO.mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.seedPacketCountOffset);
             if (Config.current.WrapPlantSelection)
             {
                 pickedPlantIndex = pickedPlantIndex < 0 ? seedBankSize -1 : pickedPlantIndex;
@@ -510,7 +510,7 @@ namespace PvZA11y.Widgets
         protected override string? GetContent()
         {
             //wait until actually interacting with plantpicker
-            bool plantPickerActive = memIO.mem.ReadByte(memIO.ptr.lawnAppPtr + ",868,174,2c") > 0;
+            bool plantPickerActive = memIO.mem.ReadByte(memIO.ptr.boardChain + memIO.ptr.choosingSeedOffset) > 0;
             if (!plantPickerActive)
             {
                 hasReadContent = false;

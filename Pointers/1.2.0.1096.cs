@@ -15,7 +15,6 @@ namespace PvZA11y
             PointerInfo ret = new PointerInfo(
                 appName: appName,
                 lawnAppPtrOffset: "+00331C50",
-                dirtyBoardPtr: ",320,18,0,8",
                 boardPtrOffset: ",868",
                 boardPausedOffset: ",17c",
                 playerInfoOffset: ",94c",

@@ -37,11 +37,11 @@ namespace PvZA11y
         public string appName;                          //popcapgame1.exe or PlantsVsZombies.exe
 
         public string lawnAppPtr;                       //[lawnapp]
-        public string dirtyBoardPtr;                    //yucky TODO: remove this
 
         public string boardPtrOffset;                   //lawnapp[,board]
         public string boardPausedOffset;                //lawnapp,board[,paused]
         public string playerInfoOffset;                 //lawnApp[,playerInfo]
+        public string playerNameOffset = ",04";         //lawnApp,playerInfo[,name]
         public string playerLevelOffset;                //lawnApp,playerInfo[,level]
         public string playerCoinsOffset;                //lawnApp,playerInfo[,coins]
         public string playerAdventureCompletionsOffset; //lawnApp,playerInfo[,AdventureCompletions]
@@ -59,22 +59,68 @@ namespace PvZA11y
 
         public string dialogIDOffset = ",154";          //widgetPtr[,dialogID]
 
+        public int zombieObjSize = 360;
+        public string zombiesOffset = ",a8,";            //lawnApp,board[,zombies]
+        public string zombiesMaxCountOffset = ",ac";     //lawnApp,board[,zombiesMaxCount]
+        public string zombiesCurrentCountOffset = ",b8"; //lawnApp,board[,zombiesCurrentCount]
+        public int plantObjSize = 332;
+        public string plantsOffset = ",c4,";
+        public string plantsMaxCountOffset = ",c8";
+        public int coinObjSize = 216;
+        public string coinsOffset = ",fc,";
+        public string coinsMaxCountOffset = ",100";
+        public int mowerObjSize = 0x48;
+        public string mowersOffset = ",118,";
+        public string mowersMaxCountOffset = ",11c";
+        public string mowersCurrentCountOffset = ",128";
+        public int gridItemObjSize = 236;
+        public string gridItemsOffset = ",134,";
+        public string gridItemsMaxCountOffset = ",138";
+        public string cursorOffset = ",150";                  //lawnApp,board[,cursorObject]
+        public string messageWidget = ",158";                 //lawnApp,board[,messageWidget]
+        public string seedPacketCountOffset = ",15c,24";      //lawnApp,board[,seedBank,seedPacketCount]
+        public string seedPacketArrayOffset = ",15c,28";      //lawnApp,board[,seedBank,seedPacketArray]
+        public string conveyorBeltCounterOffset = ",15c,34c"; //lawnApp,board[,seedBank,conveyorBeltCounter]
+        public string choosingSeedOffset = ",174,2c";         //lawnApp,board[,cutScene,choosingSeedOffset]
+        public string challengeOffset = ",178";               //lawnApp,board[,challenge]
+        public int rowTypeOffset = 0x5f0;                     //lawnapp,board[,rowTypeArray]
+        public int iceMinXOffset = 0x624;                     //lawnapp,board[,iceMinX]
+        public int iceTimerOffset = 0x63c;                    //lawnapp,board[,iceTimer]
+        public string levelTypeOffset = ",5564";              //lawnapp,board[,levelType]
+        public string sunAmountOffset = ",5578";              //lawnapp,board[,sunAmount]
+        public string numWavesOffset = ",557c";               //lawnapp,board[,numWaves]
+        public string mainCounterOffset = ",5580";            //lawnapp,board[,mainCounter]
+        public string effectCounterOffset = ",5584";          //lawnapp,board[,effectCounter]
+        public string currentWaveOffset = ",5594";            //lawnapp,board[,currentWave]
+        public string levelCompletedOffset = ",5614";         //lawnapp,board[,levelComplete]
+
+        public string challengeStateOffset = ",54";           //lawnApp,board,challenge[,challengeState]
+        public string challengeScoreOffset = ",60";           //lawnApp,board,challenge[,challengeScore]
+        public string survivalStageOffset = ",6c";            //lawnApp,board,challenge[,survivalStage]
+        public string treeTalkIndexOffset = ",b8";            //lawnApp,board,challenge[,treeTalkIndex]
+
         //Don't seem to change between versions, but I haven't checked every version yet.
-        public string creditsScreenOffset = ",87c";              //lawnApp[,creditsScene]
-        public string creditsStateOffset = ",ac";               //lawnApp,creditsScreen[,state]
+        public string creditsScreenOffset = ",87c";         //lawnApp[,creditsScene]
+        public string creditsStateOffset = ",ac";           //lawnApp,creditsScreen[,state]
 
-        public string zenGardenOffset = ",93c";         //lawnapp[,zenGarden]
-        public string zenGardenPageOffset = ",8";       //lawnapp,zenGarden[,ZenPage]
+        public int pottedPlantObjSize = 88;
+        public string zenGardenOffset = ",93c";             //lawnapp[,zenGarden]
+        public string zenGardenPageOffset = ",8";           //lawnapp,zenGarden[,ZenPage]
 
-        public string widgetPosXOffset = ",40";         //widget[,posX]
-        public string widgetPosYOffset = ",44";         //widget[,posY]
-        public string widgetWidthOffset = ",48";        //widget[,width]
-        public string widgetHeightOffset = ",4c";       //widget[,height]
-        public string widgetDialogStringOffset = ",a8"; //buttonWidget[,string]
-        public string sliderPercentageOffset = ",a8";   //Same as above, but is a double representing how far a slider is (0 is left, 1 = right)
+        public int reanimObjSize = 0xa0;
+        public string reanimsOffset = ",940,8,0";           //lawnApp[,EffectSystem,ReanimationHolder,reanims]
+        public string reanimsMaxCountOffset = ",940,8,4";   //lawnApp[,EffectSystem,ReanimationHolder,reanimsMaxCount]
+
+        public string widgetPosXOffset = ",40";             //widget[,posX]
+        public string widgetPosYOffset = ",44";             //widget[,posY]
+        public string widgetWidthOffset = ",48";            //widget[,width]
+        public string widgetHeightOffset = ",4c";           //widget[,height]
+        public string widgetDialogStringOffset = ",a8";     //buttonWidget[,string]
+        public string sliderPercentageOffset = ",a8";       //Same as above, but is a double representing how far a slider is (0 is left, 1 = right)
+        public string checkBoxIsCheckedOffset = ",a8";      //checkBox[,checked]
         public string dialogueWidgetButton1Offset = ",178"; //dialogueWidget[,button1]
         public string dialogueWidgetButton2Offset = ",17c"; //dialogueWidget[,button2]
-        public bool buttonTextAlwaysPtr = false;    //Whether the strings for button text is always a pointer, rather than sometimes being inline
+        public bool buttonTextAlwaysPtr = false;            //Whether the strings for button text is always a pointer, rather than sometimes being inline
         public string dialogTitleLenOffset = ",cc";
         public string dialogTitleStrOffset = ",bc";
         public string dialogBodyLenOffset = ",104";
@@ -83,14 +129,14 @@ namespace PvZA11y
         public string userPickerRenameOffset = ",190";
         public string userPickerDeleteOffset = ",194";
 
-        public string optionsMenuContinueOffset = ",190"; //optionsMenu[,returnButton]
-        public string optionsMenuRestartOffset = ",18c"; //optionsMenu[,RestartLevelButton]
+        public string optionsMenuContinueOffset = ",190";     //optionsMenu[,returnButton]
+        public string optionsMenuRestartOffset = ",18c";      //optionsMenu[,RestartLevelButton]
         public string optionsMenuReturnToMainOffset = ",188"; //optionsMenu[,MainMenuButton]
-        public string optionsMenuAlmanacOffset = ",184"; //optionsMenu[,ViewAlmanacButton]
-        public string optionsMenu3DAccelOffset = ",180"; //optionsMenu[,3dAccelerationCheckbox]
-        public string optionsMenuFullscreenOffset = ",17c"; //optionsMenu[,EnableFullscreenCheckbox]
-        public string optionsMenuSfxSliderOffset = ",178"; //optionsMenu[,SfxSlider]
-        public string optionsMenuMusicSliderOffset = ",174"; //optionsMenu[,MusicSlider]
+        public string optionsMenuAlmanacOffset = ",184";      //optionsMenu[,ViewAlmanacButton]
+        public string optionsMenu3DAccelOffset = ",180";      //optionsMenu[,3dAccelerationCheckbox]
+        public string optionsMenuFullscreenOffset = ",17c";   //optionsMenu[,EnableFullscreenCheckbox]
+        public string optionsMenuSfxSliderOffset = ",178";    //optionsMenu[,SfxSlider]
+        public string optionsMenuMusicSliderOffset = ",174";  //optionsMenu[,MusicSlider]
 
         public string inlineButtonPosXOffset = ",08";
         public string inlineButtonPosYOffset = ",0c";
@@ -102,20 +148,26 @@ namespace PvZA11y
         public string zenPlantCountOffset = ",378";
         public uint zenPlantStartOffset = 0x37c;
 
-        public string buttonDisabledOffet = ",1a";
+        public string seedChooserScreenOffset = ",874"; //lawnApp[,seedChooserScreen]
+        public string letsRockButtonOffset = ",a0";     //lawnApp,seedChooserScreen[,startButton]
+        public string buttonDisabledOffet = ",1a";      //lawnApp,seedChooserScreen,startButton[,buttonDisabled]
+        public int chosenSeedsOffset = 0xbc;            //lawnApp,seedChooserScreen[,chosenSeeds]
+        public string seedsInBankCountOffset = ",d3c";  //lawnApp,seedChooserScreen[,seedsInBank]
 
-        public string usernamePickerCountOffset = ",198";   //usernamePickerWidget[,userCountOffset]
-        public string usernamePickerNamesOffset = ",18c";   //usernamePickerWidget[,nameListOffset]
+        public string userCountFromProfileMgrOffset = ",948,20"; //lawnApp[,ProfileMgr,userCount]
+        public string usernamePickerCountOffset = ",198";        //usernamePickerWidget[,userCountOffset]
+        public string usernamePickerNamesOffset = ",18c";        //usernamePickerWidget[,nameListOffset]
+        public string usernamePickerNamesArrOffset = ",c0,";
 
         //public string optionsMenuReturnStrOffset = ",190,a8";   //optionsWidget[,returnButton,str]
 
         public string daveMessageIDOffset = ",970";     //lawnapp[,daveMessageID]
-        public string daveMessageLenOffset = ",988";    //lawnApp[,daveMessageID]
+        public string daveMessageLenOffset = ",988";    //lawnApp[,daveMessageLen]
         public string daveMessageTextOffset = ",978,0"; //lawnApp[,daveMessageText]
 
-        public string minigameSelectorOffset = ",880,";  //lawnApp[,minigameSelector,]       (Note the two commas)
-        public string minigameIsVisibleOffset = ",64";  //lawnApp,minigameSelector,minigameX[,isVisible]
-        public string minigameIsLockedOffset = ",66"; //lawnApp,minigameSelector,minigameX[,isLocked]
+        public string minigameSelectorOffset = ",880,"; //lawnApp[,minigameSelector,]       (Note the two commas)
+        public string widgetIsVisibleOffset = ",64";  //lawnApp,minigameSelector,minigameX[,isVisible]
+        public string widgetIsDisabledOffset = ",66";   //lawnApp,minigameSelector,minigameX[,isLocked]
 
         public string almanacPageOffset = ",198";       //widgetPtr[,almanacPage]
 
@@ -124,6 +176,13 @@ namespace PvZA11y
 
         public string lastStandButtonVisible = ",164,fd";
 
+        public string loadingCompletedOffset = ",86c,b9"; //lawnapp[,titleScreen,loadingComplete]
+
+        public string widgetManagerOffset = ",320"; //lawnapp[,widgetManager]
+        public string focusedWidgetOffset = ",a0";  //lawnapp,widgetManager[,focusedWidget]
+        public string baseWidgetOffset = ",ac";     //lawnapp,widgetManager[,baseWidget]
+
+        public string windowHandleOffset = ",3a0"; //lawnapp[,windowHandle]
 
         //Memory.dll throws an exception if an aobscan is missing a space between any bytes in the search string
         //Whyyyyyyy 
@@ -179,33 +238,33 @@ namespace PvZA11y
         public string musicPausePatched = "90 90 e8 ?? ?? ?? ?? 8b ?? ?? 83 ?? ?? 74 ?? 8b ?? ?? 83 ?? ?? 74 ?? 50";
 
         //These are probably the only things that should be exposed externally
-        public string boardChain;                       //[lawnApp,board]
-        public string boardPausedChain;                 //[lawnApp,board,paused]
-        public string playerInfoChain;                  //[lawnApp,playerInfo]
-        public string playerLevelChain;                 //[lawnApp,playerInfo,level]
-        public string playerCoinsChain;                 //[lawnApp,playerInfo,coins]
-        public string playerAdventureCompletionsChain;  //[lawnApp,playerInfo,adventureCompletions]
-        //public string playerPurchasesChain;             //[lawnApp,playerInfo,purchases]
-        public string playerMinigamesUnlockedChain;     //[lawnApp,playerInfo,minigamesUnlocked]
-        public string playerPuzzleUnlockedChain;     //[lawnApp,playerInfo,puzzleUnlocked]
+        public string boardChain;                      //[lawnApp,board]
+        public string boardPausedChain;                //[lawnApp,board,paused]
+        public string playerInfoChain;                 //[lawnApp,playerInfo]
+        public string playerLevelChain;                //[lawnApp,playerInfo,level]
+        public string playerCoinsChain;                //[lawnApp,playerInfo,coins]
+        public string playerAdventureCompletionsChain; //[lawnApp,playerInfo,adventureCompletions]
+        //public string playerPurchasesChain;            //[lawnApp,playerInfo,purchases]
+        public string playerMinigamesUnlockedChain;    //[lawnApp,playerInfo,minigamesUnlocked]
+        public string playerPuzzleUnlockedChain;       //[lawnApp,playerInfo,puzzleUnlocked]
         public string playerSurvivalUnlockedChain;     //[lawnApp,playerInfo,survivalUnlocked]
-        public string gameSceneChain;                   //[lawnApp,gameScene]
-        public string gameModeChain;                    //[lawnApp,gameMode]
-        public string awardTypeChain;                   //[lawnApp,awardScreen,awardType]
+        public string gameSceneChain;                  //[lawnApp,gameScene]
+        public string gameModeChain;                   //[lawnApp,gameMode]
+        public string awardTypeChain;                  //[lawnApp,awardScreen,awardType]
 
-        public string creditsStageChain;                //[lawnApp,credits,stage]
-        public string zenGardenPageChain;               //[lawnApp,zenGarden,zenPage]
+        public string seedChooserScreenChain;          //[lawnApp,seedChooserScreen]
+        public string creditsStageChain;               //[lawnApp,credits,stage]
+        public string zenGardenPageChain;              //[lawnApp,zenGarden,zenPage]
 
-        public string daveMessageIDChain;               //[lawnApp,daveMessageID]
-        public string daveMessageLenChain;              //[lawnApp,daveMessageLen]
-        public string daveMessageTextChain;             //[lawnApp,daveMessageText]
+        public string daveMessageIDChain;              //[lawnApp,daveMessageID]
+        public string daveMessageLenChain;             //[lawnApp,daveMessageLen]
+        public string daveMessageTextChain;            //[lawnApp,daveMessageText]
 
 
 
         public PointerInfo(
             string appName,
             string lawnAppPtrOffset,
-            string dirtyBoardPtr,
             string boardPtrOffset,
             string boardPausedOffset,
             string playerInfoOffset,
@@ -225,7 +284,6 @@ namespace PvZA11y
         {
             this.appName = appName;
             this.lawnAppPtr = appName + lawnAppPtrOffset;
-            this.dirtyBoardPtr = dirtyBoardPtr;
             this.boardPtrOffset = boardPtrOffset;
             this.boardPausedOffset = boardPausedOffset;
             this.playerInfoOffset = playerInfoOffset;
@@ -254,6 +312,7 @@ namespace PvZA11y
             gameModeChain = lawnAppPtr + gameModeOffset;
             awardTypeChain = lawnAppPtr + awardScreenOffset + awardTypeOffset;
 
+            seedChooserScreenChain = lawnAppPtr + seedChooserScreenOffset;
             creditsStageChain = lawnAppPtr + creditsScreenOffset + creditsStateOffset;
             zenGardenPageChain = lawnAppPtr + zenGardenOffset + zenGardenPageOffset;
 

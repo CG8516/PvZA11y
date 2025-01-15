@@ -223,7 +223,7 @@ namespace PvZA11y.Widgets
             if (nextSlot >= 200)
                 return;
 
-            uint slotAddr = memIO.ptr.zenPlantStartOffset + (nextSlot * 88);  //TODO: Move zenPlant struct size to pointers.cs
+            uint slotAddr = memIO.ptr.zenPlantStartOffset + (nextSlot * (uint)memIO.ptr.pottedPlantObjSize);
             //Null plant struct
             memIO.mem.WriteBytes(memIO.ptr.playerInfoChain + "," + slotAddr.ToString("X2"), new byte[88]);
 
@@ -254,7 +254,7 @@ namespace PvZA11y.Widgets
             //TODO: Move pointer offsets to pointers.cs
             int numPlants = memIO.GetPlayerPlantCount();
             int maxPlants = 200;    //Total array size the game allocates for zen garden
-            byte[] plantBytes = memIO.mem.ReadBytes(memIO.ptr.lawnAppPtr + ",94c," + memIO.ptr.zenPlantStartOffset.ToString("X2"), maxPlants * 88); //TODO: Move pointer offsets, and plant struct size to pointers.cs. mem read operation to memIO
+            byte[] plantBytes = memIO.mem.ReadBytes(memIO.ptr.playerInfoChain + memIO.ptr.zenPlantStartOffset.ToString("X2"), maxPlants * memIO.ptr.pottedPlantObjSize); //TODO: Move mem read operation to memIO
 
             List<ZenPlant> plants = new List<ZenPlant>();
             for (int i = 0; i < numPlants; i++)

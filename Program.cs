@@ -199,7 +199,7 @@ namespace PvZA11y
         {
             //Stopwatch sw = new Stopwatch();
             //sw.Start();
-            plantPickerBytes = mem.ReadBytes(memIO.ptr.lawnAppPtr + ",874,bc", 3180);  //Can we do this without reallocating the byte array? Might have to fork memory.dll to allow it
+            plantPickerBytes = mem.ReadBytes(memIO.ptr.seedChooserScreenChain + "," + memIO.ptr.chosenSeedsOffset.ToString("X2"), 3180);  //Can we do this without reallocating the byte array? Might have to fork memory.dll to allow it
             //sw.Stop();
             //Console.WriteLine("Got bytes in {0}ms", sw.ElapsedMilliseconds);
 
@@ -702,13 +702,13 @@ namespace PvZA11y
         //TODO: move to memio
         public static int GetCursorType()
         {
-            return mem.ReadInt(memIO.ptr.boardChain + ",150,30");
+            return mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.cursorOffset + ",30");
         }
 
         //TODO: Move to memio
         static int GetCursorPlantID()
         {
-            return mem.ReadInt(memIO.ptr.boardChain + ",150,28");
+            return mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.cursorOffset + ",28");
         }
 
         public static void GameplayTutorial(string[] tutorial)
@@ -760,25 +760,25 @@ namespace PvZA11y
         {
             List<GridItem> gridItems = new List<GridItem>();
 
-            int maxCount = mem.ReadInt(memIO.ptr.boardChain + ",138");
+            int maxCount = mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.gridItemsMaxCountOffset);
 
             for(int i = 0; i < maxCount; i++)
             {
                 int index = i * 236;
-                bool isActive = mem.ReadByte(memIO.ptr.boardChain + ",134," + (index + 0x20).ToString("X2")) == 0;
+                bool isActive = mem.ReadByte(memIO.ptr.boardChain + memIO.ptr.gridItemsOffset + (index + 0x20).ToString("X2")) == 0;
                 if (!isActive)
                     continue;
 
                 GridItem gridItem = new GridItem();
-                gridItem.type = mem.ReadInt(memIO.ptr.boardChain + ",134," + (index + 0x08).ToString("X2"));
-                gridItem.state = mem.ReadInt(memIO.ptr.boardChain + ",134," + (index + 0x0c).ToString("X2"));
-                gridItem.x = mem.ReadInt(memIO.ptr.boardChain + ",134," + (index + 0x10).ToString("X2"));
-                gridItem.y = mem.ReadInt(memIO.ptr.boardChain + ",134," + (index + 0x14).ToString("X2"));
-                gridItem.floatX = mem.ReadFloat(memIO.ptr.boardChain + ",134," + (index + 0x24).ToString("X2"));
-                gridItem.floatY = mem.ReadFloat(memIO.ptr.boardChain + ",134," + (index + 0x28).ToString("X2"));
-                gridItem.vaseZombie = mem.ReadInt(memIO.ptr.boardChain + ",134," + (index + 0x3c).ToString("X2"));
-                gridItem.vasePlant = mem.ReadInt(memIO.ptr.boardChain + ",134," + (index + 0x40).ToString("X2"));
-                gridItem.transparent = mem.ReadInt(memIO.ptr.boardChain + ",134," + (index + 0x4c).ToString("X2"));
+                gridItem.type = mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.gridItemsOffset + (index + 0x08).ToString("X2"));
+                gridItem.state = mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.gridItemsOffset + (index + 0x0c).ToString("X2"));
+                gridItem.x = mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.gridItemsOffset + (index + 0x10).ToString("X2"));
+                gridItem.y = mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.gridItemsOffset + (index + 0x14).ToString("X2"));
+                gridItem.floatX = mem.ReadFloat(memIO.ptr.boardChain + memIO.ptr.gridItemsOffset + (index + 0x24).ToString("X2"));
+                gridItem.floatY = mem.ReadFloat(memIO.ptr.boardChain + memIO.ptr.gridItemsOffset + (index + 0x28).ToString("X2"));
+                gridItem.vaseZombie = mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.gridItemsOffset + (index + 0x3c).ToString("X2"));
+                gridItem.vasePlant = mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.gridItemsOffset + (index + 0x40).ToString("X2"));
+                gridItem.transparent = mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.gridItemsOffset + (index + 0x4c).ToString("X2"));
                 gridItems.Add(gridItem);
 
                 //Console.WriteLine("Added item at {0} {1}", gridItem.x, gridItem.y);
@@ -790,7 +790,7 @@ namespace PvZA11y
         
         public static void Debug_FinishLevel()
         {
-            mem.WriteMemory(memIO.ptr.boardChain + ",5614", "byte", "1");
+            mem.WriteMemory(memIO.ptr.boardChain + memIO.ptr.levelCompletedOffset, "byte", "1");
         }
 
         //TODO: Move to board class
@@ -811,7 +811,7 @@ namespace PvZA11y
             int pumpkinHealth = 0;
             int lilypadHealth = 0;
             int flowerpotHealth = 0;
-            for(int i =0; i < plants.Count; i++)
+            for(int i = 0; i < plants.Count; i++)
             {
                 if (plants[i].column == x - 1 && plants[i].row == y && plants[i].plantType == (int)SeedType.SEED_COBCANNON)
                 {
@@ -903,33 +903,33 @@ namespace PvZA11y
         {
             List<PlantOnBoard> plants = new List<PlantOnBoard>();
 
-            int maxCount = mem.ReadInt(memIO.ptr.boardChain + ",c8");
+            int maxCount = mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.plantsMaxCountOffset);
             //int currentCount = mem.ReadInt(boardPtr + ",d4");
 
-            for(int i =0; i < maxCount; i++)
+            for(int i = 0; i < maxCount; i++)
             {
-                int index = i * 332;
-                byte isDead = (byte)mem.ReadByte(memIO.ptr.boardChain + ",c4," + (index + 0x141).ToString("X2"));
-                byte isSquished = (byte)mem.ReadByte(memIO.ptr.boardChain + ",c4," + (index + 0x142).ToString("X2"));
-                byte isSleeping = (byte)mem.ReadByte(memIO.ptr.boardChain + ",c4," + (index + 0x143).ToString("X2"));
-                byte onBoard = (byte)mem.ReadByte(memIO.ptr.boardChain + ",c4," + (index + 0x144).ToString("X2"));
+                int index = i * memIO.ptr.plantObjSize;
+                byte isDead = (byte)mem.ReadByte(memIO.ptr.boardChain + memIO.ptr.plantsOffset + (index + 0x141).ToString("X2"));
+                byte isSquished = (byte)mem.ReadByte(memIO.ptr.boardChain + memIO.ptr.plantsOffset + (index + 0x142).ToString("X2"));
+                byte isSleeping = (byte)mem.ReadByte(memIO.ptr.boardChain + memIO.ptr.plantsOffset + (index + 0x143).ToString("X2"));
+                byte onBoard = (byte)mem.ReadByte(memIO.ptr.boardChain + memIO.ptr.plantsOffset + (index + 0x144).ToString("X2"));
 
                 if (onBoard == 1 && isDead == 0)
                 {
                     PlantOnBoard p = new PlantOnBoard();
                     p.squished = isSquished == 1;
                     p.sleeping = isSleeping == 1;
-                    p.row = mem.ReadInt(memIO.ptr.boardChain + ",c4," + (index + 0x1c).ToString("X2"));
-                    p.plantType = mem.ReadInt(memIO.ptr.boardChain + ",c4," + (index + 0x24).ToString("X2"));
-                    p.column = mem.ReadInt(memIO.ptr.boardChain + ",c4," + (index + 0x28).ToString("X2"));
-                    p.state = mem.ReadInt(memIO.ptr.boardChain + ",c4," + (index + 0x3c).ToString("X2"));
-                    p.health = mem.ReadInt(memIO.ptr.boardChain + ",c4," + (index + 0x40).ToString("X2"));
+                    p.row = mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.plantsOffset + (index + 0x1c).ToString("X2"));
+                    p.plantType = mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.plantsOffset + (index + 0x24).ToString("X2"));
+                    p.column = mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.plantsOffset + (index + 0x28).ToString("X2"));
+                    p.state = mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.plantsOffset + (index + 0x3c).ToString("X2"));
+                    p.health = mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.plantsOffset + (index + 0x40).ToString("X2"));
 
                     //magnetItems: c8
                     for(int mag = 0; mag < 5; mag++)
                     {
                         int magIndex = index + 0xc8 + (mag * 0x14) + 0x10;
-                        int magItem = mem.ReadInt(memIO.ptr.boardChain + ",c4," + (magIndex).ToString("X2"));
+                        int magItem = mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.plantsOffset + (magIndex).ToString("X2"));
                         if (magItem > 0 && (magItem <= 17 || magItem == 21))
                             p.magItem = magItem;
                     }
@@ -962,16 +962,16 @@ namespace PvZA11y
             int sunAmount = 0;
 
             //Grab all coins, sunflowers, awards
-            int maxCount = mem.ReadInt(memIO.ptr.boardChain + ",100");
+            int maxCount = mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.coinsMaxCountOffset);
             //List<Vector2> clickables = new List<Vector2>();
-            for(int i =0; i < maxCount; i++)
+            for(int i = 0; i < maxCount; i++)
             {
-                int index = i * 216;
+                int index = i * memIO.ptr.coinObjSize;
 
-                int coinType = mem.ReadInt(memIO.ptr.boardChain + ",fc," + (index + 0x58).ToString("X2"));
+                int coinType = mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.coinsOffset + (index + 0x58).ToString("X2"));
 
                 //Skip inactive clickables
-                if (mem.ReadByte(memIO.ptr.boardChain + ",fc," + (index + 0x38).ToString("X2")) == 1)
+                if (mem.ReadByte(memIO.ptr.boardChain + memIO.ptr.coinsOffset + (index + 0x38).ToString("X2")) == 1)
                     continue;
 
                 //Skip seed packets
@@ -979,7 +979,7 @@ namespace PvZA11y
                     continue;
 
                 //Skip collectables we've already clicked on
-                if (mem.ReadByte(memIO.ptr.boardChain + ",fc," + (index + 0x50).ToString("X2")) == 1)
+                if (mem.ReadByte(memIO.ptr.boardChain + memIO.ptr.coinsOffset + (index + 0x50).ToString("X2")) == 1)
                 {
 
                     switch ((CoinType)coinType)
@@ -998,8 +998,8 @@ namespace PvZA11y
                 
                 //Get pos, add a couple of pixels to account for rounding errors
                 Vector2 pos = new Vector2();
-                pos.X = (mem.ReadFloat(memIO.ptr.boardChain + ",fc," + (index + 0x24).ToString("X2"))+8.0f) / 800.0f;
-                pos.Y = (mem.ReadFloat(memIO.ptr.boardChain + ",fc," + (index + 0x28).ToString("X2"))+8.0f) / 600.0f;
+                pos.X = (mem.ReadFloat(memIO.ptr.boardChain + memIO.ptr.coinsOffset + (index + 0x24).ToString("X2"))+8.0f) / 800.0f;
+                pos.Y = (mem.ReadFloat(memIO.ptr.boardChain + memIO.ptr.coinsOffset + (index + 0x28).ToString("X2"))+8.0f) / 600.0f;
 
                 //If at/above the seed picker/bank, don't click.
                 if (pos.Y < 0.15f)
@@ -1085,13 +1085,13 @@ namespace PvZA11y
             //plantInBoardBank[] plants = new plantInBoardBank[10];
             List<plantInBoardBank> newPlants = new List<plantInBoardBank>();
 
-            byte[] plantBytes = mem.ReadBytes(memIO.ptr.lawnAppPtr + ",868,15c,28", 800);    //yucky
+            byte[] plantBytes = mem.ReadBytes(memIO.ptr.boardChain + memIO.ptr.seedPacketArrayOffset, 800);
 
             //On conveyor levels, for each plant at offsetX == 0, the max offsetX should decrease by idk something
             int maxX = 450;
             int stoppedPlants = 0;
 
-            for(int i =0; i < 10; i++)
+            for(int i = 0; i < 10; i++)
             {
                 int byteIndex = i * 80;
                 //plants[i] = new plantInBoardBank();
@@ -1171,18 +1171,18 @@ namespace PvZA11y
 
         public static Widget GetActiveWidget(Widget? currentWidget)
         {
-            uint focusedWidgetVtableID = mem.ReadUInt(memIO.ptr.lawnAppPtr + ",320,a0,0");
+            uint focusedWidgetVtableID = mem.ReadUInt(memIO.ptr.lawnAppPtr + memIO.ptr.widgetManagerOffset + memIO.ptr.focusedWidgetOffset + ",0");
 
-            uint baseWidgetVtableID = mem.ReadUInt(memIO.ptr.lawnAppPtr + ",320,ac,0");
-            uint baseWidgetDialogID = mem.ReadUInt(memIO.ptr.lawnAppPtr + ",320,ac" + memIO.ptr.dialogIDOffset);
+            uint baseWidgetVtableID = mem.ReadUInt(memIO.ptr.lawnAppPtr + memIO.ptr.widgetManagerOffset + memIO.ptr.baseWidgetOffset + ",0");
+            uint baseWidgetDialogID = mem.ReadUInt(memIO.ptr.lawnAppPtr + memIO.ptr.widgetManagerOffset + memIO.ptr.baseWidgetOffset + memIO.ptr.dialogIDOffset);
 
             uint vtableID = baseWidgetVtableID;
-            string ptrChain = memIO.ptr.lawnAppPtr + ",320,ac";
+            string ptrChain = memIO.ptr.lawnAppPtr + memIO.ptr.widgetManagerOffset + memIO.ptr.baseWidgetOffset;
 
             if (baseWidgetVtableID == 0)
             {
                 vtableID = focusedWidgetVtableID;
-                ptrChain = memIO.ptr.lawnAppPtr + ",320,a0";
+                ptrChain = memIO.ptr.lawnAppPtr + memIO.ptr.widgetManagerOffset + memIO.ptr.focusedWidgetOffset;
             }
 
             uint dialogID = mem.ReadUInt(ptrChain + memIO.ptr.dialogIDOffset);
@@ -1377,14 +1377,14 @@ namespace PvZA11y
             int gameScene = memIO.GetGameScene();
             bool inGarden = memIO.GetGameMode() == (int)GameMode.ZenGarden && (gameScene == 2 || gameScene == 3);
 
-            uint baseWidgetMid = mem.ReadUInt(memIO.ptr.lawnAppPtr + ",320,ac" +memIO.ptr.dialogIDOffset);
+            uint baseWidgetMid = mem.ReadUInt(memIO.ptr.lawnAppPtr + memIO.ptr.widgetManagerOffset + memIO.ptr.baseWidgetOffset + memIO.ptr.dialogIDOffset);
 
             if (baseWidgetMid == DialogIDs.Store)
                 inGarden = false;
 
             if (inGarden)
             {
-                int daveMsgLength = mem.ReadInt(memIO.ptr.lawnAppPtr + ",988");
+                int daveMsgLength = mem.ReadInt(memIO.ptr.lawnAppPtr + memIO.ptr.daveMessageLenOffset);
                 if (daveMsgLength > 0)
                     return true;
             }
@@ -1630,7 +1630,7 @@ namespace PvZA11y
             //Get type of each row, to determine if plant can be placed there (eg; can't place on dirt rows in first few levels)
             int[] rowTypes = new int[6];
             for (int i = 0; i < 6; i++)
-                rowTypes[i] = mem.ReadInt(memIO.ptr.boardChain + "," + (0x5f0 + (i*4)).ToString("X2"));
+                rowTypes[i] = mem.ReadInt(memIO.ptr.boardChain + "," + (memIO.ptr.rowTypeOffset + (i*4)).ToString("X2"));
 
             minY = 0;
             for(int i =0; i < 6; i++)
@@ -1844,7 +1844,7 @@ namespace PvZA11y
             Widget? tempWidget = GetActiveWidget(null);
             while (prevScene == GameScene.Loading)
             {
-                bool loadingComplete = mem.ReadByte(memIO.ptr.lawnAppPtr + ",86c,b9") > 0;  //lawnapp,titleScreen,loadingComplete
+                bool loadingComplete = mem.ReadByte(memIO.ptr.lawnAppPtr + memIO.ptr.loadingCompletedOffset) > 0;
 
                 tempWidget = GetActiveWidget(tempWidget);
                 if(tempWidget is SteamSaveChoice)
@@ -1911,7 +1911,7 @@ namespace PvZA11y
 
                 if (onBoard && inVaseBreaker)
                 {
-                    int heldPlantID = mem.ReadInt(memIO.ptr.boardChain + ",150,28");
+                    int heldPlantID = mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.cursorOffset + ",28");
                     if (heldPlantID != -1 && VasebreakerHeldPlantID == -1)
                     {
                         string plantStr = Text.plantNames[heldPlantID] + " in hand.";
@@ -1925,10 +1925,10 @@ namespace PvZA11y
 
                 if (onBoard)
                 {
-                    int messageDuration = mem.ReadInt(memIO.ptr.boardChain + ",158,88");
+                    int messageDuration = mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.messageWidget + ",88");
                     if (oldMsgDuration == 0 && messageDuration != 0)
                     {
-                        string messageStr = mem.ReadString(memIO.ptr.boardChain + ",158,4","",128, true, Program.encoding);
+                        string messageStr = mem.ReadString(memIO.ptr.boardChain + memIO.ptr.messageWidget + ",4","",128, true, Program.encoding);
                         if (messageStr.StartsWith("Click-and-drag"))
                             messageStr = "Press the deny button, then a direction, to swap plants and make matches of three.";
                         if (messageStr == "No possible moves!")
@@ -1948,7 +1948,7 @@ namespace PvZA11y
                 bool inTree = gameMode == (int)GameMode.TreeOfWisdom && ((int)gameScene == 2 || (int)gameScene == 3);
                 if (inTree)
                 {
-                    int newTreeDialogue = mem.ReadInt(memIO.ptr.boardChain + ",178,b8");
+                    int newTreeDialogue = mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.challengeOffset + memIO.ptr.treeTalkIndexOffset);
                     if (newTreeDialogue != CurrentTreeDialogue)
                     {
                         if (Text.TreeDialogue.ContainsKey(newTreeDialogue))
@@ -2166,7 +2166,7 @@ namespace PvZA11y
                 if (currentWidget is SeedPicker)
                 {
                     int plantPickCount = GetSelectedPlants().Length;
-                    int seedBankSize = mem.ReadInt(memIO.ptr.lawnAppPtr + ",868,15c,24");
+                    int seedBankSize = mem.ReadInt(memIO.ptr.boardChain + memIO.ptr.seedPacketCountOffset);
                     if (plantPickCount == seedBankSize)
                     {
                         //Play sound indicating seedbank is full
