@@ -99,6 +99,9 @@ namespace PvZA11y
 
             switch(gameVersion)
             {
+                case 1001051:
+                    ptr = Pointers._1_0_0_1051(appName);
+                    break;
                 case 1201073:
                     ptr = Pointers._1_2_0_1073(appName);
                     break;
@@ -298,7 +301,7 @@ namespace PvZA11y
 
         public int GetUserCountFromProfileMgr()
         {
-            return mem.ReadInt(ptr.lawnAppPtr + ",948,20");
+            return mem.ReadInt(ptr.lawnAppPtr + ptr.userCountFromProfileMgrOffset);
         }
 
         public int GetUserCountFromPicker(string ptrChainToWidget)
@@ -320,13 +323,13 @@ namespace PvZA11y
             string[] userNames = new string[userCount];
             for (int i = 0; i < userCount; i++)
             {                
-                int nameLength = mem.ReadInt(ptrChainToWidget + ptr.usernamePickerNamesOffset + ",c0," + ((i * userEntrySize) + 20).ToString("X2"));
+                int nameLength = mem.ReadInt(ptrChainToWidget + ptr.usernamePickerNamesOffset + ptr.usernamePickerNamesArrOffset + ((i * userEntrySize) + 20).ToString("X2"));
 
                 //If name is over 15 characters, name will be a pointer to the name. Otherwise name will be embedded directly in struct.
                 if(nameLength > 15)
-                    userNames[i] = mem.ReadString(ptrChainToWidget + ptr.usernamePickerNamesOffset + ",c0," + ((i * userEntrySize) + 4).ToString("X2") + ",0", "", nameLength, true, Program.encoding);
+                    userNames[i] = mem.ReadString(ptrChainToWidget + ptr.usernamePickerNamesOffset + ptr.usernamePickerNamesArrOffset + ((i * userEntrySize) + 4).ToString("X2") + ",0", "", nameLength, true, Program.encoding);
                 else
-                    userNames[i] = mem.ReadString(ptrChainToWidget + ptr.usernamePickerNamesOffset + ",c0," + ((i * userEntrySize) + 4).ToString("X2"), "", nameLength, true, Program.encoding);
+                    userNames[i] = mem.ReadString(ptrChainToWidget + ptr.usernamePickerNamesOffset + ptr.usernamePickerNamesArrOffset + ((i * userEntrySize) + 4).ToString("X2"), "", nameLength, true, Program.encoding);
             }
 
             return userNames;
@@ -338,8 +341,8 @@ namespace PvZA11y
             int index = 0xb8 + (gameID * 4);
             string buttonChain = ptr.lawnAppPtr + ptr.minigameSelectorOffset + index.ToString("X2");    //[lawnapp,minigameSelector,minigames(gameID)]
 
-            bool isVisible = mem.ReadByte(buttonChain + ptr.minigameIsVisibleOffset) == 1;
-            bool isLocked = mem.ReadByte(buttonChain + ptr.minigameIsLockedOffset) == 1;
+            bool isVisible = mem.ReadByte(buttonChain + ptr.widgetIsVisibleOffset) == 1;
+            bool isLocked = mem.ReadByte(buttonChain + ptr.widgetIsDisabledOffset) == 1;
 
             if (!isVisible || isLocked)
                 return null;
@@ -364,30 +367,30 @@ namespace PvZA11y
 
         public LevelType GetLevelType()
         {
-            return (LevelType)mem.ReadInt(ptr.boardChain + ",5564"); //TODO: Move pointer offset to pointers.cs
+            return (LevelType)mem.ReadInt(ptr.boardChain + ptr.levelTypeOffset);
         }
 
         public int GetWindowWidth()
         {
-            return mem.ReadInt(ptr.lawnAppPtr + ",3a0,a0"); ;
+            return mem.ReadInt(ptr.lawnAppPtr + ptr.windowHandleOffset + ",a0"); ;
         }
         public int GetWindowHeight()
         {
-            return mem.ReadInt(ptr.lawnAppPtr + ",3a0,a4"); ;
+            return mem.ReadInt(ptr.lawnAppPtr + ptr.windowHandleOffset + ",a4"); ;
         }
 
         public int GetDrawWidth()
         {
-            return mem.ReadInt(ptr.lawnAppPtr + ",3a0,b8"); ;
+            return mem.ReadInt(ptr.lawnAppPtr + ptr.windowHandleOffset + ",b8"); ;
         }
         public int GetDrawHeight()
         {
-            return mem.ReadInt(ptr.lawnAppPtr + ",3a0,bc"); ;
+            return mem.ReadInt(ptr.lawnAppPtr + ptr.windowHandleOffset + ",bc"); ;
         }
 
         public bool GetWindowed()
         {
-            return mem.ReadByte(ptr.lawnAppPtr + ",3a0,ce4") == 1;
+            return mem.ReadByte(ptr.lawnAppPtr + ptr.windowHandleOffset + ",ce4") == 1;
         }
     }
 }

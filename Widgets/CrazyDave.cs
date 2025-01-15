@@ -101,7 +101,7 @@ namespace PvZA11y.Widgets
             if (newMessageID >= 2100 && newMessageID <= 2104)
                 zenSellDialogue = false;
 
-            uint baseDialogueID = memIO.mem.ReadUInt(memIO.ptr.lawnAppPtr + ",320,ac" + memIO.ptr.dialogIDOffset);  //TODO: Move to pointers/memIO
+            uint baseDialogueID = memIO.mem.ReadUInt(memIO.ptr.lawnAppPtr + memIO.ptr.widgetManagerOffset + memIO.ptr.baseWidgetOffset + memIO.ptr.dialogIDOffset);
 
             if (baseDialogueID == DialogIDs.Store)
                 zenSellDialogue = false;
@@ -151,7 +151,7 @@ namespace PvZA11y.Widgets
 
             //Console.WriteLine("Zen sell dialogue: {0}", zenSellDialogue);
 
-            uint baseDialogueID = memIO.mem.ReadUInt(memIO.ptr.lawnAppPtr + ",320,ac" + memIO.ptr.dialogIDOffset);  //TODO: Move to pointers/memIO
+            uint baseDialogueID = memIO.mem.ReadUInt(memIO.ptr.lawnAppPtr + memIO.ptr.widgetManagerOffset + memIO.ptr.baseWidgetOffset + memIO.ptr.dialogIDOffset);
 
             if (baseDialogueID == DialogIDs.Store)
                 zenSellDialogue = false;

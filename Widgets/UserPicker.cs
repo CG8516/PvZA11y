@@ -41,7 +41,7 @@ namespace PvZA11y.Widgets
             }
             else
             {
-                memIO.mem.WriteMemory(pointerChain + memIO.ptr.usernamePickerNamesOffset + ",fc", "int", listIndex.ToString()); //Set index of current selection
+                memIO.mem.WriteMemory(pointerChain + memIO.ptr.usernamePickerNamesOffset + memIO.ptr.dialogBodyStrOffset, "int", listIndex.ToString()); //Set index of current selection
 
                 //Ok button position
                 UpdateWidgetPosition();
@@ -77,7 +77,7 @@ namespace PvZA11y.Widgets
             {
                 if (intent == InputIntent.Info1)
                 {
-                    memIO.mem.WriteMemory(pointerChain + memIO.ptr.usernamePickerNamesOffset + ",fc", "int", listIndex.ToString()); //Set index of current selection
+                    memIO.mem.WriteMemory(pointerChain + memIO.ptr.usernamePickerNamesOffset + memIO.ptr.dialogBodyStrOffset, "int", listIndex.ToString()); //Set index of current selection
                     //Click rename button
 
                     UpdateWidgetPosition();
@@ -91,7 +91,7 @@ namespace PvZA11y.Widgets
                 }
                 else if (intent == InputIntent.Info2)
                 {
-                    memIO.mem.WriteMemory(pointerChain + memIO.ptr.usernamePickerNamesOffset + ",fc", "int", listIndex.ToString()); //Set index of current selection
+                    memIO.mem.WriteMemory(pointerChain + memIO.ptr.usernamePickerNamesOffset + memIO.ptr.dialogBodyStrOffset, "int", listIndex.ToString()); //Set index of current selection
                     //Click delete button (don't worry, there's a confirmation dialogue)
 
                     UpdateWidgetPosition();

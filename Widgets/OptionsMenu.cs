@@ -33,13 +33,13 @@ namespace PvZA11y.Widgets
             Vector2 accelButtonPos = memIO.GetWidgetPos(ptrChain + memIO.ptr.optionsMenu3DAccelOffset) / baseSize + posOffset;
 
             Vector2 almanacPos = memIO.GetWidgetPos(ptrChain + memIO.ptr.optionsMenuAlmanacOffset) / baseSize + posOffset;
-            bool almanacVisible = memIO.mem.ReadByte(ptrChain + memIO.ptr.optionsMenuAlmanacOffset + ",64") > 0;
+            bool almanacVisible = memIO.mem.ReadByte(ptrChain + memIO.ptr.optionsMenuAlmanacOffset + memIO.ptr.widgetIsVisibleOffset) > 0;
 
             Vector2 mainMenuPos = memIO.GetWidgetPos(ptrChain + memIO.ptr.optionsMenuReturnToMainOffset) / baseSize + posOffset;
-            bool mainMenuVisible = memIO.mem.ReadByte(ptrChain + memIO.ptr.optionsMenuReturnToMainOffset + ",64") > 0;
+            bool mainMenuVisible = memIO.mem.ReadByte(ptrChain + memIO.ptr.optionsMenuReturnToMainOffset + memIO.ptr.widgetIsVisibleOffset) > 0;
 
             Vector2 restartPos = memIO.GetWidgetPos(ptrChain + memIO.ptr.optionsMenuRestartOffset) / baseSize + posOffset;
-            bool restartVisible = memIO.mem.ReadByte(ptrChain + memIO.ptr.optionsMenuRestartOffset + ",64") > 0;
+            bool restartVisible = memIO.mem.ReadByte(ptrChain + memIO.ptr.optionsMenuRestartOffset + memIO.ptr.widgetIsVisibleOffset) > 0;
 
             Vector2 continuePos = memIO.GetWidgetPos(ptrChain + memIO.ptr.optionsMenuContinueOffset) / baseSize + posOffset;
 
@@ -183,8 +183,8 @@ namespace PvZA11y.Widgets
             }
 
             //Ensure checkbox text is accurate
-            bool accelChecked = memIO.mem.ReadByte(pointerChain + memIO.ptr.optionsMenu3DAccelOffset + ",a8") == 1;
-            bool fullscreenChecked = memIO.mem.ReadByte(pointerChain + memIO.ptr.optionsMenuFullscreenOffset + ",a8") == 1;
+            bool accelChecked = memIO.mem.ReadByte(pointerChain + memIO.ptr.optionsMenu3DAccelOffset + memIO.ptr.checkBoxIsCheckedOffset) == 1;
+            bool fullscreenChecked = memIO.mem.ReadByte(pointerChain + memIO.ptr.optionsMenuFullscreenOffset + memIO.ptr.checkBoxIsCheckedOffset) == 1;
 
             //Cleanup previous text to remove "Checked: " / "Unchecked: " portion, before we re-insert that in the string (yucky, I know)
             listItems[2].text = listItems[2].text.Replace(Text.menus.boxChecked, "");
